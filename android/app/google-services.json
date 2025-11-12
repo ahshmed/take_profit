@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "880001631618",
+    "project_id": "takeproft-408d5",
+    "storage_bucket": "takeproft-408d5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:880001631618:android:182c92f628df3b84af7b9b",
+        "android_client_info": {
+          "package_name": "com.takeproft.trader"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "880001631618-bkftaskll21tqb8l9s4vs7v8v5mdkngk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.takeproft.trader",
+            "certificate_hash": "7b4c8f5066d337a83475cfef8150db1d10c2d1e2"
+          }
+        },
+        {
+          "client_id": "880001631618-v42to422hkgjqpg25uikhhh6ukc9ijbn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.takeproft.trader",
+            "certificate_hash": "5246141b4e1c9288c3734d7c4179a0cacee05cb0"
+          }
+        },
+        {
+          "client_id": "880001631618-o94msgegu1dcs5bbm9bhqq7b3n67s2uo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeBZqewLM562cfGkaRmK867LeGwkgQgC4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "880001631618-o94msgegu1dcs5bbm9bhqq7b3n67s2uo.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "880001631618-65nmios84u78g4eol3n6cs5jvo7ld1ik.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.takeproft.trader"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

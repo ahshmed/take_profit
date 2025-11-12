@@ -1,0 +1,8 @@
+- /verify_email.  Email Verify Getting OTP is not send for this api "No OTP is requested for the given email.",
+- Apple Developer account Setup for Android app and Social sign in in app
+- Notification Redirection
+- Bug Fixing reported in Redmine
+- /favourite_list , /signal_list, /currency_search ,
+- add one param for currency id from  which I can get real time price from third party api
+- All Pricing Api Remove Currency Suffix in Price param and Add separate Param for Currency
+- Bank Details Api For Get Details of Recommender and Edit That Details

@@ -1,0 +1,92 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'dev.flutter.flutter-gradle-plugin'
+    id 'com.google.gms.google-services' // Keep only if using Firebase
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode') ?: '1'
+def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '1.0'
+
+android {
+    namespace "com.takeproft.trader" // ✅ REQUIRED for AGP 8+
+    compileSdk = 36
+
+    defaultConfig {
+        applicationId "com.takeproft.trader"
+        minSdk = 26
+        targetSdk = 36
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        multiDexEnabled true
+
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
+        }
+    }
+
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+
+    lint {
+        abortOnError false
+        disable 'InvalidPackage', 'Instantiatable'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    signingConfigs {
+        // Uncomment and configure for release builds when ready
+        // release {
+        //     def keystoreProperties = new Properties()
+        //     def keystoreFile = rootProject.file('key.properties')
+        //     if (keystoreFile.exists()) {
+        //         keystoreProperties.load(new FileInputStream(keystoreFile))
+        //     }
+        //
+        //     keyAlias keystoreProperties['keyAlias']
+        //     keyPassword keystoreProperties['keyPassword']
+        //     storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+        //     storePassword keystoreProperties['storePassword']
+        // }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            signingConfig signingConfigs.debug // Change to release when ready
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.0"
+    // Uncomment if using Firebase
+    // implementation platform('com.google.firebase:firebase-bom:34.4.0')
+    // implementation 'com.google.firebase:firebase-analytics'
+    // implementation 'com.google.firebase:firebase-messaging'
+}

@@ -1,0 +1,50 @@
+{
+  "identifier" : "68EDD4DE",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "0.99",
+      "familyShareable" : false,
+      "internalID" : "6475165375",
+      "localizations" : [
+        {
+          "description" : "Get Recommendations and analytics for 1 day",
+          "displayName" : "1 Day Package",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.takeproft.trader.package.daily1",
+      "referenceName" : "1 Day Package",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "5.99",
+      "familyShareable" : false,
+      "internalID" : "6475165600",
+      "localizations" : [
+        {
+          "description" : "Get Recommendations and analytics for 7 days",
+          "displayName" : "7 Days Package",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.takeproft.trader.package.weekly7",
+      "referenceName" : "7 Days Package",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6471070700",
+    "_developerTeamID" : "WKJDUM5M2U",
+    "_lastSynchronizedDate" : 725557164.27888
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 2,
+    "minor" : 0
+  }
+}
