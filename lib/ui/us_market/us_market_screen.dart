@@ -312,6 +312,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
   // Body Widget with complete redesigned layout
   Widget bodyWidget(stockWatch, profileWatch) {
     return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       child: Column(
         children: [
           SizedBox(height: 16.h),
@@ -326,6 +327,8 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
           SizedBox(height: 16.h),
           // Investment Cards
           buildInvestmentCards(stockWatch),
+          // Add bottom padding to ensure promotional banner is fully visible
+          SizedBox(height: 80.h),
         ],
       ),
     );
@@ -651,7 +654,10 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                   child: buildInvestmentCard(stock),
                 ),
                 SizedBox(height: 16.h),
-                buildPromotionalBanner(), // Full width - no horizontal padding
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: buildPromotionalBanner(),
+                ),
                 SizedBox(height: 16.h),
               ],
             );
@@ -671,13 +677,14 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     );
   }
 
-  /// Promotional Banner (Full Width)
+  /// Promotional Banner (With Padding)
   Widget buildPromotionalBanner() {
     return Container(
-      width: double.infinity, // Full width
+      width: double.infinity,
       height: 140.h,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16.r),
+        gradient: const LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
           colors: [
