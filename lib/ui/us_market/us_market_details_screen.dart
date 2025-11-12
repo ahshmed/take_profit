@@ -9,11 +9,19 @@ import '../../utils/widgets/commonappbar.dart';
 class USMarketDetailsScreen extends ConsumerStatefulWidget {
   final String ticker;
   final String companyName;
+  final String price;
+  final String buyStatus;
+  final String complianceStatus;
+  final String dateTime;
 
   const USMarketDetailsScreen({
     Key? key,
     required this.ticker,
     required this.companyName,
+    required this.price,
+    required this.buyStatus,
+    required this.complianceStatus,
+    required this.dateTime,
   }) : super(key: key);
 
   @override
@@ -127,7 +135,7 @@ class _USMarketDetailsScreenState
                   children: [
                     // Date with matching style from US Market screen
                     Text(
-                      '01/11/2022 14:35',
+                      widget.dateTime,
                       style: TextStyles.txtRegular12(context).copyWith(
                         color: Constant.clrBlackOrigin.withOpacity(0.5),
                         fontSize: 11.sp,
@@ -147,10 +155,10 @@ class _USMarketDetailsScreenState
                     SizedBox(height: 8.h),
                     // Price
                     Text(
-                      '\$644.0',
+                      widget.price,
                       style: TextStyles.txtSemiBold18(context).copyWith(
-                        color: Constant.clrPrimary,
-                        fontWeight: FontWeight.w600,
+                        color: Constant.clrBlue,
+                        fontSize: 18.sp,
                       ),
                     ),
                   ],
@@ -169,7 +177,7 @@ class _USMarketDetailsScreenState
                     height: 23.h,
                     padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                     decoration: BoxDecoration(
-                      color: Colors.green,
+                      color: _getBuyStatusColor(widget.buyStatus),
                       borderRadius: getAppLanguage() == 'ar'
                           ? BorderRadius.only(
                         topRight: Radius.circular(12.r),
@@ -181,7 +189,7 @@ class _USMarketDetailsScreenState
                       ),
                     ),
                     child: Text(
-                      'Key_StrongBuy'.localized,
+                      widget.buyStatus,
                       style: TextStyles.txtSemiBoldG10(context).copyWith(
                         fontWeight: Constant.fwRegular,
                         color: Constant.clrWhite,
@@ -197,7 +205,7 @@ class _USMarketDetailsScreenState
                     height: 23.h,
                     padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                     decoration: BoxDecoration(
-                      color: Colors.purple,
+                      color: _getComplianceColor(widget.complianceStatus),
                       borderRadius: getAppLanguage() == 'ar'
                           ? BorderRadius.only(
                         topRight: Radius.circular(12.r),
@@ -209,7 +217,7 @@ class _USMarketDetailsScreenState
                       ),
                     ),
                     child: Text(
-                      'Key_ShariaCompliant'.localized,
+                      _getComplianceText(widget.complianceStatus),
                       style: TextStyles.txtSemiBoldG10(context).copyWith(
                         fontWeight: Constant.fwRegular,
                         color: Constant.clrWhite,
@@ -610,5 +618,38 @@ class _USMarketDetailsScreenState
         ],
       ),
     );
+  }
+
+  /// Helper: Get Buy Status Color
+  Color _getBuyStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'strong buy':
+      case 'buy':
+        return const Color(0xFF32C671); // Green (Success)
+      case 'sell':
+        return const Color(0xFFE74C3C); // Red (Danger)
+      case 'hold':
+        return const Color(0xFFF59E0B); // Orange
+      default:
+        return Colors.grey;
+    }
+  }
+
+  /// Helper: Get Compliance Color
+  Color _getComplianceColor(String status) {
+    if (status.toLowerCase().contains('sharia compliant')) {
+      return const Color(0xFF7B61FF); // Purple (Secondary)
+    } else {
+      return const Color(0xFFF97316); // Orange
+    }
+  }
+
+  /// Helper: Get Compliance Text
+  String _getComplianceText(String status) {
+    if (status.toLowerCase().contains('sharia compliant')) {
+      return 'Sharia Compliant';
+    } else {
+      return 'Non-Sharia';
+    }
   }
 }

@@ -945,6 +945,10 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                       builder: (context) => USMarketDetailsScreen(
                         ticker: stockData.ticker,
                         companyName: stockData.companyName,
+                        price: stockData.price,
+                        buyStatus: (stockData as dynamic).buyStatus ?? 'Hold',
+                        complianceStatus: (stockData as dynamic).complianceStatus ?? 'Sharia Compliant',
+                        dateTime: dateTime,
                       ),
                       settings: const RouteSettings(),
                     );
