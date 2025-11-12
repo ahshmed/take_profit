@@ -93,13 +93,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final List<BottomNavItem> guestTraderNavItems = isUSMarket
         ? [
       // US Market Mode: Home (US Market), Stock, AI Assistant, Courses, Crypto
-      // CRITICAL FIX: US Market screen with appbarRequired=false for proper simple app bar
       BottomNavItem(
-        iconPath: Constant.icUsMarketN,
-        label: getLocalValue("Key_Us_Market"),
+        iconPath: Constant.icHomeN,
+        label: getLocalValue("Key_Home"),
         screen: const UsMarketDetailScreen(
           recommenderID: '',
-          appbarRequired: false,  // Shows back button + "US Market" title
+          appbarRequired: false,
         ),
       ),
       BottomNavItem(
