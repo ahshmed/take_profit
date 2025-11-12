@@ -203,10 +203,9 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
           ),
         ),
         SizedBox(width: 5.w),
-        // Notification Icon - using image asset like home screen
-        Visibility(
-          visible: getUserStatus() != guest,
-          child: IconButton(
+        // Notification Icon - only show for non-guest users
+        if (getUserStatus() != guest)
+          IconButton(
             onPressed: () {
               final route = SlideRightPageRoute(
                 builder: (context) => const NotificationScreen(),
@@ -220,43 +219,47 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             splashRadius: 18,
-            icon: Visibility(
-              visible: (notificationWatch.notificationCountResponseModel.data?.count != '0') &&
-                  (notificationWatch.notificationCountResponseModel.data != null),
-              replacement: Image.asset(
-                Constant.icNotificationN,
-                width: 39.81.h,
-                height: 39.81.h,
-                color: Constant.clrTitlePageByTheme(context),
-              ),
-              child: badge.Badge(
-                position: badge.BadgePosition.topEnd(top: 1, end: 6),
-                badgeStyle: const badge.BadgeStyle(
-                  badgeColor: Colors.red,
-                  padding: EdgeInsets.all(4),
-                  elevation: 0,
-                ),
-                badgeContent: Text(
-                  notificationWatch.notificationCountResponseModel.data?.count ?? '',
-                  style: TextStyles.txtRegular10(context).copyWith(
-                    color: Constant.clrWhite,
-                  ),
-                ),
-                child: Image.asset(
-                  Constant.icNotificationN,
-                  width: 39.81.h,
-                  height: 39.81.h,
-                  color: Constant.clrTitlePageByTheme(context),
-                ),
-              ),
-            ),
+            icon: _buildNotificationIcon(notificationWatch),
           ),
-        ),
-        Visibility(
-          visible: getUserStatus() != guest,
-          child: SizedBox(width: 4.w),
-        ),
+        if (getUserStatus() != guest) SizedBox(width: 4.w),
       ],
+    );
+  }
+
+  /// Build notification icon with badge (matching currencies screen pattern)
+  Widget _buildNotificationIcon(notificationWatch) {
+    final hasNotifications =
+        (notificationWatch.notificationCountResponseModel.data?.count != '0') &&
+            (notificationWatch.notificationCountResponseModel.data != null);
+
+    if (!hasNotifications) {
+      return Image.asset(
+        Constant.icNotificationN,
+        width: 39.81.h,
+        height: 39.81.h,
+        color: Constant.clrTitlePageByTheme(context),
+      );
+    }
+
+    return badge.Badge(
+      position: badge.BadgePosition.topEnd(top: 1, end: 6),
+      badgeStyle: const badge.BadgeStyle(
+        badgeColor: Colors.red,
+        padding: EdgeInsets.all(4),
+        elevation: 0,
+      ),
+      badgeContent: Text(
+        notificationWatch.notificationCountResponseModel.data?.count ?? '',
+        style: TextStyles.txtRegular10(context).copyWith(
+          color: Constant.clrWhite,
+        ),
+      ),
+      child: Image.asset(
+        Constant.icNotificationN,
+        width: 39.81.h,
+        height: 39.81.h,
+        color: Constant.clrTitlePageByTheme(context),
+      ),
     );
   }
 
