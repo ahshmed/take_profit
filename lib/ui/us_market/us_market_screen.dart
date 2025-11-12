@@ -11,6 +11,7 @@ import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:take_profit/ui/us_market/us_market_details_screen.dart';
 import 'package:take_profit/utils/extension/string_extension.dart';
 import '../../framework/data_provider/notification/notification_provider.dart';
+import '../../framework/data_provider/portfolio/portfolio_provider.dart';
 import '../../framework/data_provider/profile/profile_provider.dart';
 import '../../framework/data_provider/stock/stock_provider.dart'; // ADD THIS
 import '../../framework/repository/stock/model/stock_model.dart'; // ADD THIS
@@ -944,7 +945,53 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                       return;
                     }
 
-                    // Add to portfolio action (TODO: implement when ready)
+                    // Add to portfolio action
+                    try {
+                      // Parse the buy price from the current price string
+                      final priceString = stockData.price.replaceAll(RegExp(r'[^\d.]'), '');
+                      final buyPrice = double.parse(priceString);
+
+                      // Add stock to portfolio
+                      ref.read(portfolioProvider).addToPortfolio(
+                        ticker: stockData.ticker,
+                        companyName: stockData.companyName,
+                        currentPrice: stockData.price,
+                        buyPrice: buyPrice,
+                        buyStatus: (stockData as dynamic).buyStatus ?? 'Hold',
+                        complianceStatus: (stockData as dynamic).complianceStatus ?? 'Sharia Compliant',
+                        dateTime: dateTime,
+                      );
+
+                      // Show success message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            '${stockData.ticker} ${'Key_AddedToPortfolio'.localized}',
+                            style: TextStyles.txtRegular14(context).copyWith(
+                              color: Constant.clrWhite,
+                            ),
+                          ),
+                          backgroundColor: const Color(0xFF32C671),
+                          duration: const Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    } catch (e) {
+                      // Show error message if something goes wrong
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Key_ErrorAddingToPortfolio'.localized,
+                            style: TextStyles.txtRegular14(context).copyWith(
+                              color: Constant.clrWhite,
+                            ),
+                          ),
+                          backgroundColor: const Color(0xFFE74C3C),
+                          duration: const Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    }
                   },
                   child: Container(
                     height: 42.h,
