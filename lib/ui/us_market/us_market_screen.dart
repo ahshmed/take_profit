@@ -124,8 +124,8 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     return Stack(
       children: [
         Scaffold(
-          backgroundColor: Constant.clrScaffoldBGByTheme(context),
-          // Redesigned App Bar to match the image
+          backgroundColor: Constant.clrPageBackColor,
+          // App Bar matching the image with profile, title, and notification
           appBar: (widget.appbarRequired)
               ? CommonAppBar(
             title: getLocalValue("Key_RecommenderDetail"),
@@ -135,7 +135,57 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                 toolbarHeight: 64.h),
             isDrawer: false,
           )
-              : _buildModernAppBar(context, notificationWatch),
+              : CommonAppBar(
+            backgroundColor: Constant.clrPrimary,
+            title: getLocalValue("Key_UsMarket"),
+            titleTextStyle: TextStyles.txtSemiBold18(context).copyWith(
+              color: Constant.clrWhite,
+              fontWeight: Constant.fwSemiBold,
+            ),
+            isTitleCenter: true,
+            appBar: AppBar(
+              backgroundColor: Constant.clrPrimary,
+              toolbarHeight: 64.h,
+            ),
+            isDrawer: true,
+            action: [
+              // Notification Icon
+              IconButton(
+                onPressed: () {
+                  Route route = SlideRightPageRoute(
+                    builder: (context) => const NotificationScreen(),
+                    settings: const RouteSettings(),
+                  );
+                  Navigator.of(context).push(route);
+                },
+                style: IconButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size(40.h, 40.h),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                icon: badge.Badge(
+                  showBadge: (notificationWatch.notificationCountResponseModel.data?.count != '0') &&
+                      (notificationWatch.notificationCountResponseModel.data != null),
+                  position: badge.BadgePosition.topEnd(top: 1, end: 6),
+                  badgeStyle: const badge.BadgeStyle(
+                    badgeColor: Colors.red,
+                    padding: EdgeInsets.all(4),
+                    elevation: 0,
+                  ),
+                  badgeContent: Text(
+                    notificationWatch.notificationCountResponseModel.data?.count ?? '',
+                    style: const TextStyle(color: Colors.white, fontSize: 10),
+                  ),
+                  child: Icon(
+                    Icons.notifications_outlined,
+                    color: Constant.clrWhite,
+                    size: 28.h,
+                  ),
+                ),
+              ),
+              SizedBox(width: 4.w),
+            ],
+          ),
           body: NoInternetBuilder(child: bodyWidget(stockWatch)),
         ),
         // CRITICAL FIX: Show loading indicator from provider
@@ -144,162 +194,6 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     );
   }
 
-  /// Modern App Bar matching the design image
-  PreferredSizeWidget _buildModernAppBar(
-      BuildContext context, notificationWatch) {
-    final profileWatch = ref.watch(profileProvider);
-    return AppBar(
-      backgroundColor: Constant.clrPrimary,
-      elevation: 0,
-      toolbarHeight: 64.h,
-      leading: Padding(
-        padding: EdgeInsets.only(left: 16.w),
-        child: GestureDetector(
-          onTap: () {
-            // Open drawer or navigate back
-            Navigator.of(context).pop();
-          },
-          child: Container(
-            width: 40.w,
-            height: 40.h,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-            ),
-            child: ClipOval(
-              child: CacheImage(
-                imageURL: profileWatch.profileDetailResponseModel?.data?.profileImage ?? '',
-                width: 40.w,
-                height: 40.h,
-              ),
-            ),
-          ),
-        ),
-      ),
-      title: Text(
-        getLocalValue("Key_UsMarket"),
-        style: TextStyles.txtSemiBold18(context).copyWith(
-          color: Constant.clrWhite,
-          fontWeight: Constant.fwSemiBold,
-        ),
-      ),
-      centerTitle: true,
-      actions: [
-        badge.Badge(
-          showBadge: (notificationWatch.notificationCountResponseModel.data?.count != '0') &&
-              (notificationWatch.notificationCountResponseModel.data != null),
-          position: badge.BadgePosition.topEnd(top: 8, end: 8),
-          badgeStyle: const badge.BadgeStyle(
-            badgeColor: Colors.red,
-            padding: EdgeInsets.all(4),
-          ),
-          badgeContent: Text(
-            notificationWatch.notificationCountResponseModel.data?.count ?? '',
-            style: const TextStyle(color: Colors.white, fontSize: 10),
-          ),
-          child: IconButton(
-            icon: Icon(
-              Icons.notifications_outlined,
-              color: Constant.clrWhite,
-              size: 28.h,
-            ),
-            onPressed: () {
-              Route route = SlideRightPageRoute(
-                builder: (context) => const NotificationScreen(),
-                settings: const RouteSettings(),
-              );
-              Navigator.of(context).push(route);
-            },
-          ),
-        ),
-        SizedBox(width: 8.w),
-      ],
-    );
-  }
-
-  // Simple App Bar (Back button + Title) - Used when US Market is HOME
-  PreferredSizeWidget _buildSimpleAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: Constant.clrHomeScreenByTheme(context),
-      elevation: 0,
-      centerTitle: true,
-      leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back,
-          color: Constant.clrTitlePageByTheme(context),
-        ),
-        onPressed: () => Navigator.of(context).pop(),
-      ),
-      title: Text(
-        getLocalValue("Key_UsMarket"),
-        style: TextStyles.txtSemiBold18(context).copyWith(
-          color: Constant.clrTitlePageByTheme(context),
-          fontWeight: Constant.fwMedium,
-        ),
-      ),
-    );
-  }
-
-  // Full App Bar with profile and notifications
-  // PreferredSizeWidget _buildFullAppBar(
-  //     BuildContext context, notificationWatch) {
-  //   final profileWatch = ref.watch(profileProvider);
-  //   return CommonAppBar(
-  //     appBar: AppBar(
-  //       elevation: 0,
-  //       backgroundColor: Constant.clrHomeScreenByTheme(context),
-  //       title: Text(
-  //         getLocalValue("Key_UsMarket"),
-  //         style: TextStyles.txtSemiBold18(context).copyWith(
-  //           color: Constant.clrTitlePageByTheme(context),
-  //           fontWeight: Constant.fwMedium,
-  //         ),
-  //       ),
-  //       leading: GestureDetector(
-  //         onTap: () {
-  //           // You can add an action here, e.g., open profile screen
-  //         },
-  //         child: Padding(
-  //           padding: EdgeInsets.only(left: 16.w),
-  //           child: CircleAvatar(
-  //             radius: 20.r,
-  //             backgroundColor: Constant.clrHomeScreenByTheme(context),
-  //             child: ClipOval(
-  //               child: CacheImage(
-  //                 imageURL: profileWatch.profileData.data?.profilePic ?? '',
-  //                 width: 40.w,
-  //                 height: 40.h,
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //       actions: [
-  //         badge.Badge(
-  //           showBadge: notificationWatch.notificationCount > 0,
-  //           position: badge.BadgePosition.topEnd(top: 8, end: 8),
-  //           badgeContent: Text(
-  //             notificationWatch.notificationCount.toString(),
-  //             style: const TextStyle(color: Colors.white, fontSize: 10),
-  //           ),
-  //           child: IconButton(
-  //             icon: Icon(
-  //               Icons.notifications_outlined,
-  //               color: Constant.clrTitlePageByTheme(context),
-  //             ),
-  //             onPressed: () {
-  //               Route route = SlideRightPageRoute(
-  //                 builder: (context) => const NotificationScreen(),
-  //                 settings: const RouteSettings(),
-  //               );
-  //               Navigator.of(context).push(route);
-  //             },
-  //           ),
-  //         ),
-  //         SizedBox(width: 8.w),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   // CRITICAL FIX: Pass stockWatch to bodyWidget
   Widget bodyWidget(stockWatch) {
