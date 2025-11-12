@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../framework/data_provider/portfolio/portfolio_provider.dart';
 import '../../utils/const.dart';
 import '../../utils/extension/string_extension.dart';
 import '../../utils/theme_const.dart';
@@ -239,7 +240,43 @@ class _USMarketDetailsScreenState
             height: 50.h,
             child: OutlinedButton(
               onPressed: () {
-                // TODO: Add to portfolio functionality
+                final portfolioWatch = ref.read(portfolioProvider);
+
+                // Check if already in portfolio
+                final isInPortfolio = portfolioWatch.isInPortfolio(widget.ticker);
+
+                if (isInPortfolio) {
+                  // Show already added message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Key_AlreadyInPortfolio'.localized),
+                      backgroundColor: Constant.clrPrimary,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                } else {
+                  // Add to portfolio
+                  final currentPrice = double.parse(widget.price.replaceAll(RegExp(r'[^\d.]'), ''));
+
+                  portfolioWatch.addToPortfolio(
+                    ticker: widget.ticker,
+                    companyName: widget.companyName,
+                    currentPrice: widget.price,
+                    buyPrice: currentPrice, // Use current price as buy price
+                    buyStatus: widget.buyStatus,
+                    complianceStatus: widget.complianceStatus,
+                    dateTime: widget.dateTime,
+                  );
+
+                  // Show success message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Key_AddedToPortfolio'.localized),
+                      backgroundColor: const Color(0xFF32C671),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
               },
               style: OutlinedButton.styleFrom(
                 side: BorderSide(

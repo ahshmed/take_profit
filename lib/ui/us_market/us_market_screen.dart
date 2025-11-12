@@ -26,6 +26,7 @@ import '../../utils/widgets/empty_state_widget.dart';
 import '../notification/notification_screen.dart';
 import '../search/search_screen.dart';
 import '../stock/stock_screen.dart';
+import 'portfolio_screen.dart';
 
 // REMOVE the StockData class - we'll use StockModel instead
 
@@ -449,7 +450,14 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                   text: 'Your Portfolio',
                   isPrimary: false,
                   color: Constant.clrGrey,
-                  onTap: () {},
+                  onTap: () {
+                    // Navigate to Portfolio Screen
+                    Route route = SlideRightPageRoute(
+                      builder: (context) => const PortfolioScreen(),
+                      settings: const RouteSettings(),
+                    );
+                    Navigator.of(context).push(route);
+                  },
                 ),
               ),
             ],
