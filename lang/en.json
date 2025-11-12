@@ -540,5 +540,11 @@
   "Key_Remove": "Remove",
   "Key_Cancel": "Cancel",
   "Key_AddedToPortfolio": "Stock added to your portfolio successfully!",
-  "Key_AlreadyInPortfolio": "This stock is already in your portfolio"
+  "Key_AlreadyInPortfolio": "This stock is already in your portfolio",
+  "Key_InvestInFuture": "Invest in the future of finance",
+  "Key_Consultation": "Consultation",
+  "Key_TakeProfitInvestments": "TakeProfit Investments",
+  "Key_YourPortfolioBtn": "Your Portfolio",
+  "Key_AddToPortfolio": "Add to Portfolio",
+  "Key_ViewDetails": "View Details"
 }

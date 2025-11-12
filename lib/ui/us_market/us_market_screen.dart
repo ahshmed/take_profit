@@ -390,7 +390,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    'Invest in the future of finance',
+                    'Key_InvestInFuture'.localized,
                     style: TextStyles.txtRegular14(context).copyWith(
                       color: Constant.clrWhite.withOpacity(0.9),
                     ),
@@ -415,7 +415,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
             children: [
               Expanded(
                 child: _buildButton(
-                  text: 'Consultation',
+                  text: 'Key_Consultation'.localized,
                   isPrimary: false,
                   color: Constant.clrPrimary,
                   onTap: () {},
@@ -424,7 +424,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
               SizedBox(width: 12.w),
               Expanded(
                 child: _buildButton(
-                  text: 'Subscribe',
+                  text: 'Key_Subscribe'.localized,
                   isPrimary: true,
                   color: const Color(0xFFE6B35A), // Gold
                   onTap: () {},
@@ -438,7 +438,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
             children: [
               Expanded(
                 child: _buildButton(
-                  text: 'TakeProfit Investments',
+                  text: 'Key_TakeProfitInvestments'.localized,
                   isPrimary: true,
                   color: Constant.clrBlackOrigin,
                   onTap: () {},
@@ -447,7 +447,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
               SizedBox(width: 12.w),
               Expanded(
                 child: _buildButton(
-                  text: 'Your Portfolio',
+                  text: 'Key_YourPortfolioBtn'.localized,
                   isPrimary: false,
                   color: Constant.clrGrey,
                   onTap: () {
@@ -952,7 +952,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                     ),
                     child: Center(
                       child: Text(
-                        'Add to Portfolio',
+                        'Key_AddToPortfolio'.localized,
                         style: TextStyles.txtMedium12(context).copyWith(
                           color: Constant.clrPrimary,
                           fontWeight: Constant.fwSemiBold,
@@ -1001,7 +1001,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                     ),
                     child: Center(
                       child: Text(
-                        'View Details',
+                        'Key_ViewDetails'.localized,
                         style: TextStyles.txtMedium12(context).copyWith(
                           color: Constant.clrWhite,
                           fontWeight: Constant.fwSemiBold,

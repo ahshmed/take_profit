@@ -531,5 +531,11 @@
   "Key_Remove": "إزالة",
   "Key_Cancel": "إلغاء",
   "Key_AddedToPortfolio": "تمت إضافة السهم إلى محفظتك بنجاح!",
-  "Key_AlreadyInPortfolio": "هذا السهم موجود بالفعل في محفظتك"
+  "Key_AlreadyInPortfolio": "هذا السهم موجود بالفعل في محفظتك",
+  "Key_InvestInFuture": "استثمر في مستقبل التمويل",
+  "Key_Consultation": "استشارة",
+  "Key_TakeProfitInvestments": "استثمارات تيك بروفت",
+  "Key_YourPortfolioBtn": "محفظتك",
+  "Key_AddToPortfolio": "أضف للمحفظة",
+  "Key_ViewDetails": "عرض التفاصيل"
 }
