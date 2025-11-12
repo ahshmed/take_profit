@@ -260,7 +260,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Constant.clrWhite,
+        color: Constant.clrHomeCardByTheme(context),
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
@@ -281,14 +281,14 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
           Text(
             value,
             style: TextStyles.txtBold20(context).copyWith(
-              color: Constant.clrBlackOrigin,
+              color: Constant.clrTitlePageByTheme(context),
             ),
           ),
           SizedBox(height: 4.h),
           Text(
             title,
             style: TextStyles.txtRegular10(context).copyWith(
-              color: Constant.clrBlackOrigin.withOpacity(0.6),
+              color: Constant.clrTitlePageByTheme(context).withOpacity(0.6),
             ),
             textAlign: TextAlign.center,
             maxLines: 1,
@@ -327,7 +327,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
         margin: EdgeInsets.only(bottom: 16.h),
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: Constant.clrWhite,
+          color: Constant.clrHomeCardByTheme(context),
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
             BoxShadow(
@@ -377,7 +377,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                             Text(
                               '${item.companyName} (${item.ticker})',
                               style: TextStyles.txtSemiBold16(context).copyWith(
-                                color: Constant.clrBlackOrigin,
+                                color: Constant.clrTitlePageByTheme(context),
                                 fontSize: 15.sp,
                               ),
                               maxLines: 2,
@@ -387,7 +387,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                             Text(
                               item.dateTime,
                               style: TextStyles.txtRegular12(context).copyWith(
-                                color: Constant.clrBlackOrigin.withOpacity(0.5),
+                                color: Constant.clrTitlePageByTheme(context).withOpacity(0.5),
                                 fontSize: 11.sp,
                               ),
                             ),
@@ -406,7 +406,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                   },
                   child: Icon(
                     Icons.delete_outline,
-                    color: Constant.clrBlackOrigin.withOpacity(0.4),
+                    color: Constant.clrTitlePageByTheme(context).withOpacity(0.4),
                     size: 24.h,
                   ),
                 ),
@@ -426,7 +426,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                       Text(
                         'Key_CurrentPrice'.localized,
                         style: TextStyles.txtRegular12(context).copyWith(
-                          color: Constant.clrBlackOrigin.withOpacity(0.6),
+                          color: Constant.clrTitlePageByTheme(context).withOpacity(0.6),
                         ),
                       ),
                       SizedBox(height: 4.h),
@@ -448,14 +448,14 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                       Text(
                         'Key_BuyPrice'.localized,
                         style: TextStyles.txtRegular12(context).copyWith(
-                          color: Constant.clrBlackOrigin.withOpacity(0.6),
+                          color: Constant.clrTitlePageByTheme(context).withOpacity(0.6),
                         ),
                       ),
                       SizedBox(height: 4.h),
                       Text(
                         '\$${buyPrice.toStringAsFixed(2)}',
                         style: TextStyles.txtSemiBold16(context).copyWith(
-                          color: Constant.clrBlackOrigin.withOpacity(0.8),
+                          color: Constant.clrTitlePageByTheme(context).withOpacity(0.8),
                         ),
                       ),
                     ],
@@ -470,7 +470,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                       Text(
                         'Key_ProfitLoss'.localized,
                         style: TextStyles.txtRegular12(context).copyWith(
-                          color: Constant.clrBlackOrigin.withOpacity(0.6),
+                          color: Constant.clrTitlePageByTheme(context).withOpacity(0.6),
                         ),
                       ),
                       SizedBox(height: 4.h),
@@ -513,7 +513,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
           title: Text(
             'Key_RemoveFromPortfolio'.localized,
             style: TextStyles.txtBold18(context).copyWith(
-              color: Constant.clrBlackOrigin,
+              color: Constant.clrTitlePageByTheme(context),
             ),
           ),
           content: Text(
@@ -530,7 +530,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
               child: Text(
                 'Key_Cancel'.localized,
                 style: TextStyles.txtMedium14(context).copyWith(
-                  color: Constant.clrBlackOrigin.withOpacity(0.6),
+                  color: Constant.clrTitlePageByTheme(context).withOpacity(0.6),
                 ),
               ),
             ),

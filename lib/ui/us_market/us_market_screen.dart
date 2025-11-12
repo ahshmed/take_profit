@@ -481,14 +481,17 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     required VoidCallback onTap,
   }) {
     // Check if this is the consultation button to add dotted border
-    final bool isConsultation = text.toLowerCase().contains('consult');
+    // Check for both English and Arabic
+    final bool isConsultation = text.toLowerCase().contains('consult') ||
+                                 text.contains('استشارة') ||
+                                 text == 'Key_Consultation'.localized;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         height: 48.h,
         decoration: BoxDecoration(
-          color: isPrimary ? color : Constant.clrWhite,
+          color: isPrimary ? color : Constant.clrCardBGByTheme(context),
           borderRadius: BorderRadius.circular(12.r),
           // Only solid border for non-consultation outlined buttons
           border: isPrimary || isConsultation
@@ -521,7 +524,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
       child: Container(
         height: 48.h,
         decoration: BoxDecoration(
-          color: Constant.clrWhite,
+          color: Constant.clrHomeCardByTheme(context),
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
@@ -541,16 +544,16 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
             ref.read(stockProvider).searchStocks(value);
           },
           style: TextStyles.txtRegular14(context).copyWith(
-            color: Constant.clrBlackOrigin,
+            color: Constant.clrTitlePageByTheme(context),
           ),
           decoration: InputDecoration(
             hintText: getLocalValue('Key_Search'),
             hintStyle: TextStyles.txtRegular14(context).copyWith(
-              color: Constant.clrBlackOrigin.withOpacity(0.4),
+              color: Constant.clrTitlePageByTheme(context).withOpacity(0.4),
             ),
             prefixIcon: Icon(
               Icons.search,
-              color: Constant.clrBlackOrigin.withOpacity(0.5),
+              color: Constant.clrTitlePageByTheme(context).withOpacity(0.5),
               size: 22.h,
             ),
             suffixIcon: searchQuery.isNotEmpty
@@ -789,7 +792,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     Widget cardContent = Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Constant.clrWhite,
+        color: Constant.clrHomeCardByTheme(context),
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
@@ -806,7 +809,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
           Text(
             dateTime,
             style: TextStyles.txtRegular12(context).copyWith(
-              color: Constant.clrBlackOrigin.withOpacity(0.5),
+              color: Constant.clrTitlePageByTheme(context).withOpacity(0.5),
               fontSize: 11.sp,
             ),
           ),
@@ -833,7 +836,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                           Text(
                             '${stockData.companyName} (${stockData.ticker})',
                             style: TextStyles.txtSemiBold16(context).copyWith(
-                              color: Constant.clrBlackOrigin,
+                              color: Constant.clrTitlePageByTheme(context),
                               fontSize: 15.sp,
                             ),
                             maxLines: 2,
@@ -946,7 +949,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                   child: Container(
                     height: 42.h,
                     decoration: BoxDecoration(
-                      color: Constant.clrWhite,
+                      color: Constant.clrCardBGByTheme(context),
                       borderRadius: BorderRadius.circular(8.r),
                       border: Border.all(color: Constant.clrPrimary, width: 1.5),
                     ),

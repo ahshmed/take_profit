@@ -97,7 +97,7 @@ class _USMarketDetailsScreenState
       margin: EdgeInsets.all(20.w),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Constant.clrWhite,
+        color: Constant.clrHomeCardByTheme(context),
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
@@ -139,7 +139,7 @@ class _USMarketDetailsScreenState
                     Text(
                       widget.dateTime,
                       style: TextStyles.txtRegular12(context).copyWith(
-                        color: Constant.clrBlackOrigin.withOpacity(0.5),
+                        color: Constant.clrTitlePageByTheme(context).withOpacity(0.5),
                         fontSize: 11.sp,
                       ),
                     ),
@@ -148,7 +148,7 @@ class _USMarketDetailsScreenState
                     Text(
                       '${widget.companyName} (${widget.ticker})',
                       style: TextStyles.txtSemiBold16(context).copyWith(
-                        color: Constant.clrBlackOrigin,
+                        color: Constant.clrTitlePageByTheme(context),
                         fontSize: 15.sp,
                       ),
                       maxLines: 2,
