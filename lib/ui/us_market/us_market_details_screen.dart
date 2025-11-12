@@ -59,11 +59,8 @@ class _USMarketDetailsScreenState
       ),
       body: Column(
         children: [
-          // Stock Header Card
+          // Stock Header Card (with button inside)
           _buildStockHeader(),
-
-          // Add to Portfolio Button
-          _buildAddToPortfolioButton(),
 
           // Tabs
           _buildTabBar(),
@@ -90,134 +87,139 @@ class _USMarketDetailsScreenState
       margin: EdgeInsets.all(20.w),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Constant.clrCardBGByTheme(context),
-        borderRadius: BorderRadius.circular(15.r),
+        color: Constant.clrWhite,
+        borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.08),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: [
-          // Stock Icon Placeholder
-          Container(
-            width: 60.w,
-            height: 60.h,
-            decoration: BoxDecoration(
-              color: Constant.clrPrimary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(30.r),
-            ),
-            child: Center(
+          Row(
+            children: [
+              // Stock Icon Placeholder
+              Container(
+                width: 50.w,
+                height: 50.h,
+                decoration: BoxDecoration(
+                  color: Constant.clrPrimary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(25.r),
+                ),
+                child: Center(
+                  child: Text(
+                    widget.ticker.substring(0, 1),
+                    style: TextStyles.txtMedium24(context).copyWith(
+                      color: Constant.clrPrimary,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 12.w),
+
+              // Company Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Date with matching style from US Market screen
+                    Text(
+                      '01/11/2022 14:35',
+                      style: TextStyles.txtRegular12(context).copyWith(
+                        color: Constant.clrBlackOrigin.withOpacity(0.5),
+                        fontSize: 11.sp,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    // Company name with matching style from US Market screen
+                    Text(
+                      '${widget.companyName} (${widget.ticker})',
+                      style: TextStyles.txtSemiBold16(context).copyWith(
+                        color: Constant.clrBlackOrigin,
+                        fontSize: 15.sp,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 8.h),
+                    // Price
+                    Text(
+                      '\$644.0',
+                      style: TextStyles.txtSemiBold18(context).copyWith(
+                        color: Constant.clrPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Status Badges
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Text(
+                      'Key_StrongBuy'.localized,
+                      style: TextStyles.txtRegular10(context).copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    decoration: BoxDecoration(
+                      color: Colors.purple,
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Text(
+                      'Key_ShariaCompliant'.localized,
+                      style: TextStyles.txtRegular10(context).copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          // Add to Portfolio Button inside the card
+          SizedBox(height: 16.h),
+          SizedBox(
+            width: double.infinity,
+            height: 50.h,
+            child: OutlinedButton(
+              onPressed: () {
+                // TODO: Add to portfolio functionality
+              },
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(
+                  color: Constant.clrPrimary,
+                  width: 1.5,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25.r),
+                ),
+              ),
               child: Text(
-                widget.ticker.substring(0, 1),
-                style: TextStyles.txtMedium24(context).copyWith(
+                'Key_AddToMyPortfolio'.localized,
+                style: TextStyles.txtRegular16(context).copyWith(
                   color: Constant.clrPrimary,
                 ),
               ),
             ),
           ),
-          SizedBox(width: 12.w),
-
-          // Company Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '01/11/2022 14:35', // Placeholder date
-                  style: TextStyles.txtMedGI12(context).copyWith(
-                    fontSize: 11.sp,
-                    color: Constant.clrHeaderSubSignDetailsColor,
-                  ),
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  '${widget.companyName} (${widget.ticker})',
-                  style: TextStyles.txtBold16(context).copyWith(
-                    color: Constant.clrTitlePageByTheme(context),
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  '\$644.0', // Placeholder price
-                  style: TextStyles.txtSemiBold18(context).copyWith(
-                      color: Constant.clrPrimary,
-                      fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Status Badges
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(20.r),
-                ),
-                child: Text(
-                  'Key_StrongBuy'.localized,
-                  style: TextStyles.txtRegular10(context).copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              SizedBox(height: 8.h),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                decoration: BoxDecoration(
-                  color: Colors.purple,
-                  borderRadius: BorderRadius.circular(20.r),
-                ),
-                child: Text(
-                  'Key_ShariaCompliant'.localized,
-                  style: TextStyles.txtRegular10(context).copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildAddToPortfolioButton() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
-      child: SizedBox(
-        width: double.infinity,
-        height: 50.h,
-        child: OutlinedButton(
-          onPressed: () {
-            // TODO: Add to portfolio functionality
-          },
-          style: OutlinedButton.styleFrom(
-            side: BorderSide(
-              color: Constant.clrPrimary,
-              width: 1.5,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25.r),
-            ),
-          ),
-          child: Text(
-            'Key_AddToMyPortfolio'.localized,
-            style: TextStyles.txtRegular16(context).copyWith(
-              color: Constant.clrPrimary,
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -232,7 +234,7 @@ class _USMarketDetailsScreenState
       child: TabBar(
         controller: _tabController,
         indicator: BoxDecoration(
-          color: Colors.black,
+          color: Constant.clrPrimary,
           borderRadius: BorderRadius.circular(25.r),
         ),
         labelColor: Colors.white,
