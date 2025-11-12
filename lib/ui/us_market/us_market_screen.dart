@@ -473,16 +473,10 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
         decoration: BoxDecoration(
           color: isPrimary ? color : Constant.clrWhite,
           borderRadius: BorderRadius.circular(12.r),
-          border: isPrimary
+          // Only solid border for non-consultation outlined buttons
+          border: isPrimary || isConsultation
               ? null
-              : isConsultation
-                  ? Border.all(
-                      color: color,
-                      width: 1.5,
-                      strokeAlign: BorderSide.strokeAlignInside,
-                      // Note: Dotted border requires custom painter
-                    )
-                  : Border.all(color: color, width: 1.5),
+              : Border.all(color: color, width: 1.5),
         ),
         child: CustomPaint(
           painter: isConsultation && !isPrimary
@@ -648,8 +642,8 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
           int index = entry.key;
           StockModel stock = entry.value;
 
-          // Add promotional banner after 1st card (index 0) and make it full width
-          if (index == 1) {
+          // Add promotional banner after FIRST card (index 0)
+          if (index == 0) {
             return Column(
               children: [
                 Padding(
@@ -840,7 +834,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                 ),
               ),
               SizedBox(width: 12.w),
-              // Status Tags Column - Support RTL/LTR
+              // Status Tags Column - Matching recommender_details_screen design
               Column(
                 crossAxisAlignment: getAppLanguage() == 'ar'
                     ? CrossAxisAlignment.start
@@ -848,35 +842,57 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                 children: [
                   // Buy Status Tag
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                    width: 97.w,
+                    height: 23.h,
+                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                     decoration: BoxDecoration(
                       color: _getBuyStatusColor((stockData as dynamic).buyStatus ?? 'Hold'),
-                      borderRadius: BorderRadius.circular(6.r),
+                      borderRadius: getAppLanguage() == 'ar'
+                          ? BorderRadius.only(
+                        topRight: Radius.circular(12.r),
+                        bottomRight: Radius.circular(12.r),
+                      )
+                          : BorderRadius.only(
+                        topLeft: Radius.circular(12.r),
+                        bottomLeft: Radius.circular(12.r),
+                      ),
                     ),
                     child: Text(
                       (stockData as dynamic).buyStatus ?? 'Hold',
-                      style: TextStyles.txtMedium10(context).copyWith(
+                      style: TextStyles.txtSemiBoldG10(context).copyWith(
+                        fontWeight: Constant.fwRegular,
                         color: Constant.clrWhite,
-                        fontWeight: Constant.fwSemiBold,
                         fontSize: 10.sp,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                   SizedBox(height: 6.h),
                   // Sharia Compliance Tag
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                    width: 97.w,
+                    height: 23.h,
+                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                     decoration: BoxDecoration(
                       color: _getComplianceColor((stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
-                      borderRadius: BorderRadius.circular(6.r),
+                      borderRadius: getAppLanguage() == 'ar'
+                          ? BorderRadius.only(
+                        topRight: Radius.circular(12.r),
+                        bottomRight: Radius.circular(12.r),
+                      )
+                          : BorderRadius.only(
+                        topLeft: Radius.circular(12.r),
+                        bottomLeft: Radius.circular(12.r),
+                      ),
                     ),
                     child: Text(
                       _getComplianceText((stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
-                      style: TextStyles.txtMedium10(context).copyWith(
+                      style: TextStyles.txtSemiBoldG10(context).copyWith(
+                        fontWeight: Constant.fwRegular,
                         color: Constant.clrWhite,
-                        fontWeight: Constant.fwSemiBold,
                         fontSize: 9.sp,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],
