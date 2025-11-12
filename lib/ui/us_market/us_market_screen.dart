@@ -184,7 +184,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
         IconButton(
           onPressed: () {
             final route = SlideRightPageRoute(
-              builder: (context) => const SearchScreen(),
+              builder: (context) => const SearchStockScreen(),
               settings: const RouteSettings(),
             );
             Navigator.of(context).push(route);
