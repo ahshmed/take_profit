@@ -521,5 +521,6 @@
   "Key_Disclaimer": "Disclaimer",
   "Key_DisclaimerText": "These Recommendations Do Not Constitute Direct Investment Advice, But Rather General Analytical Insights. Any Investment Decisions Are Solely The Responsibility Of The User.",
   "Key_RisksContent": "Risk information content here...",
-  "Key_ShariaCompliant": "Sharia Compliant"
+  "Key_ShariaCompliant": "Sharia Compliant",
+  "Key_FailedToChangeLanguage": "Failed to change language. Please try again."
 }

@@ -512,5 +512,6 @@
   "Key_Insight": "رؤية",
   "Key_Story": "القصة",
   "Key_Scorecard": "بطاقة الأداء",
-  "Key_Risks": "المخاطر"
+  "Key_Risks": "المخاطر",
+  "Key_FailedToChangeLanguage": "فشل تغيير اللغة. يرجى المحاولة مرة أخرى."
 }
