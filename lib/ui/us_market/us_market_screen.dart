@@ -451,6 +451,12 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                   isPrimary: false,
                   color: Constant.clrGrey,
                   onTap: () {
+                    // Check if user is guest
+                    if (getUserStatus() == guest) {
+                      getStartedDialog(context);
+                      return;
+                    }
+
                     // Navigate to Portfolio Screen
                     Route route = SlideRightPageRoute(
                       builder: (context) => const PortfolioScreen(),
