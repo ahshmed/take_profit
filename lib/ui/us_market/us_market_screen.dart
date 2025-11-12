@@ -915,7 +915,19 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    // Add to portfolio action
+                    // Check if card should be blurred
+                    final shouldBlur = _shouldBlurCard();
+
+                    if (shouldBlur) {
+                      // Show appropriate dialog based on user status
+                      if (getUserStatus() == guest) {
+                        getStartedDialog(context);
+                      }
+                      // TODO: Add subscription dialog when US Market subscription is implemented
+                      return;
+                    }
+
+                    // Add to portfolio action (TODO: implement when ready)
                   },
                   child: Container(
                     height: 42.h,
@@ -941,6 +953,19 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
               Expanded(
                 child: GestureDetector(
                   onTap: () {
+                    // Check if card should be blurred
+                    final shouldBlur = _shouldBlurCard();
+
+                    if (shouldBlur) {
+                      // Show appropriate dialog based on user status
+                      if (getUserStatus() == guest) {
+                        getStartedDialog(context);
+                      }
+                      // TODO: Add subscription dialog when US Market subscription is implemented
+                      return;
+                    }
+
+                    // Navigate to details screen if not blurred
                     Route route = SlideRightPageRoute(
                       builder: (context) => USMarketDetailsScreen(
                         ticker: stockData.ticker,
@@ -979,15 +1004,32 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
       ),
     );
 
-    /// Apply blur if stock is marked as blurred
-    final isBlurred = (stockData as dynamic).isBlurred ?? false;
-    return isBlurred
+    /// Apply blur based on user status and subscription (similar to recommender_details_screen)
+    final shouldBlur = _shouldBlurCard();
+    return shouldBlur
         ? Blur(
       borderRadius: BorderRadius.circular(16.r),
       blurColor: Constant.clrDarkByScaffoldTheme(context).withOpacity(0.2),
       child: cardContent,
     )
         : cardContent;
+  }
+
+  /// Determine if card should be blurred based on user status
+  /// Similar logic to recommender_details_screen.dart
+  bool _shouldBlurCard() {
+    final isGuest = getUserStatus() == guest;
+
+    // For US Market stocks:
+    // - Blur if user is guest (they need to sign up)
+    // - In future: also check subscription to US Market service
+    if (isGuest) {
+      return true;
+    }
+
+    // TODO: Add subscription check when US Market subscription is implemented
+    // For now, logged-in users (trader/recommender) can view all stocks
+    return false;
   }
 
   /// Helper: Get Compliance Text
