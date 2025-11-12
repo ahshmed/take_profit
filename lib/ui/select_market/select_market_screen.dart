@@ -192,6 +192,9 @@ class _ChooseMarketScreenState extends ConsumerState<SelectMarketScreen> {
                           // CRITICAL FIX: Mark that user has completed market selection
                           setFirstTimeUser(false);
 
+                          // CRITICAL FIX: Set user status to guest to avoid 401 errors and show proper greeting
+                          saveLocalData(KEY_USER_STATUS, guest);
+
                           // Navigate to dashboard and force tab reset to home
                           Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(builder: (context) => const DashboardScreen()),
