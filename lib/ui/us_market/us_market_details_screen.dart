@@ -34,6 +34,7 @@ class _USMarketDetailsScreenState
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _selectedTabIndex = 0;
+  bool _showDisclaimer = true; // Show disclaimer by default
 
   @override
   void initState() {
@@ -43,11 +44,6 @@ class _USMarketDetailsScreenState
       setState(() {
         _selectedTabIndex = _tabController.index;
       });
-    });
-
-    // Show disclaimer popup when screen opens
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showDisclaimerDialog();
     });
   }
 
@@ -346,6 +342,65 @@ class _USMarketDetailsScreenState
             content:
             'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
           ),
+          SizedBox(height: 16.h),
+
+          // Disclaimer with close button
+          if (_showDisclaimer)
+            Container(
+              padding: EdgeInsets.all(16.w),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(15.r),
+                border: Border.all(
+                  color: Colors.orange.withOpacity(0.3),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    color: Colors.orange,
+                    size: 24.h,
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Key_Disclaimer'.localized,
+                          style: TextStyles.txtBold14(context).copyWith(
+                            color: Colors.orange,
+                          ),
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          'Key_DisclaimerText'.localized,
+                          style: TextStyles.txtRegular12(context).copyWith(
+                            color: Constant.clrTitlePageByTheme(context),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  // Close button
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _showDisclaimer = false;
+                      });
+                    },
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.orange,
+                      size: 20.h,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           SizedBox(height: 20.h),
         ],
       ),
@@ -614,94 +669,5 @@ class _USMarketDetailsScreenState
     } else {
       return 'Non-Sharia';
     }
-  }
-
-  /// Show Disclaimer Dialog Popup
-  void _showDisclaimerDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.r),
-          ),
-          child: Container(
-            padding: EdgeInsets.all(20.w),
-            decoration: BoxDecoration(
-              color: Constant.clrWhite,
-              borderRadius: BorderRadius.circular(15.r),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Close button at top right
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.close,
-                        color: Constant.clrBlackOrigin,
-                        size: 24.h,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8.h),
-
-                // Disclaimer content with same design
-                Container(
-                  padding: EdgeInsets.all(16.w),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(15.r),
-                    border: Border.all(
-                      color: Colors.orange.withOpacity(0.3),
-                    ),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.warning_amber_rounded,
-                        color: Colors.orange,
-                        size: 24.h,
-                      ),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Key_Disclaimer'.localized,
-                              style: TextStyles.txtBold14(context).copyWith(
-                                color: Colors.orange,
-                              ),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              'Key_DisclaimerText'.localized,
-                              style: TextStyles.txtRegular12(context).copyWith(
-                                color: Constant.clrBlackOrigin,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
   }
 }
