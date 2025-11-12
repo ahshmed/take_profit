@@ -328,9 +328,9 @@ class _USMarketDetailsScreenState
         },
         child: Container(
           decoration: BoxDecoration(
-            color: isSelected ? Colors.black : Colors.transparent,
+            color: isSelected ? Constant.clrBlackOrigin : Colors.transparent,
             border: Border.all(
-              color: Colors.grey.shade300,
+              color: Constant.clrGrey.withOpacity(0.3),
               width: 1,
             ),
             borderRadius: BorderRadius.circular(8.r),
@@ -339,8 +339,8 @@ class _USMarketDetailsScreenState
           child: Text(
             label,
             style: TextStyles.txtRegular12(context).copyWith(
-              color: isSelected ? Colors.white : Constant.clrTitlePageByTheme(context),
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              color: isSelected ? Constant.clrWhite : Constant.clrTitlePageByTheme(context),
+              fontWeight: isSelected ? Constant.fwSemiBold : Constant.fwRegular,
             ),
             textAlign: TextAlign.center,
             maxLines: 1,
@@ -386,10 +386,10 @@ class _USMarketDetailsScreenState
             Container(
               padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
+                color: Constant.clrOrange.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(15.r),
                 border: Border.all(
-                  color: Colors.orange.withOpacity(0.3),
+                  color: Constant.clrOrange.withOpacity(0.3),
                 ),
               ),
               child: Row(
@@ -397,7 +397,7 @@ class _USMarketDetailsScreenState
                 children: [
                   Icon(
                     Icons.warning_amber_rounded,
-                    color: Colors.orange,
+                    color: Constant.clrOrange,
                     size: 24.h,
                   ),
                   SizedBox(width: 12.w),
@@ -408,7 +408,7 @@ class _USMarketDetailsScreenState
                         Text(
                           'Key_Disclaimer'.localized,
                           style: TextStyles.txtBold14(context).copyWith(
-                            color: Colors.orange,
+                            color: Constant.clrOrange,
                           ),
                         ),
                         SizedBox(height: 4.h),
@@ -431,7 +431,7 @@ class _USMarketDetailsScreenState
                     },
                     child: Icon(
                       Icons.close,
-                      color: Colors.orange,
+                      color: Constant.clrOrange,
                       size: 20.h,
                     ),
                   ),

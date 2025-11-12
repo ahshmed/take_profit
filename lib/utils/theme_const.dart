@@ -78,6 +78,7 @@ class Constant {
   static Color clrDarkBlue = const Color(0xff1D0330);
   static Color clrRed = const Color(0xffF35353);
   static Color clrYellow = const Color(0xffFFBD19);
+  static Color clrOrange = const Color(0xffFFA500);
   static Color clrDarkPurple = const Color(0xff6622BD);
   static Color clrDarkGreen = const Color(0xff009C4D);
   static Color clrDarkGreenNew = const Color(0xff00994B);
