@@ -157,35 +157,65 @@ class _USMarketDetailsScreenState
                 ),
               ),
 
-              // Status Badges
+              // Status Badges - matching US Market screen style
               Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: getAppLanguage() == 'ar'
+                    ? CrossAxisAlignment.start
+                    : CrossAxisAlignment.end,
                 children: [
+                  // Buy Status Tag with one-sided radius
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    width: 97.w,
+                    height: 23.h,
+                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                     decoration: BoxDecoration(
                       color: Colors.green,
-                      borderRadius: BorderRadius.circular(20.r),
+                      borderRadius: getAppLanguage() == 'ar'
+                          ? BorderRadius.only(
+                        topRight: Radius.circular(12.r),
+                        bottomRight: Radius.circular(12.r),
+                      )
+                          : BorderRadius.only(
+                        topLeft: Radius.circular(12.r),
+                        bottomLeft: Radius.circular(12.r),
+                      ),
                     ),
                     child: Text(
                       'Key_StrongBuy'.localized,
-                      style: TextStyles.txtRegular10(context).copyWith(
-                        color: Colors.white,
+                      style: TextStyles.txtSemiBoldG10(context).copyWith(
+                        fontWeight: Constant.fwRegular,
+                        color: Constant.clrWhite,
+                        fontSize: 10.sp,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                  SizedBox(height: 8.h),
+                  SizedBox(height: 6.h),
+                  // Sharia Compliance Tag with one-sided radius
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    width: 97.w,
+                    height: 23.h,
+                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                     decoration: BoxDecoration(
                       color: Colors.purple,
-                      borderRadius: BorderRadius.circular(20.r),
+                      borderRadius: getAppLanguage() == 'ar'
+                          ? BorderRadius.only(
+                        topRight: Radius.circular(12.r),
+                        bottomRight: Radius.circular(12.r),
+                      )
+                          : BorderRadius.only(
+                        topLeft: Radius.circular(12.r),
+                        bottomLeft: Radius.circular(12.r),
+                      ),
                     ),
                     child: Text(
                       'Key_ShariaCompliant'.localized,
-                      style: TextStyles.txtRegular10(context).copyWith(
-                        color: Colors.white,
+                      style: TextStyles.txtSemiBoldG10(context).copyWith(
+                        fontWeight: Constant.fwRegular,
+                        color: Constant.clrWhite,
+                        fontSize: 9.sp,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],
@@ -227,25 +257,50 @@ class _USMarketDetailsScreenState
   Widget _buildTabBar() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-      decoration: BoxDecoration(
-        color: Constant.clrCardBGByTheme(context),
-        borderRadius: BorderRadius.circular(25.r),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        indicator: BoxDecoration(
-          color: Constant.clrPrimary,
-          borderRadius: BorderRadius.circular(25.r),
-        ),
-        labelColor: Colors.white,
-        unselectedLabelColor: Constant.clrTitlePageByTheme(context),
-        labelStyle: TextStyles.txtRegular12(context),
-        tabs: [
-          Tab(text: 'Key_Insight'.localized),
-          Tab(text: 'Key_Story'.localized),
-          Tab(text: 'Key_Scorecard'.localized),
-          Tab(text: 'Key_Risks'.localized),
+      height: 40.h,
+      child: Row(
+        children: [
+          _buildTab('Key_Insight'.localized, 0),
+          SizedBox(width: 8.w),
+          _buildTab('Key_Story'.localized, 1),
+          SizedBox(width: 8.w),
+          _buildTab('Key_Scorecard'.localized, 2),
+          SizedBox(width: 8.w),
+          _buildTab('Key_Risks'.localized, 3),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTab(String label, int index) {
+    final bool isSelected = _selectedTabIndex == index;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          _tabController.animateTo(index);
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.black : Colors.transparent,
+            border: Border.all(
+              color: Colors.grey.shade300,
+              width: 1,
+            ),
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: TextStyles.txtRegular12(context).copyWith(
+              color: isSelected ? Colors.white : Constant.clrTitlePageByTheme(context),
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
       ),
     );
   }
