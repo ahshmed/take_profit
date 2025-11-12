@@ -463,6 +463,9 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     required Color color,
     required VoidCallback onTap,
   }) {
+    // Check if this is the consultation button to add dotted border
+    final bool isConsultation = text.toLowerCase().contains('consult');
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -470,16 +473,30 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
         decoration: BoxDecoration(
           color: isPrimary ? color : Constant.clrWhite,
           borderRadius: BorderRadius.circular(12.r),
-          border: isPrimary ? null : Border.all(color: color, width: 1.5),
+          border: isPrimary
+              ? null
+              : isConsultation
+                  ? Border.all(
+                      color: color,
+                      width: 1.5,
+                      strokeAlign: BorderSide.strokeAlignInside,
+                      // Note: Dotted border requires custom painter
+                    )
+                  : Border.all(color: color, width: 1.5),
         ),
-        child: Center(
-          child: Text(
-            text,
-            style: TextStyles.txtMedium14(context).copyWith(
-              color: isPrimary ? Constant.clrWhite : color,
-              fontWeight: Constant.fwSemiBold,
+        child: CustomPaint(
+          painter: isConsultation && !isPrimary
+              ? DottedBorderPainter(color: color, strokeWidth: 1.5, radius: 12.r)
+              : null,
+          child: Center(
+            child: Text(
+              text,
+              style: TextStyles.txtMedium14(context).copyWith(
+                color: isPrimary ? Constant.clrWhite : color,
+                fontWeight: Constant.fwSemiBold,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
         ),
       ),
@@ -625,45 +642,48 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
       );
     }
 
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: Column(
-        children: [
-          ...filteredList.asMap().entries.map((entry) {
-            int index = entry.key;
-            StockModel stock = entry.value;
+    return Column(
+      children: [
+        ...filteredList.asMap().entries.map((entry) {
+          int index = entry.key;
+          StockModel stock = entry.value;
 
-            // Add promotional banner after 2nd card
-            if (index == 2) {
-              return Column(
-                children: [
-                  buildInvestmentCard(stock),
-                  SizedBox(height: 16.h),
-                  buildPromotionalBanner(),
-                  SizedBox(height: 16.h),
-                ],
-              );
-            }
-
+          // Add promotional banner after 1st card (index 0) and make it full width
+          if (index == 1) {
             return Column(
               children: [
-                buildInvestmentCard(stock),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: buildInvestmentCard(stock),
+                ),
+                SizedBox(height: 16.h),
+                buildPromotionalBanner(), // Full width - no horizontal padding
                 SizedBox(height: 16.h),
               ],
             );
-          }).toList(),
-        ],
-      ),
+          }
+
+          return Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: buildInvestmentCard(stock),
+              ),
+              SizedBox(height: 16.h),
+            ],
+          );
+        }).toList(),
+      ],
     );
   }
 
-  /// Promotional Banner
+  /// Promotional Banner (Full Width)
   Widget buildPromotionalBanner() {
     return Container(
+      width: double.infinity, // Full width
       height: 140.h,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.r),
-        gradient: const LinearGradient(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
           colors: [
@@ -671,13 +691,6 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
             Color(0xFF2A1A5E), // Dark purple
           ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Stack(
         children: [
@@ -695,7 +708,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(20.w),
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -784,40 +797,54 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
           ),
           SizedBox(height: 12.h),
 
-          // Investment Title and Tags
+          // Investment Title with Logo and Tags
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Logo and Text Section
               Expanded(
-                child: Column(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '${stockData.companyName} (${stockData.ticker})',
-                      style: TextStyles.txtSemiBold16(context).copyWith(
-                        color: Constant.clrBlackOrigin,
-                        fontSize: 15.sp,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 8.h),
-                    // Price in Blue
-                    Text(
-                      stockData.price,
-                      style: TextStyles.txtSemiBold18(context).copyWith(
-                        color: Constant.clrBlue,
-                        fontSize: 18.sp,
+                    // Company Logo
+                    _buildStockLogo(stockData.ticker),
+                    SizedBox(width: 12.w),
+                    // Company Name and Price
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${stockData.companyName} (${stockData.ticker})',
+                            style: TextStyles.txtSemiBold16(context).copyWith(
+                              color: Constant.clrBlackOrigin,
+                              fontSize: 15.sp,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 8.h),
+                          // Price in Blue
+                          Text(
+                            stockData.price,
+                            style: TextStyles.txtSemiBold18(context).copyWith(
+                              color: Constant.clrBlue,
+                              fontSize: 18.sp,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
               SizedBox(width: 12.w),
-              // Status Tags Column
+              // Status Tags Column - Support RTL/LTR
               Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: getAppLanguage() == 'ar'
+                    ? CrossAxisAlignment.start
+                    : CrossAxisAlignment.end,
                 children: [
                   // Buy Status Tag
                   Container(
@@ -1065,4 +1092,137 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
       return const Color(0xFFF97316); // Orange
     }
   }
+
+  /// Helper: Build Stock Logo
+  Widget _buildStockLogo(String ticker) {
+    // Map ticker to logo asset
+    String logoAsset;
+    switch (ticker.toUpperCase()) {
+      case 'XPEV':
+        logoAsset = Constant.icXpengLogo;
+        break;
+      case 'AAPL':
+        logoAsset = Constant.icAppleLogo;
+        break;
+      case 'TSLA':
+        logoAsset = Constant.icTeslaLogo;
+        break;
+      case 'AMZN':
+        logoAsset = Constant.icAmazonLogo;
+        break;
+      case 'NIO':
+        logoAsset = Constant.icNIOLogo;
+        break;
+      case 'PLTR':
+        logoAsset = Constant.icPLTRLogo;
+        break;
+      case 'DIS':
+        logoAsset = Constant.icDISLogo;
+        break;
+      case 'APDD':
+        logoAsset = Constant.icAPDDLogo;
+        break;
+      default:
+        // Default placeholder - show ticker initial
+        return Container(
+          width: 40.w,
+          height: 40.h,
+          decoration: BoxDecoration(
+            color: Constant.clrPrimary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+          child: Center(
+            child: Text(
+              ticker.substring(0, 1),
+              style: TextStyles.txtBold16(context).copyWith(
+                color: Constant.clrPrimary,
+                fontSize: 18.sp,
+              ),
+            ),
+          ),
+        );
+    }
+
+    return Container(
+      width: 40.w,
+      height: 40.h,
+      decoration: BoxDecoration(
+        color: Constant.clrWhite,
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(
+          color: Constant.clrGrey.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8.r),
+        child: Image.asset(
+          logoAsset,
+          width: 40.w,
+          height: 40.h,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            // Fallback if image doesn't exist
+            return Container(
+              color: Constant.clrPrimary.withOpacity(0.1),
+              child: Center(
+                child: Text(
+                  ticker.substring(0, 1),
+                  style: TextStyles.txtBold16(context).copyWith(
+                    color: Constant.clrPrimary,
+                    fontSize: 18.sp,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+/// Custom Painter for Dotted Border
+class DottedBorderPainter extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+  final double radius;
+
+  DottedBorderPainter({
+    required this.color,
+    required this.strokeWidth,
+    required this.radius,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    const dashWidth = 5.0;
+    const dashSpace = 3.0;
+    double startX = 0;
+
+    final path = Path()
+      ..addRRect(RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        Radius.circular(radius),
+      ));
+
+    // Draw dashed path
+    for (PathMetric pathMetric in path.computeMetrics()) {
+      while (startX < pathMetric.length) {
+        final nextDash = startX + dashWidth;
+        final segment = pathMetric.extractPath(startX, nextDash);
+        canvas.drawPath(segment, paint);
+        startX = nextDash + dashSpace;
+      }
+      startX = 0;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
