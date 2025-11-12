@@ -353,7 +353,11 @@ class _USMarketDetailsScreenState
 
   Widget _buildInsightTab() {
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      padding: EdgeInsets.only(
+        left: 20.w,
+        right: 20.w,
+        bottom: MediaQuery.of(context).padding.bottom + 20.h,
+      ),
       child: Column(
         children: [
           _buildInsightCard(
@@ -438,7 +442,6 @@ class _USMarketDetailsScreenState
                 ],
               ),
             ),
-          SizedBox(height: 20.h),
         ],
       ),
     );
@@ -503,7 +506,11 @@ class _USMarketDetailsScreenState
 
   Widget _buildStoryTab() {
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      padding: EdgeInsets.only(
+        left: 20.w,
+        right: 20.w,
+        bottom: MediaQuery.of(context).padding.bottom + 20.h,
+      ),
       child: Column(
         children: [
           _buildStoryCard(
@@ -529,7 +536,6 @@ class _USMarketDetailsScreenState
             content:
             '• Last year: Made \$60 billion (that\'s a LOT!)\n• This year: Will make even more\n• Companies are spending billions on AI',
           ),
-          SizedBox(height: 20.h),
         ],
       ),
     );
@@ -597,7 +603,11 @@ class _USMarketDetailsScreenState
 
   Widget _buildScorecardTab() {
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      padding: EdgeInsets.only(
+        left: 20.w,
+        right: 20.w,
+        bottom: MediaQuery.of(context).padding.bottom + 20.h,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -652,7 +662,6 @@ class _USMarketDetailsScreenState
               color: Constant.clrSigDetByTheme(context),
             ),
           ),
-          SizedBox(height: 20.h),
         ],
       ),
     );
@@ -660,7 +669,11 @@ class _USMarketDetailsScreenState
 
   Widget _buildRisksTab() {
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      padding: EdgeInsets.only(
+        left: 20.w,
+        right: 20.w,
+        bottom: MediaQuery.of(context).padding.bottom + 20.h,
+      ),
       child: Column(
         children: [
           Text(
@@ -669,7 +682,6 @@ class _USMarketDetailsScreenState
               color: Constant.clrSigDetByTheme(context),
             ),
           ),
-          SizedBox(height: 20.h),
         ],
       ),
     );
