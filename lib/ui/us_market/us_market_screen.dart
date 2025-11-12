@@ -328,7 +328,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
           // Investment Cards
           buildInvestmentCards(stockWatch),
           // Add bottom padding to ensure promotional banner is fully visible
-          SizedBox(height: 80.h),
+          SizedBox(height: 200.h),
         ],
       ),
     );
