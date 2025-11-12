@@ -118,14 +118,12 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
   Widget build(BuildContext context) {
     final notificationWatch = ref.watch(notificationProvider);
     final profileWatch = ref.watch(profileProvider);
-    // CRITICAL FIX: Watch the stock provider
     final stockWatch = ref.watch(stockProvider);
 
     return Stack(
       children: [
         Scaffold(
-          backgroundColor: Constant.clrPageBackColor,
-          // App Bar matching the image with profile, title, and notification
+          backgroundColor: Constant.clrWhite,
           appBar: (widget.appbarRequired)
               ? CommonAppBar(
             title: getLocalValue("Key_RecommenderDetail"),
@@ -135,79 +133,297 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                 toolbarHeight: 64.h),
             isDrawer: false,
           )
-              : CommonAppBar(
-            backgroundColor: Constant.clrPrimary,
-            title: getLocalValue("Key_UsMarket"),
-            titleTextStyle: TextStyles.txtSemiBold18(context).copyWith(
-              color: Constant.clrWhite,
-              fontWeight: Constant.fwSemiBold,
-            ),
-            isTitleCenter: true,
-            appBar: AppBar(
-              backgroundColor: Constant.clrPrimary,
-              toolbarHeight: 64.h,
-            ),
-            isDrawer: true,
-            action: [
-              // Notification Icon
-              IconButton(
-                onPressed: () {
-                  Route route = SlideRightPageRoute(
-                    builder: (context) => const NotificationScreen(),
-                    settings: const RouteSettings(),
-                  );
-                  Navigator.of(context).push(route);
-                },
-                style: IconButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size(40.h, 40.h),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                icon: badge.Badge(
-                  showBadge: (notificationWatch.notificationCountResponseModel.data?.count != '0') &&
-                      (notificationWatch.notificationCountResponseModel.data != null),
-                  position: badge.BadgePosition.topEnd(top: 1, end: 6),
-                  badgeStyle: const badge.BadgeStyle(
-                    badgeColor: Colors.red,
-                    padding: EdgeInsets.all(4),
-                    elevation: 0,
-                  ),
-                  badgeContent: Text(
-                    notificationWatch.notificationCountResponseModel.data?.count ?? '',
-                    style: const TextStyle(color: Colors.white, fontSize: 10),
-                  ),
-                  child: Icon(
-                    Icons.notifications_outlined,
-                    color: Constant.clrWhite,
-                    size: 28.h,
-                  ),
-                ),
-              ),
-              SizedBox(width: 4.w),
-            ],
-          ),
-          body: NoInternetBuilder(child: bodyWidget(stockWatch)),
+              : _buildCustomHeader(context, profileWatch, notificationWatch),
+          body: NoInternetBuilder(child: bodyWidget(stockWatch, profileWatch)),
         ),
-        // CRITICAL FIX: Show loading indicator from provider
         DialogProgressBar(isLoading: stockWatch.isLoading),
       ],
     );
   }
 
+  /// Custom Header with Profile, Greeting, Search, and Notification
+  PreferredSizeWidget _buildCustomHeader(
+      BuildContext context, profileWatch, notificationWatch) {
+    final String userName = profileWatch.profileDetailResponseModel?.data?.nameEn ?? 'User';
 
-  // CRITICAL FIX: Pass stockWatch to bodyWidget
-  Widget bodyWidget(stockWatch) {
-    return Column(
-      children: [
-        SizedBox(height: 20.h),
-        buildSearchBar(stockWatch), // Pass stockWatch
-        SizedBox(height: 20.h),
-        buildTabBar(),
-        SizedBox(height: 16.h),
-        Expanded(
-          child: buildStockListView(stockWatch), // Pass stockWatch
+    return AppBar(
+      backgroundColor: Constant.clrWhite,
+      elevation: 0,
+      toolbarHeight: 70.h,
+      automaticallyImplyLeading: false,
+      title: Row(
+        children: [
+          // Profile Photo
+          GestureDetector(
+            onTap: () {
+              // Open drawer or profile
+            },
+            child: Container(
+              width: 45.w,
+              height: 45.h,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+              ),
+              child: ClipOval(
+                child: CacheImage(
+                  imageURL: profileWatch.profileDetailResponseModel?.data?.profileImage ?? '',
+                  width: 45.w,
+                  height: 45.h,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 12.w),
+          // Greeting Text
+          Expanded(
+            child: Text(
+              'Hi, $userName',
+              style: TextStyles.txtSemiBold18(context).copyWith(
+                color: Constant.clrBlackOrigin,
+                fontWeight: Constant.fwSemiBold,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        // Search Icon
+        Container(
+          width: 40.w,
+          height: 40.h,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Constant.clrGrey.withOpacity(0.3),
+          ),
+          child: IconButton(
+            icon: Icon(
+              Icons.search,
+              color: Constant.clrBlackOrigin,
+              size: 22.h,
+            ),
+            onPressed: () {
+              // Search functionality
+            },
+          ),
         ),
+        SizedBox(width: 10.w),
+        // Notification Icon
+        Container(
+          width: 40.w,
+          height: 40.h,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Constant.clrGrey.withOpacity(0.3),
+          ),
+          child: IconButton(
+            icon: badge.Badge(
+              showBadge: (notificationWatch.notificationCountResponseModel.data?.count != '0') &&
+                  (notificationWatch.notificationCountResponseModel.data != null),
+              position: badge.BadgePosition.topEnd(top: 0, end: 2),
+              badgeStyle: const badge.BadgeStyle(
+                badgeColor: Colors.red,
+                padding: EdgeInsets.all(3),
+              ),
+              badgeContent: Text(
+                notificationWatch.notificationCountResponseModel.data?.count ?? '',
+                style: const TextStyle(color: Colors.white, fontSize: 8),
+              ),
+              child: Icon(
+                Icons.notifications_outlined,
+                color: Constant.clrBlackOrigin,
+                size: 22.h,
+              ),
+            ),
+            onPressed: () {
+              Route route = SlideRightPageRoute(
+                builder: (context) => const NotificationScreen(),
+                settings: const RouteSettings(),
+              );
+              Navigator.of(context).push(route);
+            },
+          ),
+        ),
+        SizedBox(width: 16.w),
       ],
+    );
+  }
+
+
+  // Body Widget with complete redesigned layout
+  Widget bodyWidget(stockWatch, profileWatch) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SizedBox(height: 16.h),
+          // Banner Section
+          buildBannerSection(),
+          SizedBox(height: 16.h),
+          // Action Buttons
+          buildActionButtons(),
+          SizedBox(height: 24.h),
+          // Category Tabs with Underline
+          buildUnderlineTabs(),
+          SizedBox(height: 16.h),
+          // Investment Cards
+          buildInvestmentCards(stockWatch),
+        ],
+      ),
+    );
+  }
+
+  /// Banner Section with Bitcoin Image
+  Widget buildBannerSection() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: Container(
+        height: 180.h,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.r),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFE6B35A), // Gold
+              Color(0xFFD4A049), // Darker gold
+            ],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Bitcoin Icon/Pattern Background
+            Positioned(
+              right: -20,
+              top: -20,
+              child: Opacity(
+                opacity: 0.3,
+                child: Icon(
+                  Icons.currency_bitcoin,
+                  size: 150.h,
+                  color: Constant.clrWhite,
+                ),
+              ),
+            ),
+            // Text Content
+            Padding(
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '3D Gold Bitcoin',
+                    style: TextStyles.txtBold22(context).copyWith(
+                      color: Constant.clrWhite,
+                      fontSize: 24.sp,
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'Invest in the future of finance',
+                    style: TextStyles.txtRegular14(context).copyWith(
+                      color: Constant.clrWhite.withOpacity(0.9),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Action Buttons Section
+  Widget buildActionButtons() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: Column(
+        children: [
+          // First Row: Consultation and Subscribe
+          Row(
+            children: [
+              Expanded(
+                child: _buildButton(
+                  text: 'Consultation',
+                  isPrimary: false,
+                  color: Constant.clrPrimary,
+                  onTap: () {},
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: _buildButton(
+                  text: 'Subscribe',
+                  isPrimary: true,
+                  color: const Color(0xFFE6B35A), // Gold
+                  onTap: () {},
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          // Second Row: TakeProfit Investments and Your Portfolio
+          Row(
+            children: [
+              Expanded(
+                child: _buildButton(
+                  text: 'TakeProfit Investments',
+                  isPrimary: true,
+                  color: Constant.clrBlackOrigin,
+                  onTap: () {},
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: _buildButton(
+                  text: 'Your Portfolio',
+                  isPrimary: false,
+                  color: Constant.clrGrey,
+                  onTap: () {},
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Helper: Build Button
+  Widget _buildButton({
+    required String text,
+    required bool isPrimary,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 48.h,
+        decoration: BoxDecoration(
+          color: isPrimary ? color : Constant.clrWhite,
+          borderRadius: BorderRadius.circular(12.r),
+          border: isPrimary ? null : Border.all(color: color, width: 1.5),
+        ),
+        child: Center(
+          child: Text(
+            text,
+            style: TextStyles.txtMedium14(context).copyWith(
+              color: isPrimary ? Constant.clrWhite : color,
+              fontWeight: Constant.fwSemiBold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
     );
   }
 
@@ -287,92 +503,157 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     );
   }
 
-  /// Modern Pill-Shaped Tab Bar matching the design
-  Widget buildTabBar() {
+  /// Underline-Style Tabs
+  Widget buildUnderlineTabs() {
     return Container(
-      height: 44.h,
+      height: 50.h,
       padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: tabList.length,
-        itemBuilder: (context, index) {
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: List.generate(tabList.length, (index) {
           bool isSelected = selectedTabIndex == index;
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                selectedTabIndex = index;
-              });
-            },
-            child: Container(
-              margin: EdgeInsets.only(right: 10.w),
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? Constant.clrPrimary
-                    : Constant.clrWhite,
-                borderRadius: BorderRadius.circular(22.r),
-                border: Border.all(
-                  color: isSelected
-                      ? Constant.clrPrimary
-                      : Constant.clrBlackOrigin.withOpacity(0.15),
-                  width: 1.5,
-                ),
-                boxShadow: isSelected
-                    ? [
-                  BoxShadow(
-                    color: Constant.clrPrimary.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+          return Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedTabIndex = index;
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: isSelected
+                          ? Constant.clrPrimary
+                          : Colors.transparent,
+                      width: 2,
+                    ),
                   ),
-                ]
-                    : [],
-              ),
-              child: Center(
-                child: Text(
-                  getLocalValue(tabList[index]),
-                  style: TextStyles.txtMedium14(context).copyWith(
-                    color: isSelected
-                        ? Constant.clrWhite
-                        : Constant.clrBlackOrigin,
-                    fontWeight: isSelected ? Constant.fwSemiBold : Constant.fwMedium,
+                ),
+                child: Center(
+                  child: Text(
+                    getLocalValue(tabList[index]),
+                    style: TextStyles.txtMedium12(context).copyWith(
+                      color: isSelected
+                          ? Constant.clrPrimary
+                          : Constant.clrBlackOrigin.withOpacity(0.6),
+                      fontWeight: isSelected ? Constant.fwSemiBold : Constant.fwMedium,
+                      fontSize: 12.sp,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
             ),
           );
-        },
+        }),
       ),
     );
   }
 
-  /// Stock List View
-  Widget buildStockListView(stockWatch) {
-    // CRITICAL FIX: Use filteredStockList from provider
+  /// Investment Cards Section
+  Widget buildInvestmentCards(stockWatch) {
     final stockList = stockWatch.filteredStockList;
-
-    // Filter by selected tab
     final List<StockModel> filteredList = _filterStocksByTab(stockList);
 
     if (filteredList.isEmpty && !stockWatch.isLoading) {
-      return EmptyStateWidget(
-        emptyStateFor: EmptyState.noSearchFound,
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: 50.h),
+        child: EmptyStateWidget(
+          emptyStateFor: EmptyState.noSearchFound,
+        ),
       );
     }
 
-    return ListView.builder(
-      controller: _scrollController,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      itemCount: filteredList.length + 1, // +1 for ad banner
-      itemBuilder: (context, index) {
-        if (index == 3) {
-          return buildHorizontalAdBanner();
-        }
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: Column(
+        children: [
+          ...filteredList.asMap().entries.map((entry) {
+            int index = entry.key;
+            StockModel stock = entry.value;
 
-        final actualIndex = index > 3 ? index - 1 : index;
-        if (actualIndex >= filteredList.length) return const SizedBox.shrink();
+            // Add promotional banner after 2nd card
+            if (index == 2) {
+              return Column(
+                children: [
+                  buildInvestmentCard(stock),
+                  SizedBox(height: 16.h),
+                  buildPromotionalBanner(),
+                  SizedBox(height: 16.h),
+                ],
+              );
+            }
 
-        return buildStockCard(filteredList[actualIndex]);
-      },
+            return Column(
+              children: [
+                buildInvestmentCard(stock),
+                SizedBox(height: 16.h),
+              ],
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+
+  /// Promotional Banner
+  Widget buildPromotionalBanner() {
+    return Container(
+      height: 140.h,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16.r),
+        gradient: const LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [
+            Color(0xFF5E3FBE), // Purple
+            Color(0xFF2A1A5E), // Dark purple
+          ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Bitcoin icons in background
+          Positioned(
+            right: -30,
+            top: 10,
+            child: Opacity(
+              opacity: 0.2,
+              child: Icon(
+                Icons.currency_bitcoin,
+                size: 100.h,
+                color: Constant.clrWhite,
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(20.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Crypto Promotional\nOffers',
+                  style: TextStyles.txtBold22(context).copyWith(
+                    color: Constant.clrWhite,
+                    fontSize: 20.sp,
+                    height: 1.2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -413,152 +694,175 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     }).toList();
   }
 
-  /// Modern Stock Card matching the design
-  Widget buildStockCard(StockModel stockData) {
-    Widget cardContent = GestureDetector(
-      onTap: () {
-        Route route = SlideRightPageRoute(
-          builder: (context) => USMarketDetailsScreen(
-            ticker: stockData.ticker,
-            companyName: stockData.companyName,
+  /// Investment Card matching the detailed design
+  Widget buildInvestmentCard(StockModel stockData) {
+    final now = DateTime.now();
+    final dateTime = '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year} ${now.hour}:${now.minute.toString().padLeft(2, '0')}';
+
+    Widget cardContent = Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Constant.clrWhite,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
-          settings: const RouteSettings(),
-        );
-        Navigator.of(context).push(route);
-      },
-      child: Container(
-        margin: EdgeInsets.only(bottom: 12.h),
-        padding: EdgeInsets.all(16.w),
-        decoration: BoxDecoration(
-          color: Constant.clrWhite,
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.06),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Date and Time
+          Text(
+            dateTime,
+            style: TextStyles.txtRegular12(context).copyWith(
+              color: Constant.clrBlackOrigin.withOpacity(0.5),
+              fontSize: 11.sp,
             ),
-          ],
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            /// Circular Company Logo
-            Container(
-              width: 48.w,
-              height: 48.h,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Constant.clrPrimary.withOpacity(0.1),
-              ),
-              child: Center(
-                child: Text(
-                  stockData.ticker.substring(0, 1),
-                  style: TextStyles.txtBold16(context).copyWith(
-                    color: Constant.clrPrimary,
-                    fontSize: 20.sp,
-                  ),
+          ),
+          SizedBox(height: 12.h),
+
+          // Investment Title and Tags
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${stockData.companyName} (${stockData.ticker})',
+                      style: TextStyles.txtSemiBold16(context).copyWith(
+                        color: Constant.clrBlackOrigin,
+                        fontSize: 15.sp,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 8.h),
+                    // Price in Blue
+                    Text(
+                      stockData.price,
+                      style: TextStyles.txtSemiBold18(context).copyWith(
+                        color: Constant.clrBlue,
+                        fontSize: 18.sp,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            SizedBox(width: 12.w),
-
-            /// Company Name, Ticker & Status
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              SizedBox(width: 12.w),
+              // Status Tags Column
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
-                    stockData.companyName,
-                    style: TextStyles.txtSemiBold16(context).copyWith(
-                      color: Constant.clrBlackOrigin,
-                      fontSize: 16.sp,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    stockData.ticker,
-                    style: TextStyles.txtRegular12(context).copyWith(
-                      color: Constant.clrBlackOrigin.withOpacity(0.5),
-                      fontSize: 12.sp,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  /// Buy Status Badge
+                  // Buy Status Tag
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
                     decoration: BoxDecoration(
-                      color: _getBuyStatusColor((stockData as dynamic).buyStatus ?? 'Hold')
-                          .withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(16.r),
+                      color: _getBuyStatusColor((stockData as dynamic).buyStatus ?? 'Hold'),
+                      borderRadius: BorderRadius.circular(6.r),
                     ),
                     child: Text(
                       (stockData as dynamic).buyStatus ?? 'Hold',
                       style: TextStyles.txtMedium10(context).copyWith(
-                        color: _getBuyStatusColor((stockData as dynamic).buyStatus ?? 'Hold'),
+                        color: Constant.clrWhite,
                         fontWeight: Constant.fwSemiBold,
                         fontSize: 10.sp,
                       ),
                     ),
                   ),
+                  SizedBox(height: 6.h),
+                  // Sharia Compliance Tag
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                    decoration: BoxDecoration(
+                      color: _getComplianceColor((stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
+                      borderRadius: BorderRadius.circular(6.r),
+                    ),
+                    child: Text(
+                      _getComplianceText((stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
+                      style: TextStyles.txtMedium10(context).copyWith(
+                        color: Constant.clrWhite,
+                        fontWeight: Constant.fwSemiBold,
+                        fontSize: 9.sp,
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            ),
+            ],
+          ),
 
-            SizedBox(width: 12.w),
+          SizedBox(height: 16.h),
 
-            /// Price & Change
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  stockData.price,
-                  style: TextStyles.txtSemiBold16(context).copyWith(
-                    color: Constant.clrBlackOrigin,
-                    fontSize: 18.sp,
-                  ),
-                ),
-                SizedBox(height: 6.h),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                  decoration: BoxDecoration(
-                    color: stockData.isPositiveChange
-                        ? const Color(0xFF10B981).withOpacity(0.1)
-                        : const Color(0xFFEF4444).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(6.r),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        stockData.isPositiveChange
-                            ? Icons.arrow_upward
-                            : Icons.arrow_downward,
-                        size: 12.h,
-                        color: stockData.isPositiveChange
-                            ? const Color(0xFF10B981)
-                            : const Color(0xFFEF4444),
-                      ),
-                      SizedBox(width: 2.w),
-                      Text(
-                        stockData.changePercent,
+          // Action Buttons
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    // Add to portfolio action
+                  },
+                  child: Container(
+                    height: 42.h,
+                    decoration: BoxDecoration(
+                      color: Constant.clrWhite,
+                      borderRadius: BorderRadius.circular(8.r),
+                      border: Border.all(color: Constant.clrPrimary, width: 1.5),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Add to Portfolio',
                         style: TextStyles.txtMedium12(context).copyWith(
-                          color: stockData.isPositiveChange
-                              ? const Color(0xFF10B981)
-                              : const Color(0xFFEF4444),
+                          color: Constant.clrPrimary,
                           fontWeight: Constant.fwSemiBold,
                           fontSize: 12.sp,
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+              SizedBox(width: 10.w),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    Route route = SlideRightPageRoute(
+                      builder: (context) => USMarketDetailsScreen(
+                        ticker: stockData.ticker,
+                        companyName: stockData.companyName,
+                      ),
+                      settings: const RouteSettings(),
+                    );
+                    Navigator.of(context).push(route);
+                  },
+                  child: Container(
+                    height: 42.h,
+                    decoration: BoxDecoration(
+                      color: Constant.clrBlackOrigin,
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'View Details',
+                        style: TextStyles.txtMedium12(context).copyWith(
+                          color: Constant.clrWhite,
+                          fontWeight: Constant.fwSemiBold,
+                          fontSize: 12.sp,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
 
@@ -571,6 +875,15 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
       child: cardContent,
     )
         : cardContent;
+  }
+
+  /// Helper: Get Compliance Text
+  String _getComplianceText(String status) {
+    if (status.toLowerCase().contains('sharia compliant')) {
+      return 'Sharia Compliant';
+    } else {
+      return 'Non-Sharia';
+    }
   }
 
   /// Horizontal Ad Banner
@@ -675,9 +988,9 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     switch (status.toLowerCase()) {
       case 'strong buy':
       case 'buy':
-        return const Color(0xFF10B981); // Green
+        return const Color(0xFF32C671); // Green (Success)
       case 'sell':
-        return const Color(0xFFEF4444); // Red
+        return const Color(0xFFE74C3C); // Red (Danger)
       case 'hold':
         return const Color(0xFFF59E0B); // Orange
       default:
@@ -688,7 +1001,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
   /// Helper: Get Compliance Color
   Color _getComplianceColor(String status) {
     if (status.toLowerCase().contains('sharia compliant')) {
-      return const Color(0xFF8B5CF6); // Purple
+      return const Color(0xFF7B61FF); // Purple (Secondary)
     } else {
       return const Color(0xFFF97316); // Orange
     }
