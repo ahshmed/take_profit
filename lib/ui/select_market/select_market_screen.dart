@@ -195,16 +195,13 @@ class _ChooseMarketScreenState extends ConsumerState<SelectMarketScreen> {
                           // CRITICAL FIX: Set user status to guest to avoid 401 errors and show proper greeting
                           saveLocalData(KEY_USER_STATUS, guest);
 
-                          // Navigate to dashboard and force tab reset to home
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(builder: (context) => const DashboardScreen()),
-                                (route) => false,
+                          // CRITICAL FIX: Navigate to DrawerMenu instead of DashboardScreen
+                          // This ensures ZoomDrawer is properly initialized and drawer works on first launch
+                          Route route = SlideRightPageRoute(
+                            builder: (context) => const DrawerMenu(),
+                            settings: const RouteSettings(),
                           );
-
-                          // Reset to home tab (index 0)
-                          Future.delayed(const Duration(milliseconds: 100), () {
-                            ref.read(dashboardProvider).updateSelectedIndex(0);
-                          });
+                          Navigator.of(context).pushAndRemoveUntil(route, (route) => false);
                         }
                       },
                       style: ElevatedButton.styleFrom(
