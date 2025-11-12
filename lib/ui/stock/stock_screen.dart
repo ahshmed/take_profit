@@ -36,7 +36,7 @@ class _StockScreenState extends ConsumerState<StockScreen> {
 
       // Load notification count for guest/trader users
       if (getUserStatus() != guest) {
-        notificationWatch.notificationCountApi(context);
+        notificationWatch.notificationCountAPI(context);
       }
     });
   }
