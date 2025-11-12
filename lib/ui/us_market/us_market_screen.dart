@@ -7,6 +7,7 @@ import 'package:blur/blur.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:take_profit/ui/us_market/us_market_details_screen.dart';
 import 'package:take_profit/utils/extension/string_extension.dart';
 import '../../framework/data_provider/notification/notification_provider.dart';
@@ -18,10 +19,12 @@ import '../../utils/no_internet_builder.dart';
 import '../../utils/sliderightroute.dart';
 import '../../utils/theme_const.dart';
 import '../../utils/widgets/cache_image.dart';
+import '../../utils/widgets/common_image_asset.dart';
 import '../../utils/widgets/commonappbar.dart';
 import '../../utils/widgets/dialog_progressbar.dart';
 import '../../utils/widgets/empty_state_widget.dart';
 import '../notification/notification_screen.dart';
+import '../search/search_screen.dart';
 import '../stock/stock_screen.dart';
 
 // REMOVE the StockData class - we'll use StockModel instead
@@ -123,17 +126,9 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     return Stack(
       children: [
         Scaffold(
-          backgroundColor: Constant.clrWhite,
-          appBar: (widget.appbarRequired)
-              ? CommonAppBar(
-            title: getLocalValue("Key_RecommenderDetail"),
-            isTitleCenter: true,
-            appBar: AppBar(
-                backgroundColor: Constant.clrHomeScreenByTheme(context),
-                toolbarHeight: 64.h),
-            isDrawer: false,
-          )
-              : _buildCustomHeader(context, profileWatch, notificationWatch),
+          backgroundColor: Constant.clrHomeScreenByTheme(context),
+          // Always show the custom header in both scenarios
+          appBar: _buildCustomHeader(context, profileWatch, notificationWatch),
           body: NoInternetBuilder(child: bodyWidget(stockWatch, profileWatch)),
         ),
         DialogProgressBar(isLoading: stockWatch.isLoading),
@@ -141,111 +136,172 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     );
   }
 
-  /// Custom Header with Profile, Greeting, Search, and Notification
+  /// Custom Header matching Home Screen exactly
   PreferredSizeWidget _buildCustomHeader(
       BuildContext context, profileWatch, notificationWatch) {
-    final String userName = profileWatch.profileDetailResponseModel?.data?.nameEn ?? 'User';
+    // Format username like home screen
+    final String userName = getUserStatus() == guest
+        ? 'Key_TakeProfit'.localized
+        : ((getAppLanguage() == 'ar')
+        ? (profileWatch.profileDetailResponseModel?.data?.nameAr ?? "")
+        : (profileWatch.profileDetailResponseModel?.data?.nameEn ?? ""));
 
     return AppBar(
-      backgroundColor: Constant.clrWhite,
+      backgroundColor: Constant.clrHomeScreenByTheme(context),
       elevation: 0,
-      toolbarHeight: 70.h,
+      toolbarHeight: 64.h,
       automaticallyImplyLeading: false,
-      title: Row(
-        children: [
-          // Profile Photo
-          GestureDetector(
-            onTap: () {
-              // Open drawer or profile
-            },
-            child: Container(
-              width: 45.w,
-              height: 45.h,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-              ),
-              child: ClipOval(
-                child: CacheImage(
-                  imageURL: profileWatch.profileDetailResponseModel?.data?.profileImage ?? '',
-                  width: 45.w,
-                  height: 45.h,
-                ),
-              ),
+      leadingWidth: 56.w,
+      leading: Padding(
+        padding: EdgeInsets.only(left: 10.w),
+        child: GestureDetector(
+          onTap: () {
+            // Open drawer like in home screen
+            ZoomDrawer.of(context)?.toggle.call();
+          },
+          child: Container(
+            decoration: const BoxDecoration(shape: BoxShape.circle),
+            padding: EdgeInsets.all(4.w),
+            child: Center(
+              child: _buildDrawerLeadingAvatar(profileWatch),
             ),
-          ),
-          SizedBox(width: 12.w),
-          // Greeting Text
-          Expanded(
-            child: Text(
-              'Hi, $userName',
-              style: TextStyles.txtSemiBold18(context).copyWith(
-                color: Constant.clrBlackOrigin,
-                fontWeight: Constant.fwSemiBold,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        // Search Icon
-        Container(
-          width: 40.w,
-          height: 40.h,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Constant.clrGrey.withOpacity(0.3),
-          ),
-          child: IconButton(
-            icon: Icon(
-              Icons.search,
-              color: Constant.clrBlackOrigin,
-              size: 22.h,
-            ),
-            onPressed: () {
-              // Search functionality
-            },
           ),
         ),
-        SizedBox(width: 10.w),
-        // Notification Icon
-        Container(
-          width: 40.w,
-          height: 40.h,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Constant.clrGrey.withOpacity(0.3),
+      ),
+      title: Padding(
+        padding: EdgeInsets.only(left: 4.w),
+        child: Text(
+          getLocalValue("Key_Hi") + userName,
+          style: TextStyles.txtRegular16(context).copyWith(
+            color: Constant.clrTitlePageByTheme(context),
           ),
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+      titleSpacing: 0,
+      actions: [
+        // Search Icon - using image asset like home screen
+        IconButton(
+          onPressed: () {
+            final route = SlideRightPageRoute(
+              builder: (context) => const SearchScreen(),
+              settings: const RouteSettings(),
+            );
+            Navigator.of(context).push(route);
+          },
+          style: IconButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: Size(39.81.h, 39.81.h),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          splashRadius: 18,
+          icon: CommonImageAsset(
+            strIcon: Constant.icSearchN,
+            width: 39.81.h,
+            height: 39.81.h,
+            clrImg: Constant.clrTitlePageByTheme(context),
+          ),
+        ),
+        SizedBox(width: 5.w),
+        // Notification Icon - using image asset like home screen
+        Visibility(
+          visible: getUserStatus() != guest,
           child: IconButton(
-            icon: badge.Badge(
-              showBadge: (notificationWatch.notificationCountResponseModel.data?.count != '0') &&
-                  (notificationWatch.notificationCountResponseModel.data != null),
-              position: badge.BadgePosition.topEnd(top: 0, end: 2),
-              badgeStyle: const badge.BadgeStyle(
-                badgeColor: Colors.red,
-                padding: EdgeInsets.all(3),
-              ),
-              badgeContent: Text(
-                notificationWatch.notificationCountResponseModel.data?.count ?? '',
-                style: const TextStyle(color: Colors.white, fontSize: 8),
-              ),
-              child: Icon(
-                Icons.notifications_outlined,
-                color: Constant.clrBlackOrigin,
-                size: 22.h,
-              ),
-            ),
             onPressed: () {
-              Route route = SlideRightPageRoute(
+              final route = SlideRightPageRoute(
                 builder: (context) => const NotificationScreen(),
                 settings: const RouteSettings(),
               );
               Navigator.of(context).push(route);
             },
+            style: IconButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: Size(39.81.h, 39.81.h),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            splashRadius: 18,
+            icon: Visibility(
+              visible: (notificationWatch.notificationCountResponseModel.data?.count != '0') &&
+                  (notificationWatch.notificationCountResponseModel.data != null),
+              replacement: Image.asset(
+                Constant.icNotificationN,
+                width: 39.81.h,
+                height: 39.81.h,
+                color: Constant.clrTitlePageByTheme(context),
+              ),
+              child: badge.Badge(
+                position: badge.BadgePosition.topEnd(top: 1, end: 6),
+                badgeStyle: const badge.BadgeStyle(
+                  badgeColor: Colors.red,
+                  padding: EdgeInsets.all(4),
+                  elevation: 0,
+                ),
+                badgeContent: Text(
+                  notificationWatch.notificationCountResponseModel.data?.count ?? '',
+                  style: TextStyles.txtRegular10(context).copyWith(
+                    color: Constant.clrWhite,
+                  ),
+                ),
+                child: Image.asset(
+                  Constant.icNotificationN,
+                  width: 39.81.h,
+                  height: 39.81.h,
+                  color: Constant.clrTitlePageByTheme(context),
+                ),
+              ),
+            ),
           ),
         ),
-        SizedBox(width: 16.w),
+        Visibility(
+          visible: getUserStatus() != guest,
+          child: SizedBox(width: 4.w),
+        ),
       ],
+    );
+  }
+
+  /// Drawer Leading Avatar (matching CommonAppBar)
+  Widget _buildDrawerLeadingAvatar(profileWatch) {
+    final String? imageUrl = profileWatch.profileDetailResponseModel?.data?.profileImage;
+    final double avatarSize = 28.r;
+    final bool isGuestUser = getUserStatus() == guest;
+    final bool hasImage = imageUrl != null && imageUrl.isNotEmpty;
+    final bool showGuestAvatar = isGuestUser || !hasImage;
+
+    Widget avatar;
+    if (showGuestAvatar) {
+      avatar = SizedBox.square(
+        dimension: avatarSize,
+        child: ClipOval(
+          child: Image.asset(
+            Constant.icGuestN,
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+          ),
+        ),
+      );
+    } else {
+      avatar = SizedBox.square(
+        dimension: avatarSize,
+        child: ClipOval(
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+            errorBuilder: (context, error, stackTrace) => Image.asset(
+              Constant.icGuestN,
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      width: avatarSize,
+      height: avatarSize,
+      child: avatar,
     );
   }
 
