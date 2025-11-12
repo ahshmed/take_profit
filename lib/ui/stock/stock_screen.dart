@@ -170,6 +170,10 @@ class _StockScreenState extends ConsumerState<StockScreen> {
   }
 
   Widget _buildStockCard(stock) {
+    // Generate current date/time for the card
+    final now = DateTime.now();
+    final dateTime = '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year} ${now.hour}:${now.minute.toString().padLeft(2, '0')}';
+
     return GestureDetector(
       onTap: () {
         // Navigate to US Market Details Screen
@@ -177,6 +181,10 @@ class _StockScreenState extends ConsumerState<StockScreen> {
           builder: (context) => USMarketDetailsScreen(
             ticker: stock.ticker,
             companyName: stock.companyName,
+            price: stock.price,
+            buyStatus: (stock as dynamic).buyStatus ?? 'Hold',
+            complianceStatus: (stock as dynamic).complianceStatus ?? 'Sharia Compliant',
+            dateTime: dateTime,
           ),
           settings: const RouteSettings(),
         );
@@ -418,6 +426,10 @@ class _SearchStockScreenState extends ConsumerState<SearchStockScreen> {
   }
 
   Widget _buildStockCard(stock) {
+    // Generate current date/time for the card
+    final now = DateTime.now();
+    final dateTime = '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year} ${now.hour}:${now.minute.toString().padLeft(2, '0')}';
+
     return GestureDetector(
       onTap: () {
         // Navigate to US Market Details Screen
@@ -425,6 +437,10 @@ class _SearchStockScreenState extends ConsumerState<SearchStockScreen> {
           builder: (context) => USMarketDetailsScreen(
             ticker: stock.ticker,
             companyName: stock.companyName,
+            price: stock.price,
+            buyStatus: (stock as dynamic).buyStatus ?? 'Hold',
+            complianceStatus: (stock as dynamic).complianceStatus ?? 'Sharia Compliant',
+            dateTime: dateTime,
           ),
           settings: const RouteSettings(),
         );
