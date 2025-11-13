@@ -1393,7 +1393,7 @@ class DottedBorderPainter extends CustomPainter {
       ));
 
     // Draw dashed path
-    for (PathMetric pathMetric in path.computeMetrics()) {
+    for (ui.PathMetric pathMetric in path.computeMetrics()) {
       while (startX < pathMetric.length) {
         final nextDash = startX + dashWidth;
         final segment = pathMetric.extractPath(startX, nextDash);
