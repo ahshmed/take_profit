@@ -1215,7 +1215,8 @@ enum ScreenName {
   RecommenderBioScreen,
   RecommenderDetailsScreen,
   ProfileScreen,
-  RequestAnalysisScreen
+  RequestAnalysisScreen,
+  USMarketScreen
 }
 
 enum CourseType { session, Training, conference, None }

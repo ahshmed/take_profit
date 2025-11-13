@@ -25,6 +25,7 @@ import '../../utils/widgets/commonappbar.dart';
 import '../../utils/widgets/dialog_progressbar.dart';
 import '../../utils/widgets/empty_state_widget.dart';
 import '../notification/notification_screen.dart';
+import '../request_analysis/requesting_for_analysis_screen.dart';
 import '../search/search_screen.dart';
 import '../stock/stock_screen.dart';
 import 'portfolio_screen.dart';
@@ -419,7 +420,23 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                   text: 'Key_Consultation'.localized,
                   isPrimary: false,
                   color: Constant.clrPrimary,
-                  onTap: () {},
+                  onTap: () async {
+                    // Check if user is guest
+                    if (getUserStatus() == guest) {
+                      getStartedDialog(context, canPop: false);
+                      return;
+                    }
+
+                    // Navigate to Request Analysis Screen
+                    Route route = SlideRightPageRoute(
+                      builder: (context) => RequestingForAnalysisScreen(
+                        fromScreen: ScreenName.USMarketScreen,
+                        recommenderID: widget.recommenderID,
+                      ),
+                      settings: const RouteSettings(),
+                    );
+                    Navigator.push(context, route);
+                  },
                 ),
               ),
               SizedBox(width: 12.w),
