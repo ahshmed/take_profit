@@ -155,18 +155,21 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
       toolbarHeight: 64.h,
       automaticallyImplyLeading: false,
       leadingWidth: 56.w,
-      leading: Padding(
-        padding: EdgeInsets.only(left: 10.w),
-        child: GestureDetector(
-          onTap: () {
-            // Open drawer like in home screen
-            ZoomDrawer.of(context)?.toggle.call();
-          },
-          child: Container(
-            decoration: const BoxDecoration(shape: BoxShape.circle),
-            padding: EdgeInsets.all(4.w),
-            child: Center(
-              child: _buildDrawerLeadingAvatar(profileWatch),
+      leading: HeroMode(
+        enabled: false, // Disable Hero animation to prevent duplicate tag conflicts
+        child: Padding(
+          padding: EdgeInsets.only(left: 10.w),
+          child: GestureDetector(
+            onTap: () {
+              // Open drawer like in home screen
+              ZoomDrawer.of(context)?.toggle.call();
+            },
+            child: Container(
+              decoration: const BoxDecoration(shape: BoxShape.circle),
+              padding: EdgeInsets.all(4.w),
+              child: Center(
+                child: _buildDrawerLeadingAvatar(profileWatch),
+              ),
             ),
           ),
         ),
@@ -342,6 +345,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Container(
+        width: double.infinity,
         height: 180.h,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16.r),
