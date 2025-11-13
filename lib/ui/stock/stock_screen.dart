@@ -30,7 +30,14 @@ class _StockScreenState extends ConsumerState<StockScreen> {
     // Initialize stock data when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final stockWatch = ref.read(stockProvider);
+      final notificationWatch = ref.read(notificationProvider);
+
       stockWatch.initializeStockData();
+
+      // Load notification count for guest/trader users
+      if (getUserStatus() != guest) {
+        notificationWatch.notificationCountAPI(context);
+      }
     });
   }
 
@@ -47,74 +54,26 @@ class _StockScreenState extends ConsumerState<StockScreen> {
     final notificationWatch = ref.watch(notificationProvider);
 
     return Scaffold(
-      backgroundColor: Constant.clrScaffoldBGByTheme(context),
+      backgroundColor: Constant.clrBasicByTheme(context),
       appBar: CommonAppBar(
-        backgroundColor: Constant.clrHomeScreenByTheme(context),
-        isPremiumIconRequired: false,
-        title: getUserStatus() == guest
-            ? 'Key_USStocks'.localized
-            : getUserStatus() == trader
-            ? 'Key_USStocks'.localized
-            : 'Key_USStocks'.localized,
-        titleTextStyle: TextStyles.txtRegular16(context)
-            .copyWith(color: Constant.clrTitlePageByTheme(context)),
-        isDrawer: false,
+        isTitleCenter: false,
+        title: 'Key_Stock'.localized,
+        titleTextStyle: TextStyles.txtSemiBold18(context).copyWith(
+          fontWeight: Constant.fwLight,
+        ),
+        onPress: () => Navigator.pop(context, true),
         appBar: AppBar(
-          backgroundColor: Constant.clrHomeScreenByTheme(context),
+          backgroundColor: Constant.clrBasicByTheme(context),
           toolbarHeight: 64.h,
-          leading: Padding(
-            padding: EdgeInsets.all(8.w),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(25.r),
-              child: CacheImage(
-                imageURL: getUserStatus() == guest ? "" : getUserImage(),
-                isProfileImg: true,
-                height: 50.h,
-                width: 50.w,
-              ),
-            ),
-          ),
-          actions: [
-            // Search Icon - opens search stock screen
-            IconButton(
-              icon: Icon(
-                Icons.search,
-                color: Constant.clrTitlePageByTheme(context),
-                size: 24.h,
-              ),
-              onPressed: () {
-                Route route = SlideRightPageRoute(
-                  builder: (context) => const SearchStockScreen(),
-                  settings: const RouteSettings(),
-                );
-                Navigator.of(context).push(route);
-              },
-            ),
-            // Notification Icon with Badge
-            badge.Badge(
-              position: badge.BadgePosition.topEnd(top: 8.h, end: 8.w),
-              showBadge: (notificationWatch
-                  .notificationCountResponseModel
-                  .data
-                  ?.count !=
-                  null &&
-                  notificationWatch
-                      .notificationCountResponseModel
-                      .data
-                      ?.count !=
-                      '0'),
-              badgeContent: Text(
-                notificationWatch.notificationCountResponseModel?.data
-                    ?.count ??
-                    '0',
-                style: TextStyle(color: Colors.white, fontSize: 10.sp),
-              ),
+          elevation: 0,
+        ),
+        backgroundColor: Constant.clrBasicByTheme(context),
+        isDrawer: true,
+        action: [
+          if (getUserStatus() != guest)
+            Padding(
+              padding: EdgeInsets.only(right: 20.w),
               child: IconButton(
-                icon: Icon(
-                  Icons.notifications_none,
-                  color: Constant.clrTitlePageByTheme(context),
-                  size: 24.h,
-                ),
                 onPressed: () {
                   Route route = SlideRightPageRoute(
                     builder: (context) => const NotificationScreen(),
@@ -122,12 +81,16 @@ class _StockScreenState extends ConsumerState<StockScreen> {
                   );
                   Navigator.of(context).push(route);
                 },
+                style: IconButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size(39.81.h, 39.81.h),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                splashRadius: 18,
+                icon: _buildNotificationIcon(notificationWatch),
               ),
             ),
-            SizedBox(width: 8.w),
-          ],
-        ),
-
+        ],
       ),
       body: Column(
         children: [
@@ -207,6 +170,10 @@ class _StockScreenState extends ConsumerState<StockScreen> {
   }
 
   Widget _buildStockCard(stock) {
+    // Generate current date/time for the card
+    final now = DateTime.now();
+    final dateTime = '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year} ${now.hour}:${now.minute.toString().padLeft(2, '0')}';
+
     return GestureDetector(
       onTap: () {
         // Navigate to US Market Details Screen
@@ -214,6 +181,10 @@ class _StockScreenState extends ConsumerState<StockScreen> {
           builder: (context) => USMarketDetailsScreen(
             ticker: stock.ticker,
             companyName: stock.companyName,
+            price: stock.price,
+            buyStatus: (stock as dynamic).buyStatus ?? 'Hold',
+            complianceStatus: (stock as dynamic).complianceStatus ?? 'Sharia Compliant',
+            dateTime: dateTime,
           ),
           settings: const RouteSettings(),
         );
@@ -281,6 +252,41 @@ class _StockScreenState extends ConsumerState<StockScreen> {
             // Note: Favorite icon removed as per requirements
           ],
         ),
+      ),
+    );
+  }
+
+  /// Build notification icon with badge
+  Widget _buildNotificationIcon(notificationWatch) {
+    final hasNotifications = notificationWatch
+        .notificationCountResponseModel.data?.count != '0' &&
+        notificationWatch.notificationCountResponseModel.data != null;
+
+    if (!hasNotifications) {
+      return Image.asset(
+        Constant.icNotificationN,
+        width: 39.81.h,
+        height: 39.81.h,
+        color: Constant.clrTitlePageByTheme(context),
+      );
+    }
+
+    return badge.Badge(
+      position: badge.BadgePosition.topEnd(top: 1, end: 6),
+      badgeStyle: const badge.BadgeStyle(
+        badgeColor: Colors.red,
+        padding: EdgeInsets.all(4),
+        elevation: 0,
+      ),
+      badgeContent: Text(
+        notificationWatch.notificationCountResponseModel.data?.count ?? '',
+        style: TextStyles.txtRegular10(context).copyWith(color: Constant.clrWhite),
+      ),
+      child: Image.asset(
+        Constant.icNotificationN,
+        width: 39.81.h,
+        height: 39.81.h,
+        color: Constant.clrTitlePageByTheme(context),
       ),
     );
   }
@@ -420,6 +426,10 @@ class _SearchStockScreenState extends ConsumerState<SearchStockScreen> {
   }
 
   Widget _buildStockCard(stock) {
+    // Generate current date/time for the card
+    final now = DateTime.now();
+    final dateTime = '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year} ${now.hour}:${now.minute.toString().padLeft(2, '0')}';
+
     return GestureDetector(
       onTap: () {
         // Navigate to US Market Details Screen
@@ -427,6 +437,10 @@ class _SearchStockScreenState extends ConsumerState<SearchStockScreen> {
           builder: (context) => USMarketDetailsScreen(
             ticker: stock.ticker,
             companyName: stock.companyName,
+            price: stock.price,
+            buyStatus: (stock as dynamic).buyStatus ?? 'Hold',
+            complianceStatus: (stock as dynamic).complianceStatus ?? 'Sharia Compliant',
+            dateTime: dateTime,
           ),
           settings: const RouteSettings(),
         );

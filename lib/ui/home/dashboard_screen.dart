@@ -45,7 +45,29 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   void _onItemTapped(int index) {
-    ref.read(dashboardProvider).updateSelectedIndex(index);
+    final isRecommender = getUserStatus() == recommender;
+    final String? selectedMarket = getSelectedMarket();
+    final bool isUSMarket = selectedMarket == 'us_market';
+
+    // Check if user tapped on market-switching tab (index 4 for guest/trader)
+    if (!isRecommender && index == 4) {
+      // User tapped on the last tab which switches between markets
+      if (isUSMarket) {
+        // Currently in US Market mode, switch to Crypto
+        setSelectedMarket('crypto_signals');
+        ref.read(selectMarketProvider.notifier).selectMarketById('crypto_signals');
+      } else {
+        // Currently in Crypto mode, switch to US Market
+        setSelectedMarket('us_market');
+        ref.read(selectMarketProvider.notifier).selectMarketById('us_market');
+      }
+      // Reset to home tab (index 0) after market switch
+      ref.read(dashboardProvider).updateSelectedIndex(0);
+      _previousMarket = isUSMarket ? 'crypto_signals' : 'us_market';
+    } else {
+      // Normal tab selection
+      ref.read(dashboardProvider).updateSelectedIndex(index);
+    }
   }
 
   @override
@@ -71,13 +93,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final List<BottomNavItem> guestTraderNavItems = isUSMarket
         ? [
       // US Market Mode: Home (US Market), Stock, AI Assistant, Courses, Crypto
-      // CRITICAL FIX: US Market screen with appbarRequired=false for proper simple app bar
       BottomNavItem(
-        iconPath: Constant.icUsMarketN,
-        label: getLocalValue("Key_Us_Market"),
+        iconPath: Constant.icHomeN,
+        label: getLocalValue("Key_Home"),
         screen: const UsMarketDetailScreen(
           recommenderID: '',
-          appbarRequired: false,  // Shows back button + "US Market" title
+          appbarRequired: false,
         ),
       ),
       BottomNavItem(
