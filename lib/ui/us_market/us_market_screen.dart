@@ -346,7 +346,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Container(
         width: double.infinity,
-        height: 180.h,
+        height: 125.h,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16.r),
           gradient: const LinearGradient(
@@ -508,9 +508,10 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                                  text.contains('استشارة') ||
                                  text == 'Key_Consultation'.localized;
 
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
-      child: Container(
+      borderRadius: BorderRadius.circular(12.r),
+      child: Ink(
         height: 48.h,
         decoration: BoxDecoration(
           color: isPrimary ? color : Constant.clrCardBGByTheme(context),
