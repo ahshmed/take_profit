@@ -425,21 +425,32 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                   isPrimary: false,
                   color: Constant.clrPrimary,
                   onTap: () async {
+                    showLog("===== CONSULTATION BUTTON TAPPED =====");
+
                     // Check if user is guest
                     if (getUserStatus() == guest) {
+                      showLog("User is guest, showing dialog");
                       getStartedDialog(context, canPop: false);
                       return;
                     }
 
+                    showLog("User is logged in, navigating to RequestingForAnalysisScreen");
+                    showLog("RecommenderID: '${widget.recommenderID}'");
+
                     // Navigate to Request Analysis Screen
-                    Route route = SlideRightPageRoute(
-                      builder: (context) => RequestingForAnalysisScreen(
-                        fromScreen: ScreenName.USMarketScreen,
-                        recommenderID: widget.recommenderID,
-                      ),
-                      settings: const RouteSettings(),
-                    );
-                    Navigator.push(context, route);
+                    try {
+                      Route route = SlideRightPageRoute(
+                        builder: (context) => RequestingForAnalysisScreen(
+                          fromScreen: ScreenName.USMarketScreen,
+                          recommenderID: widget.recommenderID.isEmpty ? "0" : widget.recommenderID,
+                        ),
+                        settings: const RouteSettings(),
+                      );
+                      await Navigator.push(context, route);
+                      showLog("Navigation completed successfully");
+                    } catch (e) {
+                      showLog("Navigation error: $e");
+                    }
                   },
                 ),
               ),
@@ -508,32 +519,47 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                                  text.contains('استشارة') ||
                                  text == 'Key_Consultation'.localized;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12.r),
-      child: Ink(
-        height: 48.h,
-        decoration: BoxDecoration(
-          color: isPrimary ? color : Constant.clrCardBGByTheme(context),
-          borderRadius: BorderRadius.circular(12.r),
-          // Only solid border for non-consultation outlined buttons
-          border: isPrimary || isConsultation
-              ? null
-              : Border.all(color: color, width: 1.5),
-        ),
-        child: CustomPaint(
-          painter: isConsultation && !isPrimary
-              ? DottedBorderPainter(color: color, strokeWidth: 1.5, radius: 12.r)
-              : null,
-          child: Center(
-            child: Text(
-              text,
-              style: TextStyles.txtMedium14(context).copyWith(
-                color: isPrimary ? Constant.clrWhite : color,
-                fontWeight: Constant.fwSemiBold,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          showLog("Button tapped: $text");
+          onTap();
+        },
+        borderRadius: BorderRadius.circular(12.r),
+        child: Ink(
+          height: 48.h,
+          decoration: BoxDecoration(
+            color: isPrimary ? color : Constant.clrCardBGByTheme(context),
+            borderRadius: BorderRadius.circular(12.r),
+            // Only solid border for non-consultation outlined buttons
+            border: isPrimary || isConsultation
+                ? null
+                : Border.all(color: color, width: 1.5),
+          ),
+          child: Stack(
+            children: [
+              if (isConsultation && !isPrimary)
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: DottedBorderPainter(
+                      color: color,
+                      strokeWidth: 1.5,
+                      radius: 12.r,
+                    ),
+                  ),
+                ),
+              Center(
+                child: Text(
+                  text,
+                  style: TextStyles.txtMedium14(context).copyWith(
+                    color: isPrimary ? Constant.clrWhite : color,
+                    fontWeight: Constant.fwSemiBold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
+            ],
           ),
         ),
       ),
