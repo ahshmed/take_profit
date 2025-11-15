@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
-import 'package:take_profit/ui/us_market/us_market_details_screen.dart';
+import 'package:take_profit/ui/us_market/stock_details_screen.dart';
 import 'package:take_profit/utils/extension/string_extension.dart';
 import '../../framework/data_provider/notification/notification_provider.dart';
 import '../../framework/data_provider/portfolio/portfolio_provider.dart';
@@ -1012,7 +1012,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
 
                           // Navigate to details screen if not blurred
                           Route route = SlideRightPageRoute(
-                            builder: (context) => USMarketDetailsScreen(
+                            builder: (context) => StockDetailsScreen(
                               ticker: stockData.ticker,
                               companyName: stockData.companyName,
                               price: stockData.price,

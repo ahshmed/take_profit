@@ -6,7 +6,7 @@ import '../../utils/const.dart';
 import '../../utils/extension/string_extension.dart';
 import '../../utils/theme_const.dart';
 import '../../utils/widgets/commonappbar.dart';
-import 'us_market_details_screen.dart';
+import 'stock_details_screen.dart';
 import '../../utils/sliderightroute.dart';
 
 class PortfolioScreen extends ConsumerStatefulWidget {
@@ -311,7 +311,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
       onTap: () {
         // Navigate to details screen
         Route route = SlideRightPageRoute(
-          builder: (context) => USMarketDetailsScreen(
+          builder: (context) => StockDetailsScreen(
             ticker: item.ticker,
             companyName: item.companyName,
             price: item.currentPrice,
