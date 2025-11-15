@@ -908,67 +908,74 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
               ),
               SizedBox(width: 12.w),
               // Status Tags Column - Matching recommender_details_screen design
-              Column(
-                crossAxisAlignment: getAppLanguage() == 'ar'
-                    ? CrossAxisAlignment.start
-                    : CrossAxisAlignment.end,
-                children: [
-                  // Buy Status Tag
-                  Container(
-                    width: 97.w,
-                    height: 23.h,
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                    decoration: BoxDecoration(
-                      color: _getBuyStatusColor((stockData as dynamic).buyStatus ?? 'Hold'),
-                      borderRadius: getAppLanguage() == 'ar'
-                          ? BorderRadius.only(
-                        topRight: Radius.circular(12.r),
-                        bottomRight: Radius.circular(12.r),
-                      )
-                          : BorderRadius.only(
-                        topLeft: Radius.circular(12.r),
-                        bottomLeft: Radius.circular(12.r),
+              // Using Transform to extend tags to card edge (offset card padding)
+              Transform.translate(
+                offset: Offset(
+                  getAppLanguage() == 'ar' ? -16.w : 16.w,
+                  0,
+                ),
+                child: Column(
+                  crossAxisAlignment: getAppLanguage() == 'ar'
+                      ? CrossAxisAlignment.start
+                      : CrossAxisAlignment.end,
+                  children: [
+                    // Buy Status Tag
+                    Container(
+                      width: 97.w,
+                      height: 23.h,
+                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                      decoration: BoxDecoration(
+                        color: _getBuyStatusColor((stockData as dynamic).buyStatus ?? 'Hold'),
+                        borderRadius: getAppLanguage() == 'ar'
+                            ? BorderRadius.only(
+                          topRight: Radius.circular(12.r),
+                          bottomRight: Radius.circular(12.r),
+                        )
+                            : BorderRadius.only(
+                          topLeft: Radius.circular(12.r),
+                          bottomLeft: Radius.circular(12.r),
+                        ),
+                      ),
+                      child: Text(
+                        (stockData as dynamic).buyStatus ?? 'Hold',
+                        style: TextStyles.txtSemiBoldG10(context).copyWith(
+                          fontWeight: Constant.fwRegular,
+                          color: Constant.clrWhite,
+                          fontSize: 10.sp,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                    child: Text(
-                      (stockData as dynamic).buyStatus ?? 'Hold',
-                      style: TextStyles.txtSemiBoldG10(context).copyWith(
-                        fontWeight: Constant.fwRegular,
-                        color: Constant.clrWhite,
-                        fontSize: 10.sp,
+                    SizedBox(height: 6.h),
+                    // Sharia Compliance Tag
+                    Container(
+                      width: 97.w,
+                      height: 23.h,
+                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                      decoration: BoxDecoration(
+                        color: _getComplianceColor((stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
+                        borderRadius: getAppLanguage() == 'ar'
+                            ? BorderRadius.only(
+                          topRight: Radius.circular(12.r),
+                          bottomRight: Radius.circular(12.r),
+                        )
+                            : BorderRadius.only(
+                          topLeft: Radius.circular(12.r),
+                          bottomLeft: Radius.circular(12.r),
+                        ),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  SizedBox(height: 6.h),
-                  // Sharia Compliance Tag
-                  Container(
-                    width: 97.w,
-                    height: 23.h,
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                    decoration: BoxDecoration(
-                      color: _getComplianceColor((stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
-                      borderRadius: getAppLanguage() == 'ar'
-                          ? BorderRadius.only(
-                        topRight: Radius.circular(12.r),
-                        bottomRight: Radius.circular(12.r),
-                      )
-                          : BorderRadius.only(
-                        topLeft: Radius.circular(12.r),
-                        bottomLeft: Radius.circular(12.r),
+                      child: Text(
+                        _getComplianceText((stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
+                        style: TextStyles.txtSemiBoldG10(context).copyWith(
+                          fontWeight: Constant.fwRegular,
+                          color: Constant.clrWhite,
+                          fontSize: 9.sp,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                    child: Text(
-                      _getComplianceText((stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
-                      style: TextStyles.txtSemiBoldG10(context).copyWith(
-                        fontWeight: Constant.fwRegular,
-                        color: Constant.clrWhite,
-                        fontSize: 9.sp,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
