@@ -839,7 +839,6 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     final dateTime = '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year} ${now.hour}:${now.minute.toString().padLeft(2, '0')}';
 
     Widget cardContent = Container(
-      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Constant.clrHomeCardByTheme(context),
         borderRadius: BorderRadius.circular(16.r),
@@ -851,27 +850,26 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          // Date and Time
-          Text(
-            dateTime,
-            style: TextStyles.txtRegular12(context).copyWith(
-              color: Constant.clrTitlePageByTheme(context).withOpacity(0.5),
-              fontSize: 11.sp,
-            ),
-          ),
-          SizedBox(height: 12.h),
+          // Main content with padding
+          Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Date and Time
+                Text(
+                  dateTime,
+                  style: TextStyles.txtRegular12(context).copyWith(
+                    color: Constant.clrTitlePageByTheme(context).withOpacity(0.5),
+                    fontSize: 11.sp,
+                  ),
+                ),
+                SizedBox(height: 12.h),
 
-          // Investment Title with Logo and Tags
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Logo and Text Section
-              Expanded(
-                child: Row(
+                // Investment Title with Logo (without tags, they're positioned absolutely)
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Company Logo
@@ -903,221 +901,220 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                         ],
                       ),
                     ),
+                    // Add spacing for status tags so text doesn't overlap
+                    SizedBox(width: 105.w),
                   ],
                 ),
-              ),
-              SizedBox(width: 12.w),
-              // Status Tags Column - Matching recommender_details_screen design
-              // Using Transform to extend tags to card edge (offset card padding)
-              Transform.translate(
-                offset: Offset(
-                  getAppLanguage() == 'ar' ? -16.w : 16.w,
-                  0,
-                ),
-                child: Column(
-                  crossAxisAlignment: getAppLanguage() == 'ar'
-                      ? CrossAxisAlignment.start
-                      : CrossAxisAlignment.end,
+
+                SizedBox(height: 16.h),
+
+                // Action Buttons
+                Row(
                   children: [
-                    // Buy Status Tag
-                    Container(
-                      width: 97.w,
-                      height: 23.h,
-                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                      decoration: BoxDecoration(
-                        color: _getBuyStatusColor((stockData as dynamic).buyStatus ?? 'Hold'),
-                        borderRadius: getAppLanguage() == 'ar'
-                            ? BorderRadius.only(
-                          topRight: Radius.circular(12.r),
-                          bottomRight: Radius.circular(12.r),
-                        )
-                            : BorderRadius.only(
-                          topLeft: Radius.circular(12.r),
-                          bottomLeft: Radius.circular(12.r),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          // Check if card should be blurred
+                          final shouldBlur = _shouldBlurCard();
+
+                          if (shouldBlur) {
+                            // Show appropriate dialog based on user status
+                            if (getUserStatus() == guest) {
+                              getStartedDialog(context);
+                            }
+                            // TODO: Add subscription dialog when US Market subscription is implemented
+                            return;
+                          }
+
+                          // Add to portfolio action
+                          try {
+                            // Parse the buy price from the current price string
+                            final priceString = stockData.price.replaceAll(RegExp(r'[^\d.]'), '');
+                            final buyPrice = double.parse(priceString);
+
+                            // Add stock to portfolio
+                            ref.read(portfolioProvider).addToPortfolio(
+                              ticker: stockData.ticker,
+                              companyName: stockData.companyName,
+                              currentPrice: stockData.price,
+                              buyPrice: buyPrice,
+                              buyStatus: (stockData as dynamic).buyStatus ?? 'Hold',
+                              complianceStatus: (stockData as dynamic).complianceStatus ?? 'Sharia Compliant',
+                              dateTime: dateTime,
+                            );
+
+                            // Show success message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  '${stockData.ticker} ${'Key_AddedToPortfolio'.localized}',
+                                  style: TextStyles.txtRegular14(context).copyWith(
+                                    color: Constant.clrWhite,
+                                  ),
+                                ),
+                                backgroundColor: const Color(0xFF32C671),
+                                duration: const Duration(seconds: 2),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          } catch (e) {
+                            // Show error message if something goes wrong
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Key_ErrorAddingToPortfolio'.localized,
+                                  style: TextStyles.txtRegular14(context).copyWith(
+                                    color: Constant.clrWhite,
+                                  ),
+                                ),
+                                backgroundColor: const Color(0xFFE74C3C),
+                                duration: const Duration(seconds: 2),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
+                        },
+                        child: Container(
+                          height: 42.h,
+                          decoration: BoxDecoration(
+                            color: Constant.clrCardBGByTheme(context),
+                            borderRadius: BorderRadius.circular(8.r),
+                            border: Border.all(color: Constant.clrPrimary, width: 1.5),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Key_AddToPortfolio'.localized,
+                              style: TextStyles.txtMedium12(context).copyWith(
+                                color: Constant.clrPrimary,
+                                fontWeight: Constant.fwSemiBold,
+                                fontSize: 12.sp,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        (stockData as dynamic).buyStatus ?? 'Hold',
-                        style: TextStyles.txtSemiBoldG10(context).copyWith(
-                          fontWeight: Constant.fwRegular,
-                          color: Constant.clrWhite,
-                          fontSize: 10.sp,
-                        ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
-                    SizedBox(height: 6.h),
-                    // Sharia Compliance Tag
-                    Container(
-                      width: 97.w,
-                      height: 23.h,
-                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                      decoration: BoxDecoration(
-                        color: _getComplianceColor((stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
-                        borderRadius: getAppLanguage() == 'ar'
-                            ? BorderRadius.only(
-                          topRight: Radius.circular(12.r),
-                          bottomRight: Radius.circular(12.r),
-                        )
-                            : BorderRadius.only(
-                          topLeft: Radius.circular(12.r),
-                          bottomLeft: Radius.circular(12.r),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          // Check if card should be blurred
+                          final shouldBlur = _shouldBlurCard();
+
+                          if (shouldBlur) {
+                            // Show appropriate dialog based on user status
+                            if (getUserStatus() == guest) {
+                              getStartedDialog(context);
+                            }
+                            // TODO: Add subscription dialog when US Market subscription is implemented
+                            return;
+                          }
+
+                          // Navigate to details screen if not blurred
+                          Route route = SlideRightPageRoute(
+                            builder: (context) => USMarketDetailsScreen(
+                              ticker: stockData.ticker,
+                              companyName: stockData.companyName,
+                              price: stockData.price,
+                              buyStatus: (stockData as dynamic).buyStatus ?? 'Hold',
+                              complianceStatus: (stockData as dynamic).complianceStatus ?? 'Sharia Compliant',
+                              dateTime: dateTime,
+                            ),
+                            settings: const RouteSettings(),
+                          );
+                          Navigator.of(context).push(route);
+                        },
+                        child: Container(
+                          height: 42.h,
+                          decoration: BoxDecoration(
+                            color: Constant.clrBlackOrigin,
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Key_ViewDetails'.localized,
+                              style: TextStyles.txtMedium12(context).copyWith(
+                                color: Constant.clrWhite,
+                                fontWeight: Constant.fwSemiBold,
+                                fontSize: 12.sp,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        _getComplianceText((stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
-                        style: TextStyles.txtSemiBoldG10(context).copyWith(
-                          fontWeight: Constant.fwRegular,
-                          color: Constant.clrWhite,
-                          fontSize: 9.sp,
-                        ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-
-          SizedBox(height: 16.h),
-
-          // Action Buttons
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    // Check if card should be blurred
-                    final shouldBlur = _shouldBlurCard();
-
-                    if (shouldBlur) {
-                      // Show appropriate dialog based on user status
-                      if (getUserStatus() == guest) {
-                        getStartedDialog(context);
-                      }
-                      // TODO: Add subscription dialog when US Market subscription is implemented
-                      return;
-                    }
-
-                    // Add to portfolio action
-                    try {
-                      // Parse the buy price from the current price string
-                      final priceString = stockData.price.replaceAll(RegExp(r'[^\d.]'), '');
-                      final buyPrice = double.parse(priceString);
-
-                      // Add stock to portfolio
-                      ref.read(portfolioProvider).addToPortfolio(
-                        ticker: stockData.ticker,
-                        companyName: stockData.companyName,
-                        currentPrice: stockData.price,
-                        buyPrice: buyPrice,
-                        buyStatus: (stockData as dynamic).buyStatus ?? 'Hold',
-                        complianceStatus: (stockData as dynamic).complianceStatus ?? 'Sharia Compliant',
-                        dateTime: dateTime,
-                      );
-
-                      // Show success message
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            '${stockData.ticker} ${'Key_AddedToPortfolio'.localized}',
-                            style: TextStyles.txtRegular14(context).copyWith(
-                              color: Constant.clrWhite,
-                            ),
-                          ),
-                          backgroundColor: const Color(0xFF32C671),
-                          duration: const Duration(seconds: 2),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    } catch (e) {
-                      // Show error message if something goes wrong
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Key_ErrorAddingToPortfolio'.localized,
-                            style: TextStyles.txtRegular14(context).copyWith(
-                              color: Constant.clrWhite,
-                            ),
-                          ),
-                          backgroundColor: const Color(0xFFE74C3C),
-                          duration: const Duration(seconds: 2),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    }
-                  },
-                  child: Container(
-                    height: 42.h,
-                    decoration: BoxDecoration(
-                      color: Constant.clrCardBGByTheme(context),
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: Constant.clrPrimary, width: 1.5),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Key_AddToPortfolio'.localized,
-                        style: TextStyles.txtMedium12(context).copyWith(
-                          color: Constant.clrPrimary,
-                          fontWeight: Constant.fwSemiBold,
-                          fontSize: 12.sp,
-                        ),
-                      ),
+          // Status Tags positioned at card edge (outside padding)
+          Positioned(
+            top: 40.h,
+            right: getAppLanguage() == 'ar' ? null : 0,
+            left: getAppLanguage() == 'ar' ? 0 : null,
+            child: Column(
+              crossAxisAlignment: getAppLanguage() == 'ar'
+                  ? CrossAxisAlignment.start
+                  : CrossAxisAlignment.end,
+              children: [
+                // Buy Status Tag
+                Container(
+                  width: 97.w,
+                  height: 23.h,
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: _getBuyStatusColor((stockData as dynamic).buyStatus ?? 'Hold'),
+                    borderRadius: getAppLanguage() == 'ar'
+                        ? BorderRadius.only(
+                      topRight: Radius.circular(12.r),
+                      bottomRight: Radius.circular(12.r),
+                    )
+                        : BorderRadius.only(
+                      topLeft: Radius.circular(12.r),
+                      bottomLeft: Radius.circular(12.r),
                     ),
                   ),
-                ),
-              ),
-              SizedBox(width: 10.w),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    // Check if card should be blurred
-                    final shouldBlur = _shouldBlurCard();
-
-                    if (shouldBlur) {
-                      // Show appropriate dialog based on user status
-                      if (getUserStatus() == guest) {
-                        getStartedDialog(context);
-                      }
-                      // TODO: Add subscription dialog when US Market subscription is implemented
-                      return;
-                    }
-
-                    // Navigate to details screen if not blurred
-                    Route route = SlideRightPageRoute(
-                      builder: (context) => USMarketDetailsScreen(
-                        ticker: stockData.ticker,
-                        companyName: stockData.companyName,
-                        price: stockData.price,
-                        buyStatus: (stockData as dynamic).buyStatus ?? 'Hold',
-                        complianceStatus: (stockData as dynamic).complianceStatus ?? 'Sharia Compliant',
-                        dateTime: dateTime,
-                      ),
-                      settings: const RouteSettings(),
-                    );
-                    Navigator.of(context).push(route);
-                  },
-                  child: Container(
-                    height: 42.h,
-                    decoration: BoxDecoration(
-                      color: Constant.clrBlackOrigin,
-                      borderRadius: BorderRadius.circular(8.r),
+                  child: Text(
+                    (stockData as dynamic).buyStatus ?? 'Hold',
+                    style: TextStyles.txtSemiBoldG10(context).copyWith(
+                      fontWeight: Constant.fwRegular,
+                      color: Constant.clrWhite,
+                      fontSize: 10.sp,
                     ),
-                    child: Center(
-                      child: Text(
-                        'Key_ViewDetails'.localized,
-                        style: TextStyles.txtMedium12(context).copyWith(
-                          color: Constant.clrWhite,
-                          fontWeight: Constant.fwSemiBold,
-                          fontSize: 12.sp,
-                        ),
-                      ),
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-              ),
-            ],
+                SizedBox(height: 6.h),
+                // Sharia Compliance Tag
+                Container(
+                  width: 97.w,
+                  height: 23.h,
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: _getComplianceColor((stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
+                    borderRadius: getAppLanguage() == 'ar'
+                        ? BorderRadius.only(
+                      topRight: Radius.circular(12.r),
+                      bottomRight: Radius.circular(12.r),
+                    )
+                        : BorderRadius.only(
+                      topLeft: Radius.circular(12.r),
+                      bottomLeft: Radius.circular(12.r),
+                    ),
+                  ),
+                  child: Text(
+                    _getComplianceText((stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
+                    style: TextStyles.txtSemiBoldG10(context).copyWith(
+                      fontWeight: Constant.fwRegular,
+                      color: Constant.clrWhite,
+                      fontSize: 9.sp,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
