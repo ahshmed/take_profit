@@ -94,7 +94,7 @@ class _USMarketDetailsScreenState
 
   Widget _buildStockHeader() {
     return Container(
-      margin: EdgeInsets.only(left: 20.w, right: 20.w, top: 12.h, bottom: 20.h),
+      margin: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 20.h),
       decoration: BoxDecoration(
         color: Constant.clrHomeCardByTheme(context),
         borderRadius: BorderRadius.circular(16.r),
