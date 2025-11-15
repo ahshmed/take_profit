@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:take_profit/ui/us_market/stock_details_screen.dart';
+import 'package:take_profit/ui/us_market/us_market_details_screen.dart';
 import 'package:take_profit/utils/extension/string_extension.dart';
 import '../../framework/data_provider/notification/notification_provider.dart';
 import '../../framework/data_provider/portfolio/portfolio_provider.dart';
@@ -869,41 +870,71 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                 SizedBox(height: 12.h),
 
                 // Investment Title with Logo (without tags, they're positioned absolutely)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Company Logo
-                    _buildStockLogo(stockData.ticker),
-                    SizedBox(width: 12.w),
-                    // Company Name and Price
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${stockData.companyName} (${stockData.ticker})',
-                            style: TextStyles.txtSemiBold16(context).copyWith(
-                              color: Constant.clrTitlePageByTheme(context),
-                              fontSize: 15.sp,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: 8.h),
-                          // Price in Blue
-                          Text(
-                            stockData.price,
-                            style: TextStyles.txtSemiBold18(context).copyWith(
-                              color: Constant.clrBlue,
-                              fontSize: 18.sp,
-                            ),
-                          ),
-                        ],
+                // Tappable to navigate to simple stock details screen
+                GestureDetector(
+                  onTap: () {
+                    // Check if card should be blurred
+                    final shouldBlur = _shouldBlurCard();
+
+                    if (shouldBlur) {
+                      // Show appropriate dialog based on user status
+                      if (getUserStatus() == guest) {
+                        getStartedDialog(context);
+                      }
+                      // TODO: Add subscription dialog when US Market subscription is implemented
+                      return;
+                    }
+
+                    // Navigate to simple stock details screen (charts, prices, news)
+                    Route route = SlideRightPageRoute(
+                      builder: (context) => StockDetailsScreen(
+                        ticker: stockData.ticker,
+                        companyName: stockData.companyName,
+                        price: stockData.price,
+                        buyStatus: (stockData as dynamic).buyStatus ?? 'Hold',
+                        complianceStatus: (stockData as dynamic).complianceStatus ?? 'Sharia Compliant',
+                        dateTime: dateTime,
                       ),
-                    ),
-                    // Add spacing for status tags so text doesn't overlap
-                    SizedBox(width: 105.w),
-                  ],
+                      settings: const RouteSettings(),
+                    );
+                    Navigator.of(context).push(route);
+                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Company Logo
+                      _buildStockLogo(stockData.ticker),
+                      SizedBox(width: 12.w),
+                      // Company Name and Price
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${stockData.companyName} (${stockData.ticker})',
+                              style: TextStyles.txtSemiBold16(context).copyWith(
+                                color: Constant.clrTitlePageByTheme(context),
+                                fontSize: 15.sp,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: 8.h),
+                            // Price in Blue
+                            Text(
+                              stockData.price,
+                              style: TextStyles.txtSemiBold18(context).copyWith(
+                                color: Constant.clrBlue,
+                                fontSize: 18.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Add spacing for status tags so text doesn't overlap
+                      SizedBox(width: 105.w),
+                    ],
+                  ),
                 ),
 
                 SizedBox(height: 16.h),
@@ -1010,9 +1041,9 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                             return;
                           }
 
-                          // Navigate to details screen if not blurred
+                          // Navigate to detailed tabs screen (Insight, Story, Scorecard, Risks)
                           Route route = SlideRightPageRoute(
-                            builder: (context) => StockDetailsScreen(
+                            builder: (context) => USMarketDetailsScreen(
                               ticker: stockData.ticker,
                               companyName: stockData.companyName,
                               price: stockData.price,
