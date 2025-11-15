@@ -94,8 +94,7 @@ class _USMarketDetailsScreenState
 
   Widget _buildStockHeader() {
     return Container(
-      margin: EdgeInsets.all(20.w),
-      padding: EdgeInsets.all(16.w),
+      margin: EdgeInsets.only(left: 20.w, right: 20.w, top: 12.h, bottom: 20.h),
       decoration: BoxDecoration(
         color: Constant.clrHomeCardByTheme(context),
         borderRadius: BorderRadius.circular(16.r),
@@ -107,131 +106,74 @@ class _USMarketDetailsScreenState
           ),
         ],
       ),
-      child: Column(
+      child: Stack(
         children: [
-          Row(
-            children: [
-              // Stock Icon Placeholder
-              Container(
-                width: 50.w,
-                height: 50.h,
-                decoration: BoxDecoration(
-                  color: Constant.clrPrimary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(25.r),
-                ),
-                child: Center(
-                  child: Text(
-                    widget.ticker.substring(0, 1),
-                    style: TextStyles.txtMedium24(context).copyWith(
-                      color: Constant.clrPrimary,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: 12.w),
-
-              // Company Info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          // Main content with padding
+          Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              children: [
+                Row(
                   children: [
-                    // Date with matching style from US Market screen
-                    Text(
-                      widget.dateTime,
-                      style: TextStyles.txtRegular12(context).copyWith(
-                        color: Constant.clrTitlePageByTheme(context).withOpacity(0.5),
-                        fontSize: 11.sp,
+                    // Stock Icon Placeholder
+                    Container(
+                      width: 50.w,
+                      height: 50.h,
+                      decoration: BoxDecoration(
+                        color: Constant.clrPrimary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(25.r),
+                      ),
+                      child: Center(
+                        child: Text(
+                          widget.ticker.substring(0, 1),
+                          style: TextStyles.txtMedium24(context).copyWith(
+                            color: Constant.clrPrimary,
+                          ),
+                        ),
                       ),
                     ),
-                    SizedBox(height: 8.h),
-                    // Company name with matching style from US Market screen
-                    Text(
-                      '${widget.companyName} (${widget.ticker})',
-                      style: TextStyles.txtSemiBold16(context).copyWith(
-                        color: Constant.clrTitlePageByTheme(context),
-                        fontSize: 15.sp,
+                    SizedBox(width: 12.w),
+
+                    // Company Info
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Date with matching style from US Market screen
+                          Text(
+                            widget.dateTime,
+                            style: TextStyles.txtRegular12(context).copyWith(
+                              color: Constant.clrTitlePageByTheme(context).withOpacity(0.5),
+                              fontSize: 11.sp,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          // Company name with matching style from US Market screen
+                          Text(
+                            '${widget.companyName} (${widget.ticker})',
+                            style: TextStyles.txtSemiBold16(context).copyWith(
+                              color: Constant.clrTitlePageByTheme(context),
+                              fontSize: 15.sp,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 8.h),
+                          // Price
+                          Text(
+                            widget.price,
+                            style: TextStyles.txtSemiBold18(context).copyWith(
+                              color: Constant.clrBlue,
+                              fontSize: 18.sp,
+                            ),
+                          ),
+                        ],
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 8.h),
-                    // Price
-                    Text(
-                      widget.price,
-                      style: TextStyles.txtSemiBold18(context).copyWith(
-                        color: Constant.clrBlue,
-                        fontSize: 18.sp,
-                      ),
-                    ),
+                    // Add spacing for status tags so text doesn't overlap
+                    SizedBox(width: 105.w),
                   ],
                 ),
-              ),
-
-              // Status Badges - matching US Market screen style
-              Column(
-                crossAxisAlignment: getAppLanguage() == 'ar'
-                    ? CrossAxisAlignment.start
-                    : CrossAxisAlignment.end,
-                children: [
-                  // Buy Status Tag with one-sided radius
-                  Container(
-                    width: 97.w,
-                    height: 23.h,
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-                    decoration: BoxDecoration(
-                      color: _getBuyStatusColor(widget.buyStatus),
-                      borderRadius: getAppLanguage() == 'ar'
-                          ? BorderRadius.only(
-                        topRight: Radius.circular(12.r),
-                        bottomRight: Radius.circular(12.r),
-                      )
-                          : BorderRadius.only(
-                        topLeft: Radius.circular(12.r),
-                        bottomLeft: Radius.circular(12.r),
-                      ),
-                    ),
-                    child: Text(
-                      _getBuyStatusText(widget.buyStatus),
-                      style: TextStyles.txtSemiBoldG10(context).copyWith(
-                        fontWeight: Constant.fwRegular,
-                        color: Constant.clrWhite,
-                        fontSize: 10.sp,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  SizedBox(height: 6.h),
-                  // Sharia Compliance Tag with one-sided radius
-                  Container(
-                    width: 97.w,
-                    height: 23.h,
-                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-                    decoration: BoxDecoration(
-                      color: _getComplianceColor(widget.complianceStatus),
-                      borderRadius: getAppLanguage() == 'ar'
-                          ? BorderRadius.only(
-                        topRight: Radius.circular(12.r),
-                        bottomRight: Radius.circular(12.r),
-                      )
-                          : BorderRadius.only(
-                        topLeft: Radius.circular(12.r),
-                        bottomLeft: Radius.circular(12.r),
-                      ),
-                    ),
-                    child: Text(
-                      _getComplianceText(widget.complianceStatus),
-                      style: TextStyles.txtSemiBoldG10(context).copyWith(
-                        fontWeight: Constant.fwRegular,
-                        color: Constant.clrWhite,
-                        fontSize: 9.sp,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
 
           // Add to Portfolio Button inside the card
           SizedBox(height: 16.h),
@@ -293,6 +235,78 @@ class _USMarketDetailsScreenState
                   color: Constant.clrPrimary,
                 ),
               ),
+            ),
+          ),
+              ],
+            ),
+          ),
+
+          // Status Tags positioned at card edge (outside padding)
+          Positioned(
+            top: 40.h,
+            right: getAppLanguage() == 'ar' ? null : 0,
+            left: getAppLanguage() == 'ar' ? 0 : null,
+            child: Column(
+              crossAxisAlignment: getAppLanguage() == 'ar'
+                  ? CrossAxisAlignment.start
+                  : CrossAxisAlignment.end,
+              children: [
+                // Buy Status Tag with one-sided radius
+                Container(
+                  width: 97.w,
+                  height: 23.h,
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: _getBuyStatusColor(widget.buyStatus),
+                    borderRadius: getAppLanguage() == 'ar'
+                        ? BorderRadius.only(
+                      topRight: Radius.circular(12.r),
+                      bottomRight: Radius.circular(12.r),
+                    )
+                        : BorderRadius.only(
+                      topLeft: Radius.circular(12.r),
+                      bottomLeft: Radius.circular(12.r),
+                    ),
+                  ),
+                  child: Text(
+                    _getBuyStatusText(widget.buyStatus),
+                    style: TextStyles.txtSemiBoldG10(context).copyWith(
+                      fontWeight: Constant.fwRegular,
+                      color: Constant.clrWhite,
+                      fontSize: 10.sp,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                SizedBox(height: 6.h),
+                // Sharia Compliance Tag with one-sided radius
+                Container(
+                  width: 97.w,
+                  height: 23.h,
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: _getComplianceColor(widget.complianceStatus),
+                    borderRadius: getAppLanguage() == 'ar'
+                        ? BorderRadius.only(
+                      topRight: Radius.circular(12.r),
+                      bottomRight: Radius.circular(12.r),
+                    )
+                        : BorderRadius.only(
+                      topLeft: Radius.circular(12.r),
+                      bottomLeft: Radius.circular(12.r),
+                    ),
+                  ),
+                  child: Text(
+                    _getComplianceText(widget.complianceStatus),
+                    style: TextStyles.txtSemiBoldG10(context).copyWith(
+                      fontWeight: Constant.fwRegular,
+                      color: Constant.clrWhite,
+                      fontSize: 9.sp,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
