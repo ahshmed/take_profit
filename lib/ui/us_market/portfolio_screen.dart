@@ -55,9 +55,9 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Portfolio Summary Cards
-                      _buildSummaryCards(portfolioWatch),
-                      SizedBox(height: 24.h),
+                      // Portfolio Summary Cards - HIDDEN
+                      // _buildSummaryCards(portfolioWatch),
+                      // SizedBox(height: 24.h),
 
                       // Section Title
                       Text(
