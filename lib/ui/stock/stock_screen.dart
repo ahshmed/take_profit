@@ -13,6 +13,7 @@ import '../../utils/widgets/cache_image.dart';
 import '../../utils/widgets/commonappbar.dart';
 import '../notification/notification_screen.dart';
 import '../us_market/us_market_details_screen.dart';
+import '../us_market/stock_details_screen.dart';
 
 class StockScreen extends ConsumerStatefulWidget {
   const StockScreen({Key? key}) : super(key: key);
@@ -176,9 +177,9 @@ class _StockScreenState extends ConsumerState<StockScreen> {
 
     return GestureDetector(
       onTap: () {
-        // Navigate to US Market Details Screen
+        // Navigate to simple Stock Details Screen (charts, prices, news)
         Route route = SlideRightPageRoute(
-          builder: (context) => USMarketDetailsScreen(
+          builder: (context) => StockDetailsScreen(
             ticker: stock.ticker,
             companyName: stock.companyName,
             price: stock.price,
@@ -432,9 +433,9 @@ class _SearchStockScreenState extends ConsumerState<SearchStockScreen> {
 
     return GestureDetector(
       onTap: () {
-        // Navigate to US Market Details Screen
+        // Navigate to simple Stock Details Screen (charts, prices, news)
         Route route = SlideRightPageRoute(
-          builder: (context) => USMarketDetailsScreen(
+          builder: (context) => StockDetailsScreen(
             ticker: stock.ticker,
             companyName: stock.companyName,
             price: stock.price,
