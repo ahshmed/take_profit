@@ -177,7 +177,7 @@ class _USMarketDetailsScreenState
                   Container(
                     width: 97.w,
                     height: 23.h,
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
                     decoration: BoxDecoration(
                       color: _getBuyStatusColor(widget.buyStatus),
                       borderRadius: getAppLanguage() == 'ar'
@@ -205,7 +205,7 @@ class _USMarketDetailsScreenState
                   Container(
                     width: 97.w,
                     height: 23.h,
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
                     decoration: BoxDecoration(
                       color: _getComplianceColor(widget.complianceStatus),
                       borderRadius: getAppLanguage() == 'ar'

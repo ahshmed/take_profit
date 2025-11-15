@@ -1154,11 +1154,10 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     return status;
   }
 
-  /// Helper: Get Compliance Text (kept in English)
+  /// Helper: Get Compliance Text (with Arabic translation for Sharia Compliant)
   String _getComplianceText(String status) {
-    // Return status as-is without translation
     if (status.toLowerCase().contains('sharia compliant')) {
-      return 'Sharia Compliant';
+      return 'Key_ShariaCompliant'.localized;
     } else {
       return 'Non-Sharia';
     }
