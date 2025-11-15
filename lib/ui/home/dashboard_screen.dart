@@ -191,18 +191,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       backgroundColor: Constant.clrTransparent,
       // This is IMPORTANT - allows body to extend behind navigation bar
       extendBody: true,
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: SizedBox(
-        width: 50.w,
-        height: 50.w,
-        child: FittedBox(
-          child: FloatingActionButton(
-            onPressed: _openWhatsapp,
-            backgroundColor: Constant.clrWhatsapp,
-            child: Image.asset(Constant.icWhatsappFab),
-          ),
-        ),
-      ),
+      // WhatsApp floating button - COMMENTED OUT
+      // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      // floatingActionButton: SizedBox(
+      //   width: 50.w,
+      //   height: 50.w,
+      //   child: FittedBox(
+      //     child: FloatingActionButton(
+      //       onPressed: _openWhatsapp,
+      //       backgroundColor: Constant.clrWhatsapp,
+      //       child: Image.asset(Constant.icWhatsappFab),
+      //     ),
+      //   ),
+      // ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         transitionBuilder: (Widget child, Animation<double> animation) {
@@ -229,25 +230,26 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Future<void> _openWhatsapp() async {
-    const contact = '+1234567890'; // TODO: Move to config
-    final url = Platform.isIOS
-        ? "https://wa.me/$contact"
-        : "whatsapp://send?phone=$contact";
-
-    try {
-      final uri = Uri.parse(url);
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri);
-      } else {
-        if (kDebugMode) {
-          debugPrint('Could not launch WhatsApp');
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('Error opening WhatsApp: $e');
-      }
-    }
-  }
+  // WhatsApp functionality - COMMENTED OUT
+  // Future<void> _openWhatsapp() async {
+  //   const contact = '+1234567890'; // TODO: Move to config
+  //   final url = Platform.isIOS
+  //       ? "https://wa.me/$contact"
+  //       : "whatsapp://send?phone=$contact";
+  //
+  //   try {
+  //     final uri = Uri.parse(url);
+  //     if (await canLaunchUrl(uri)) {
+  //       await launchUrl(uri);
+  //     } else {
+  //       if (kDebugMode) {
+  //         debugPrint('Could not launch WhatsApp');
+  //       }
+  //     }
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       debugPrint('Error opening WhatsApp: $e');
+  //     }
+  //   }
+  // }
 }
