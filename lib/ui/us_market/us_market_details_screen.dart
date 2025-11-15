@@ -191,7 +191,7 @@ class _USMarketDetailsScreenState
                       ),
                     ),
                     child: Text(
-                      widget.buyStatus,
+                      _getBuyStatusText(widget.buyStatus),
                       style: TextStyles.txtSemiBoldG10(context).copyWith(
                         fontWeight: Constant.fwRegular,
                         color: Constant.clrWhite,
@@ -687,6 +687,22 @@ class _USMarketDetailsScreenState
     );
   }
 
+  /// Helper: Get Buy Status Text (with translation)
+  String _getBuyStatusText(String status) {
+    switch (status.toLowerCase()) {
+      case 'strong buy':
+        return 'Key_StrongBuy'.localized;
+      case 'buy':
+        return 'Key_Buy'.localized;
+      case 'hold':
+        return 'Key_Hold'.localized;
+      case 'sell':
+        return 'Key_Sell'.localized;
+      default:
+        return status; // Return original if no match
+    }
+  }
+
   /// Helper: Get Buy Status Color
   Color _getBuyStatusColor(String status) {
     switch (status.toLowerCase()) {
@@ -711,12 +727,12 @@ class _USMarketDetailsScreenState
     }
   }
 
-  /// Helper: Get Compliance Text
+  /// Helper: Get Compliance Text (with Arabic translation)
   String _getComplianceText(String status) {
     if (status.toLowerCase().contains('sharia compliant')) {
-      return 'Sharia Compliant';
+      return 'Key_ShariaCompliant'.localized;
     } else {
-      return 'Non-Sharia';
+      return 'Key_NonSharia'.localized;
     }
   }
 }
