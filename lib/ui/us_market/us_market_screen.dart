@@ -1150,18 +1150,35 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
 
   /// Helper: Get Buy Status Text (with translation)
   String _getBuyStatusText(String status) {
+    showLog("===== BUY STATUS TRANSLATION =====");
+    showLog("Input status: '$status'");
+    showLog("Lowercase status: '${status.toLowerCase()}'");
+
+    String result;
     switch (status.toLowerCase()) {
       case 'strong buy':
-        return 'Key_StrongBuy'.localized;
+        result = 'Key_StrongBuy'.localized;
+        showLog("Matched 'strong buy', returning: $result");
+        break;
       case 'buy':
-        return 'Key_Buy'.localized;
+        result = 'Key_Buy'.localized;
+        showLog("Matched 'buy', returning: $result");
+        break;
       case 'hold':
-        return 'Key_Hold'.localized;
+        result = 'Key_Hold'.localized;
+        showLog("Matched 'hold', returning: $result");
+        break;
       case 'sell':
-        return 'Key_Sell'.localized;
+        result = 'Key_Sell'.localized;
+        showLog("Matched 'sell', returning: $result");
+        break;
       default:
-        return status; // Return original if no match
+        result = status;
+        showLog("No match, returning original: $result");
+        break;
     }
+
+    return result;
   }
 
   /// Helper: Get Compliance Text (with Arabic translation)
