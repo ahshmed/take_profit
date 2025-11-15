@@ -388,7 +388,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    '3D Gold Bitcoin',
+                    'Key_3DGoldBitcoin'.localized,
                     style: TextStyles.txtBold22(context).copyWith(
                       color: Constant.clrWhite,
                       fontSize: 24.sp,
@@ -781,7 +781,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Crypto Promotional\nOffers',
+                  'Key_CryptoPromotionalOffers'.localized,
                   style: TextStyles.txtBold22(context).copyWith(
                     color: Constant.clrWhite,
                     fontSize: 20.sp,
@@ -1076,7 +1076,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                     ),
                   ),
                   child: Text(
-                    (stockData as dynamic).buyStatus ?? 'Hold',
+                    _getBuyStatusText((stockData as dynamic).buyStatus ?? 'Hold'),
                     style: TextStyles.txtSemiBoldG10(context).copyWith(
                       fontWeight: Constant.fwRegular,
                       color: Constant.clrWhite,
@@ -1148,12 +1148,28 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     return false;
   }
 
+  /// Helper: Get Localized Buy Status Text
+  String _getBuyStatusText(String status) {
+    switch (status.toLowerCase()) {
+      case 'strong buy':
+        return 'Key_StrongBuy'.localized;
+      case 'buy':
+        return 'Key_Buy'.localized;
+      case 'hold':
+        return 'Key_Hold'.localized;
+      case 'sell':
+        return 'Key_Sell'.localized;
+      default:
+        return status; // Return original if no match
+    }
+  }
+
   /// Helper: Get Compliance Text
   String _getComplianceText(String status) {
     if (status.toLowerCase().contains('sharia compliant')) {
-      return 'Sharia Compliant';
+      return 'Key_ShariaCompliant'.localized;
     } else {
-      return 'Non-Sharia';
+      return 'Key_NonSharia'.localized;
     }
   }
 
@@ -1204,8 +1220,8 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                         children: [
                           Text(
                             index % 2 == 0
-                                ? 'Stock Market\nPromotional\nOffers'
-                                : 'Investment\nBanners\n& Video Ads',
+                                ? 'Key_StockMarketPromotionalOffers'.localized
+                                : 'Key_InvestmentBannersVideoAds'.localized,
                             style: TextStyles.txtBold22(context).copyWith(
                               color: Constant.clrWhite,
                               height: 1.2,
@@ -1235,7 +1251,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                             ),
                             SizedBox(width: 4.w),
                             Text(
-                              'Learn More',
+                              'Key_LearnMore'.localized,
                               style: TextStyles.txtMedium12(context).copyWith(
                                 color: const Color(0xFF5E3FBE),
                               ),
