@@ -1148,18 +1148,28 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     return false;
   }
 
-  /// Helper: Get Buy Status Text (kept in English)
+  /// Helper: Get Buy Status Text (with translation)
   String _getBuyStatusText(String status) {
-    // Return status as-is without translation
-    return status;
+    switch (status.toLowerCase()) {
+      case 'strong buy':
+        return 'Key_StrongBuy'.localized;
+      case 'buy':
+        return 'Key_Buy'.localized;
+      case 'hold':
+        return 'Key_Hold'.localized;
+      case 'sell':
+        return 'Key_Sell'.localized;
+      default:
+        return status; // Return original if no match
+    }
   }
 
-  /// Helper: Get Compliance Text (with Arabic translation for Sharia Compliant)
+  /// Helper: Get Compliance Text (with Arabic translation)
   String _getComplianceText(String status) {
     if (status.toLowerCase().contains('sharia compliant')) {
       return 'Key_ShariaCompliant'.localized;
     } else {
-      return 'Non-Sharia';
+      return 'Key_NonSharia'.localized;
     }
   }
 
