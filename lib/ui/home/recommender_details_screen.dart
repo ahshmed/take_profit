@@ -275,15 +275,15 @@ class _RecommenderDetailScreenState
 
                     SizedBox(height: 20.h),
 
-                    /// Search Bar
-                    buildSearchBar(),
+                    /// Search Bar - HIDDEN for recommender users
+                    // buildSearchBar(),
 
-                    SizedBox(height: 20.h),
+                    // SizedBox(height: 20.h),
 
-                    /// Gain History Section
-                    buildGainHistorySection(),
+                    /// Gain History Section - HIDDEN for recommender users
+                    // buildGainHistorySection(),
 
-                    SizedBox(height: 20.h),
+                    // SizedBox(height: 20.h),
 
                     /// Consultation and Subscribe Buttons
                     Visibility(
@@ -662,9 +662,9 @@ class _RecommenderDetailScreenState
       ),
       child: Row(
         children: [
-          /// Signals Tab
+          /// Signals Tab (Increased width as it's the main tab)
           Flexible(
-            flex: 3,
+            flex: 5,
             child: InkWell(
               onTap: () async {
                 recommenderWatch.updateMainTabIndex(0);
@@ -705,7 +705,7 @@ class _RecommenderDetailScreenState
 
           /// BTC Scenarios Tab
           Flexible(
-            flex: 5,
+            flex: 4,
             child: InkWell(
               onTap: () {
                 getUserStatus() == guest
@@ -748,7 +748,7 @@ class _RecommenderDetailScreenState
 
           /// Social Tab
           Flexible(
-            flex: 4,
+            flex: 3,
             child: InkWell(
               onTap: () {
                 recommenderWatch.updateMainTabIndex(2);
