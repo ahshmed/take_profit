@@ -558,5 +558,14 @@
   "Key_StockMarketPromotionalOffers": "Stock Market Promotional Offers",
   "Key_InvestmentBannersVideoAds": "Investment Banners & Video Ads",
   "Key_LearnMore": "Learn More",
-  "Key_News": "News"
+  "Key_News": "News",
+  "Key_CreateUSMarketStory": "Create US Market Story",
+  "Key_AddCard": "Add Card",
+  "Key_Publish": "Publish",
+  "Key_Card": "Card",
+  "Key_Title": "Title",
+  "Key_EnterTitle": "Enter title",
+  "Key_Description": "Description",
+  "Key_EnterDescription": "Enter description",
+  "Key_FeatureComingSoon": "Feature coming soon! Backend integration pending."
 }

@@ -558,5 +558,14 @@
   "Key_StockMarketPromotionalOffers": "عروض سوق الأسهم الترويجية",
   "Key_InvestmentBannersVideoAds": "لافتات الاستثمار وإعلانات الفيديو",
   "Key_LearnMore": "اعرف المزيد",
-  "Key_News": "الأخبار"
+  "Key_News": "الأخبار",
+  "Key_CreateUSMarketStory": "إنشاء قصة السوق الأمريكي",
+  "Key_AddCard": "إضافة بطاقة",
+  "Key_Publish": "نشر",
+  "Key_Card": "بطاقة",
+  "Key_Title": "العنوان",
+  "Key_EnterTitle": "أدخل العنوان",
+  "Key_Description": "الوصف",
+  "Key_EnterDescription": "أدخل الوصف",
+  "Key_FeatureComingSoon": "الميزة قريبًا! في انتظار التكامل الخلفي."
 }
