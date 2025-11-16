@@ -664,7 +664,7 @@ class _RecommenderDetailScreenState
         children: [
           /// Signals Tab
           Flexible(
-            flex: 4,
+            flex: 3,
             child: InkWell(
               onTap: () async {
                 recommenderWatch.updateMainTabIndex(0);
@@ -708,7 +708,7 @@ class _RecommenderDetailScreenState
 
           /// BTC Scenarios Tab
           Flexible(
-            flex: 4,
+            flex: 5,
             child: InkWell(
               onTap: () {
                 getUserStatus() == guest
