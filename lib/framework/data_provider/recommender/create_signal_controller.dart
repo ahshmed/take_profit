@@ -12,7 +12,7 @@ import '../../../utils/const.dart';
 import '../../repository/common/model/common_response_model.dart';
 import '../../repository/currencies/model/currencies_response_model.dart';
 import '../../repository/signal/contract/signal_repository.dart';
-import '../../repository/signal/model/all_signal_list_response_model.dart';
+import '../../repository/signal/model/all_signal_list_response_model.dart' as all_signal;
 import '../../repository/signal/model/signal_details_response_model.dart';
 import '../../repository/stock/model/stock_model.dart';
 
@@ -607,7 +607,7 @@ class CreateSignalController extends ChangeNotifier {
     notifyListeners();
   }
 
-  AllSignalListResponseModel? allSignalListResponseModel;
+  all_signal.AllSignalListResponseModel? allSignalListResponseModel;
 
   /// All signal list api
   Future<void> apiAllSignalList(
@@ -623,7 +623,7 @@ class CreateSignalController extends ChangeNotifier {
     await _signalRepository.allSignalListAPI(context, _request);
 
     apiResult.when(success: (data) {
-      allSignalListResponseModel = data as AllSignalListResponseModel;
+      allSignalListResponseModel = data as all_signal.AllSignalListResponseModel;
       if (allSignalListResponseModel?.status == ApiEndPoints.apiStatus_200) {
         // Clear the appropriate list based on status
         if (status == 'active') {
