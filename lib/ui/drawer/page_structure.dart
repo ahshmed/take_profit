@@ -88,30 +88,19 @@ class _PageStructureState extends ConsumerState<PageStructure>  {
         case 0:
           screenCurrent = const DashboardScreen();
           break;
+        // case 1: MyRevenue - REMOVED (hidden in menu)
         case 1:
-          screenCurrent = const MyRevenue(
-            isFromDrawer: true,
-          );
-          break;
-        case 2:
           screenCurrent = const RequestAnalysisScreen();
           break;
-       /* case 3:
-          screenCurrent = const FavoriteScreen();
-          break;*/
-        case 3:
+        case 2:
           screenCurrent = const SettingsScreen();
           break;
-        case 4:
+        case 3:
           screenCurrent = const CmsScreen(
             isFromDrawer: true,
           );
           break;
-        case 5:
-          // screenCurrent = const SupportsScreen(); // Support hidden as requested
-          // screenCurrent = EditProfileScreen(
-          //   profileData: profileWatch.profileDetailResponseModel?.data,
-          // );
+        case 4:
           screenCurrent = const ProfileScreen();
           break;
         case 1000:

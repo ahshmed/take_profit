@@ -23,7 +23,6 @@ import '../../utils/sliderightroute.dart';
 import '../../utils/theme_const.dart';
 import '../../utils/widgets/cache_image.dart';
 import '../../utils/widgets/common_image_asset.dart';
-import '../home/dashboard_screen.dart';
 import '../home/home_screen.dart';
 import '../profile/profile_screen.dart';
 import 'drawer_menu.dart';
@@ -237,6 +236,8 @@ class CustomDrawerState extends ConsumerState<CustomDrawer>  {
                         onChanged: (isEngEnable) async {
                           drawerWatch.updateLanguageToggle(isEngEnable);
                           showLog("switch val: $isEngEnable");
+
+                          // Update server settings if logged in
                           if (getUserStatus() != guest) {
                             _updateSettingsApi(
                                 settingsWatch, true, isEngEnable);
@@ -250,20 +251,26 @@ class CustomDrawerState extends ConsumerState<CustomDrawer>  {
                           await context.setLocale(Locale(
                               drawerWatch.isEngEnable == true ? "en" : "ar"));
 
-                          // Close drawer first
+                          // Close drawer
                           ZoomDrawer.of(context)!.close();
 
-                          // Wait for drawer animation to complete
-                          await Future.delayed(const Duration(milliseconds: 100));
+                          // Wait a bit for the locale change to propagate
+                          await Future.delayed(const Duration(milliseconds: 500));
 
-                          // Navigate to a fresh dashboard, removing all previous routes
-                          // This forces everything to rebuild with the new locale
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                              builder: (context) => const DashboardScreen(),
-                            ),
-                            (route) => false, // Remove all previous routes
-                          );
+                          // Force rebuild of the entire widget tree without navigation
+                          if (mounted) {
+                            // Reset dashboard state
+                            dashboardWatch.clearProvider();
+                            dashboardWatch.bottomTabInit();
+                            dashboardWatch.tabBody = const HomeScreen();
+                            dashboardWatch.updateWidget();
+                            drawerWatch.updateUi();
+
+                            // Pop to root if not already there
+                            while (Navigator.of(context).canPop()) {
+                              Navigator.of(context).pop();
+                            }
+                          }
                         },
                       )
                     ],
