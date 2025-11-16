@@ -253,7 +253,11 @@ class CustomDrawerState extends ConsumerState<CustomDrawer>  {
                           dashboardWatch.updateWidget();
                           drawerWatch.updateUi();
 
-                          ZoomDrawer.of(context)!.toggle();
+                          // Close drawer
+                          ZoomDrawer.of(context)!.close();
+
+                          // Navigate to home screen and clear navigation stack
+                          Navigator.of(context).popUntil((route) => route.isFirst);
                         },
                       )
                     ],

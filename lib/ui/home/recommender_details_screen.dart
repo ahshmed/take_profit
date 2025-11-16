@@ -946,16 +946,21 @@ class _RecommenderDetailScreenState
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            index % 2 == 0
-                                ? 'Key_CryptoPromotionalOffers'.localized.replaceAll(' ', '\n')
-                                : 'Key_CryptoBannersVideoAds'.localized.replaceAll(' ', '\n'),
-                            style: TextStyles.txtBold22(context).copyWith(
-                              color: Constant.clrWhite,
-                              height: 1.2,
+                          Flexible(
+                            child: Text(
+                              index % 2 == 0
+                                  ? 'Key_CryptoPromotionalOffers'.localized.replaceAll(' ', '\n')
+                                  : 'Key_CryptoBannersVideoAds'.localized.replaceAll(' ', '\n'),
+                              style: TextStyles.txtBold22(context).copyWith(
+                                color: Constant.clrWhite,
+                                height: 1.2,
+                              ),
+                              textAlign: TextAlign.start,
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            textAlign: TextAlign.start,
                           ),
                         ],
                       ),
@@ -973,6 +978,7 @@ class _RecommenderDetailScreenState
                           borderRadius: BorderRadius.circular(20.r),
                         ),
                         child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               Icons.monetization_on,
