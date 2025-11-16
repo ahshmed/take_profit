@@ -905,7 +905,7 @@ class _RecommenderDetailScreenState
   /// Horizontal Ad Banner - Appears AFTER first card
   Widget buildHorizontalAdBanner() {
     return Container(
-      height: 120.h,
+      height: 140.h,
       margin: EdgeInsets.symmetric(vertical: 16.h),
       child: PageView.builder(
         controller: _adPageController,
@@ -945,14 +945,14 @@ class _RecommenderDetailScreenState
                       left: 16.w,
                       top: 16.h,
                       right: 100.w,
-                      bottom: 50.h,
+                      bottom: 45.h,
                       child: Text(
                         (index % 2 == 0
                             ? getLocalValue('Key_CryptoPromotionalOffers')
                             : getLocalValue('Key_CryptoBannersVideoAds')).replaceAll(' ', '\n'),
                         style: TextStyles.txtBold22(context).copyWith(
                           color: Constant.clrWhite,
-                          height: 1.2,
+                          height: 1.1,
                         ),
                         textAlign: TextAlign.start,
                         maxLines: 3,
