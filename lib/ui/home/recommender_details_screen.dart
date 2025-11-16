@@ -309,7 +309,7 @@ class _RecommenderDetailScreenState
                           : socialWatch.isLoadingPagination,
                       forPagination: true,
                     ),
-                    SizedBox(height: 180.h)
+                    SizedBox(height: 24.h)
                   ],
                 ),
               ),
