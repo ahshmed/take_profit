@@ -236,6 +236,8 @@ class _CreateUSMarketStoryScreenState extends ConsumerState<CreateUSMarketStoryS
                   child: CommonButton(
                     label: getLocalValue('Key_Publish'),
                     onTap: _submitStory,
+                    bgColor: Constant.clrPrimary,
+                    labelColor: Constant.clrWhite,
                   ),
                 ),
               ],
@@ -305,8 +307,9 @@ class _CreateUSMarketStoryScreenState extends ConsumerState<CreateUSMarketStoryS
           ),
           SizedBox(height: 8.h),
           CustomTextField(
-            controller: _titleControllers[index],
-            focusNode: _titleFocusNodes[index],
+            context: context,
+            myController: _titleControllers[index],
+            myFocus: _titleFocusNodes[index],
             hintText: getLocalValue('Key_EnterTitle'),
             textInputType: TextInputType.text,
             onChanged: (value) {
@@ -324,11 +327,12 @@ class _CreateUSMarketStoryScreenState extends ConsumerState<CreateUSMarketStoryS
           ),
           SizedBox(height: 8.h),
           CustomTextField(
-            controller: _descriptionControllers[index],
-            focusNode: _descriptionFocusNodes[index],
+            context: context,
+            myController: _descriptionControllers[index],
+            myFocus: _descriptionFocusNodes[index],
             hintText: getLocalValue('Key_EnterDescription'),
             textInputType: TextInputType.multiline,
-            maxLines: 5,
+            maxLine: 5,
             onChanged: (value) {
               _storyCards[index].description = value;
             },
