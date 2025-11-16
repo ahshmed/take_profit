@@ -685,6 +685,9 @@ class _RecommenderDetailScreenState
                           ? FontWeight.w400
                           : FontWeight.w400,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 8.h),
                   Container(
@@ -728,6 +731,9 @@ class _RecommenderDetailScreenState
                           ? FontWeight.w400
                           : FontWeight.w400,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 8.h),
                   Container(
@@ -768,6 +774,9 @@ class _RecommenderDetailScreenState
                           ? FontWeight.w400
                           : FontWeight.w400,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 8.h),
                   Container(

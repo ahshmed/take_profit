@@ -72,6 +72,7 @@ const String KEY_USER_IMAGE = 'key_user_image';
 const String KEY_SKIP_VERSION = 'key_skip_version';
 const String KEY_FIRST_TIME_USER = 'first_time_user';
 const String KEY_SELECTED_MARKET = 'selected_market';
+const String KEY_US_MARKET_DISCLAIMER_SHOWN = 'key_us_market_disclaimer_shown';
 
 /// Twitter Data
 const String apikey_twitter = "rNJw0zn5tvG2RuqAmTxPPgXrs";

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../framework/data_provider/portfolio/portfolio_provider.dart';
@@ -6,6 +7,7 @@ import '../../utils/const.dart';
 import '../../utils/extension/string_extension.dart';
 import '../../utils/theme_const.dart';
 import '../../utils/widgets/commonappbar.dart';
+import '../../utils/widgets/common_button.dart';
 
 class USMarketDetailsScreen extends ConsumerStatefulWidget {
   final String ticker;
@@ -35,7 +37,6 @@ class _USMarketDetailsScreenState
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _selectedTabIndex = 0;
-  bool _showDisclaimer = true; // Show disclaimer by default
 
   @override
   void initState() {
@@ -46,6 +47,80 @@ class _USMarketDetailsScreenState
         _selectedTabIndex = _tabController.index;
       });
     });
+
+    // Show disclaimer dialog on first visit
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _showDisclaimerDialogIfNeeded();
+    });
+  }
+
+  void _showDisclaimerDialogIfNeeded() {
+    // Check if disclaimer has been shown before
+    final hasShownDisclaimer = userBox.get(KEY_US_MARKET_DISCLAIMER_SHOWN) ?? false;
+
+    if (!hasShownDisclaimer) {
+      _showDisclaimerDialog();
+    }
+  }
+
+  void _showDisclaimerDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+          child: Container(
+            padding: EdgeInsets.all(24.w),
+            decoration: BoxDecoration(
+              color: Constant.clrScaffoldBGByTheme(context),
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.warning_amber_rounded,
+                  color: Constant.clrOrange,
+                  size: 48.h,
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  'Key_Disclaimer'.localized,
+                  style: TextStyles.txtBold16(context).copyWith(
+                    color: Constant.clrOrange,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 12.h),
+                Text(
+                  'Key_DisclaimerText'.localized,
+                  style: TextStyles.txtRegular14(context).copyWith(
+                    color: Constant.clrTitlePageByTheme(context),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 24.h),
+                CommonButton(
+                  width: double.infinity,
+                  height: 48.h,
+                  bgColor: Constant.clrOrange,
+                  labelColor: Constant.clrWhite,
+                  label: 'Key_Ok'.localized,
+                  onTap: () {
+                    // Save that disclaimer has been shown
+                    saveLocalData(KEY_US_MARKET_DISCLAIMER_SHOWN, true);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -399,63 +474,7 @@ class _USMarketDetailsScreenState
           ),
           SizedBox(height: 16.h),
 
-          // Disclaimer with close button
-          if (_showDisclaimer)
-            Container(
-              padding: EdgeInsets.all(16.w),
-              decoration: BoxDecoration(
-                color: Constant.clrOrange.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(15.r),
-                border: Border.all(
-                  color: Constant.clrOrange.withOpacity(0.3),
-                ),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.warning_amber_rounded,
-                    color: Constant.clrOrange,
-                    size: 24.h,
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Key_Disclaimer'.localized,
-                          style: TextStyles.txtBold14(context).copyWith(
-                            color: Constant.clrOrange,
-                          ),
-                        ),
-                        SizedBox(height: 4.h),
-                        Text(
-                          'Key_DisclaimerText'.localized,
-                          style: TextStyles.txtRegular12(context).copyWith(
-                            color: Constant.clrTitlePageByTheme(context),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  // Close button
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _showDisclaimer = false;
-                      });
-                    },
-                    child: Icon(
-                      Icons.close,
-                      color: Constant.clrOrange,
-                      size: 20.h,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          // Disclaimer is now shown as a one-time popup dialog
         ],
       ),
     );
