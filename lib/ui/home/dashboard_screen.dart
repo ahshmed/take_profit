@@ -155,6 +155,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     ];
 
     // Navigation items for Recommender (4 tabs + center button with new styled design)
+    // Recommender: Currencies changes to Stock when US Market selected
     final List<BottomNavItem> recommenderNavItems = [
       BottomNavItem(
         iconPath: Constant.icHomeN,
@@ -163,8 +164,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
       BottomNavItem(
         iconPath: Constant.icCurrenciesN,
-        label: getLocalValue("Key_Currencies"),
-        screen: const CurrenciesScreen(isDrawer: true),
+        label: isUSMarket
+            ? getLocalValue("Key_Stock")
+            : getLocalValue("Key_Currencies"),
+        screen: isUSMarket
+            ? const StockScreen()
+            : const CurrenciesScreen(isDrawer: true),
       ),
       BottomNavItem(
         iconPath: Constant.icRecommendations,
@@ -172,9 +177,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         screen: const MyRecommendationSignalScreen(),
       ),
       BottomNavItem(
-        iconPath: Constant.icProfile,
-        label: getLocalValue("Key_Profile"),
-        screen: const ProfileScreen(),
+        iconPath: Constant.icUsMarketN,
+        label: getLocalValue("Key_Us_Market"),
+        screen: const UsMarketDetailScreen(
+          recommenderID: '',
+          appbarRequired: true,
+        ),
       ),
     ];
 
