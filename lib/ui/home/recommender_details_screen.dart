@@ -662,9 +662,9 @@ class _RecommenderDetailScreenState
       ),
       child: Row(
         children: [
-          /// Signals Tab (Increased width as it's the main tab)
+          /// Signals Tab
           Flexible(
-            flex: 5,
+            flex: 4,
             child: InkWell(
               onTap: () async {
                 recommenderWatch.updateMainTabIndex(0);
@@ -754,7 +754,7 @@ class _RecommenderDetailScreenState
 
           /// Social Tab
           Flexible(
-            flex: 3,
+            flex: 4,
             child: InkWell(
               onTap: () {
                 recommenderWatch.updateMainTabIndex(2);
