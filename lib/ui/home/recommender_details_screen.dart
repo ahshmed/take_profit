@@ -941,28 +941,22 @@ class _RecommenderDetailScreenState
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.all(16.w),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              index % 2 == 0
-                                  ? 'Key_CryptoPromotionalOffers'.localized.replaceAll(' ', '\n')
-                                  : 'Key_CryptoBannersVideoAds'.localized.replaceAll(' ', '\n'),
-                              style: TextStyles.txtBold22(context).copyWith(
-                                color: Constant.clrWhite,
-                                height: 1.2,
-                              ),
-                              textAlign: TextAlign.start,
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
+                    Positioned(
+                      left: 16.w,
+                      top: 16.h,
+                      right: 100.w,
+                      bottom: 50.h,
+                      child: Text(
+                        index % 2 == 0
+                            ? 'Key_CryptoPromotionalOffers'.localized.replaceAll(' ', '\n')
+                            : 'Key_CryptoBannersVideoAds'.localized.replaceAll(' ', '\n'),
+                        style: TextStyles.txtBold22(context).copyWith(
+                          color: Constant.clrWhite,
+                          height: 1.2,
+                        ),
+                        textAlign: TextAlign.start,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     Positioned(

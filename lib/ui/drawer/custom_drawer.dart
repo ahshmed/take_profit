@@ -245,19 +245,25 @@ class CustomDrawerState extends ConsumerState<CustomDrawer>  {
 
                           await context.setLocale(Locale(
                               drawerWatch.isEngEnable == true ? "en" : "ar"));
+
+                          // Reset dashboard to home screen
                           dashboardWatch.clearProvider();
-                           dashboardWatch.bottomTabInit();
+                          dashboardWatch.bottomTabInit();
                           dashboardWatch.tabBody = const HomeScreen();
-                          // _getTrendingList();
                           await recommenderDetailsApiCall();
                           dashboardWatch.updateWidget();
                           drawerWatch.updateUi();
 
-                          // Close drawer
+                          // Close drawer first
                           ZoomDrawer.of(context)!.close();
 
-                          // Navigate to home screen and clear navigation stack
-                          Navigator.of(context).popUntil((route) => route.isFirst);
+                          // Wait for drawer to close and state to update, then navigate to home
+                          await Future.delayed(const Duration(milliseconds: 300));
+
+                          // Pop all routes until we reach the dashboard (first route)
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.of(context).popUntil((route) => route.isFirst);
+                          }
                         },
                       )
                     ],
