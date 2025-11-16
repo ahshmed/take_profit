@@ -15,6 +15,7 @@ import '../../framework/data_provider/home/home_provider.dart';
 import '../../framework/data_provider/notification/notification_controller.dart';
 import '../../framework/data_provider/notification/notification_provider.dart';
 import '../../framework/data_provider/profile/profile_provider.dart';
+import '../../framework/data_provider/select_market/market_providers.dart';
 import '../../utils/const.dart';
 import '../../utils/darkmode/dark_provider.dart';
 import '../../utils/no_internet_builder.dart';
@@ -313,11 +314,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           body: NoInternetBuilder(
             child: (homeWatch.homeRecommenderDetailsResponseModel?.data != null)
-                ? RecommenderDetailScreen(
-                    recommenderID: homeWatch.homeRecommenderDetailsResponseModel
-                            ?.data?.recommenderId ??
-                        '',
-                    appbarRequired: false,
+                ? Column(
+                    children: [
+                      // Market selector for recommenders only
+                      if (getUserStatus() == recommender)
+                        _buildMarketSelector(ref),
+
+                      // Main content
+                      Expanded(
+                        child: RecommenderDetailScreen(
+                          recommenderID: homeWatch.homeRecommenderDetailsResponseModel
+                                  ?.data?.recommenderId ??
+                              '',
+                          appbarRequired: false,
+                        ),
+                      ),
+                    ],
                   )
                 : const Offstage(),
           ),
@@ -327,6 +339,108 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 homeWatch.isLoading ||
                 notificationWatch.isLoading),
       ],
+    );
+  }
+
+  /// Market Selector Widget for Recommenders
+  Widget _buildMarketSelector(WidgetRef ref) {
+    final selectedMarket = getSelectedMarket();
+    final bool isUSMarket = selectedMarket == 'us_market';
+
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      padding: EdgeInsets.all(4.w),
+      decoration: BoxDecoration(
+        color: Constant.clrScaffoldBGByTheme(context),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: Constant.clrPrimary.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          // Crypto Button
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                if (isUSMarket) {
+                  setSelectedMarket('crypto_signals');
+                  ref.read(selectMarketProvider.notifier).selectMarketById('crypto_signals');
+                  ref.read(dashboardProvider).updateSelectedIndex(0);
+                  setState(() {});
+                }
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+                decoration: BoxDecoration(
+                  color: !isUSMarket ? Constant.clrPrimary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      Constant.icCryptoN,
+                      width: 20.w,
+                      height: 20.h,
+                      color: !isUSMarket ? Constant.clrWhite : Constant.clrTitlePageByTheme(context),
+                    ),
+                    SizedBox(width: 8.w),
+                    Text(
+                      getLocalValue('Key_Crypto'),
+                      style: TextStyles.txtMedium14(context).copyWith(
+                        color: !isUSMarket ? Constant.clrWhite : Constant.clrTitlePageByTheme(context),
+                        fontWeight: !isUSMarket ? Constant.fwSemiBold : Constant.fwRegular,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 8.w),
+          // US Market Button
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                if (!isUSMarket) {
+                  setSelectedMarket('us_market');
+                  ref.read(selectMarketProvider.notifier).selectMarketById('us_market');
+                  ref.read(dashboardProvider).updateSelectedIndex(0);
+                  setState(() {});
+                }
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+                decoration: BoxDecoration(
+                  color: isUSMarket ? Constant.clrPrimary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      Constant.icUsMarketN,
+                      width: 20.w,
+                      height: 20.h,
+                      color: isUSMarket ? Constant.clrWhite : Constant.clrTitlePageByTheme(context),
+                    ),
+                    SizedBox(width: 8.w),
+                    Text(
+                      getLocalValue('Key_Us_Market'),
+                      style: TextStyles.txtMedium14(context).copyWith(
+                        color: isUSMarket ? Constant.clrWhite : Constant.clrTitlePageByTheme(context),
+                        fontWeight: isUSMarket ? Constant.fwSemiBold : Constant.fwRegular,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
