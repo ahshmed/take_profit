@@ -706,94 +706,96 @@ class _RecommenderDetailScreenState
             ),
           ),
 
-          /// BTC Scenarios Tab
-          Flexible(
-            flex: 5,
-            child: InkWell(
-              onTap: () {
-                getUserStatus() == guest
-                    ? getStartedDialog(context)
-                    : recommenderWatch.updateMainTabIndex(1);
-                getBTCScenariosList(myRecommendationWatch, widget.recommenderID,
-                    removeOld: true);
-                recommenderWatch.clearDate();
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    getLocalValue(recommenderWatch.mainTabList[1]),
-                    style: TextStyles.txtBold14(context).copyWith(
-                      color: recommenderWatch.mainTabSelectIndex == 1
-                          ? Constant.clrPrimary
-                          : Constant.clrHomeUnselectedColor,
-                      fontWeight: recommenderWatch.mainTabSelectIndex == 1
-                          ? FontWeight.w400
-                          : FontWeight.w400,
+          /// BTC Scenarios Tab - Only show if exists in mainTabList (not in US Market mode)
+          if (recommenderWatch.mainTabList.length > 1)
+            Flexible(
+              flex: 5,
+              child: InkWell(
+                onTap: () {
+                  getUserStatus() == guest
+                      ? getStartedDialog(context)
+                      : recommenderWatch.updateMainTabIndex(1);
+                  getBTCScenariosList(myRecommendationWatch, widget.recommenderID,
+                      removeOld: true);
+                  recommenderWatch.clearDate();
+                },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      getLocalValue(recommenderWatch.mainTabList[1]),
+                      style: TextStyles.txtBold14(context).copyWith(
+                        color: recommenderWatch.mainTabSelectIndex == 1
+                            ? Constant.clrPrimary
+                            : Constant.clrHomeUnselectedColor,
+                        fontWeight: recommenderWatch.mainTabSelectIndex == 1
+                            ? FontWeight.w400
+                            : FontWeight.w400,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 8.h),
-                  Container(
-                    height: 3.h,
-                    decoration: BoxDecoration(
-                      color: recommenderWatch.mainTabSelectIndex == 1
-                          ? Constant.clrPrimary
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(3.r),
+                    SizedBox(height: 8.h),
+                    Container(
+                      height: 3.h,
+                      decoration: BoxDecoration(
+                        color: recommenderWatch.mainTabSelectIndex == 1
+                            ? Constant.clrPrimary
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(3.r),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
 
-          /// Social Tab
-          Flexible(
-            flex: 4,
-            child: InkWell(
-              onTap: () {
-                recommenderWatch.updateMainTabIndex(2);
-                recommenderWatch.clearDate();
-                socialListApi(recommenderWatch);
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    getLocalValue(recommenderWatch.mainTabList[2]),
-                    style: TextStyles.txtBold14(context).copyWith(
-                      color: recommenderWatch.mainTabSelectIndex == 2
-                          ? Constant.clrPrimary
-                          : Constant.clrHomeUnselectedColor,
-                      fontWeight: recommenderWatch.mainTabSelectIndex == 2
-                          ? FontWeight.w400
-                          : FontWeight.w400,
+          /// Social Tab - Only show if exists in mainTabList (not in US Market mode)
+          if (recommenderWatch.mainTabList.length > 2)
+            Flexible(
+              flex: 4,
+              child: InkWell(
+                onTap: () {
+                  recommenderWatch.updateMainTabIndex(2);
+                  recommenderWatch.clearDate();
+                  socialListApi(recommenderWatch);
+                },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      getLocalValue(recommenderWatch.mainTabList[2]),
+                      style: TextStyles.txtBold14(context).copyWith(
+                        color: recommenderWatch.mainTabSelectIndex == 2
+                            ? Constant.clrPrimary
+                            : Constant.clrHomeUnselectedColor,
+                        fontWeight: recommenderWatch.mainTabSelectIndex == 2
+                            ? FontWeight.w400
+                            : FontWeight.w400,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 8.h),
-                  Container(
-                    height: 3.h,
-                    decoration: BoxDecoration(
-                      color: recommenderWatch.mainTabSelectIndex == 2
-                          ? Constant.clrPrimary
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(3.r),
+                    SizedBox(height: 8.h),
+                    Container(
+                      height: 3.h,
+                      decoration: BoxDecoration(
+                        color: recommenderWatch.mainTabSelectIndex == 2
+                            ? Constant.clrPrimary
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(3.r),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
