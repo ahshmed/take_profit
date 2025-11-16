@@ -312,7 +312,7 @@ class _MyRecommendationSignalScreenState
       ),
       child: Row(
         children: [
-          /// Signals Tab
+          /// Signals Tab (always shown)
           Flexible(
             flex: 3,
             child: InkWell(
@@ -348,80 +348,82 @@ class _MyRecommendationSignalScreenState
             ),
           ),
 
-          /// BTC Scenarios Tab
-          Flexible(
-            flex: 5,
-            child: InkWell(
-              onTap: () {
-                //trackEvent("tab_pressed", {"user_id": getUserEntityId(), "tab_name": "btc"});
-                getUserStatus() == guest
-                    ? getStartedDialog(context)
-                    : myRecommendationWatch.updateMainTabIndex(1);
-                myRecommendationWatch.clearDate();
-                getBTCScenariosList(myRecommendationWatch, getUserEntityId());
-              },
-              child: Container(
-                height: 30.h,
-                padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 3.h),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.r),
-                  color: myRecommendationWatch.mainTabSelectIndex == 1
-                      ? Constant.clrPrimary
-                      : Colors.transparent,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      getLocalValue(myRecommendationWatch.mainTabList[1]),
-                      style: TextStyles.txtRegular12(context).copyWith(
-                          color: myRecommendationWatch.mainTabSelectIndex == 1
-                              ? Constant.clrWhiteNew
-                              : Constant.clrBlackNew),
-                    ),
-                  ],
+          /// BTC Scenarios Tab - Only show if exists in mainTabList (not in US Market mode)
+          if (myRecommendationWatch.mainTabList.length > 1)
+            Flexible(
+              flex: 5,
+              child: InkWell(
+                onTap: () {
+                  //trackEvent("tab_pressed", {"user_id": getUserEntityId(), "tab_name": "btc"});
+                  getUserStatus() == guest
+                      ? getStartedDialog(context)
+                      : myRecommendationWatch.updateMainTabIndex(1);
+                  myRecommendationWatch.clearDate();
+                  getBTCScenariosList(myRecommendationWatch, getUserEntityId());
+                },
+                child: Container(
+                  height: 30.h,
+                  padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 3.h),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.r),
+                    color: myRecommendationWatch.mainTabSelectIndex == 1
+                        ? Constant.clrPrimary
+                        : Colors.transparent,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        getLocalValue(myRecommendationWatch.mainTabList[1]),
+                        style: TextStyles.txtRegular12(context).copyWith(
+                            color: myRecommendationWatch.mainTabSelectIndex == 1
+                                ? Constant.clrWhiteNew
+                                : Constant.clrBlackNew),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
 
-          /// Social Tab
-          Flexible(
-            flex: 4,
-            child: InkWell(
-              onTap: () {
-                //trackEvent("tab_pressed", {"user_id": getUserEntityId(), "tab_name": "social"});
-                myRecommendationWatch.updateMainTabIndex(2);
-                myRecommendationWatch.updateSocialSubTabIndex(0);
-                myRecommendationWatch.clearDate();
-                socialListApi(myRecommendationWatch);
-              },
-              child: Container(
-                height: 30.h,
-                padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 3.h),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.r),
-                  color: myRecommendationWatch.mainTabSelectIndex == 2
-                      ? Constant.clrPrimary
-                      : Colors.transparent,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      getLocalValue(myRecommendationWatch.mainTabList[2]),
-                      style: TextStyles.txtRegular12(context).copyWith(
-                          color: myRecommendationWatch.mainTabSelectIndex == 2
-                              ? Constant.clrWhiteNew
-                              : Constant.clrBlackNew),
-                    ),
-                  ],
+          /// Social Tab - Only show if exists in mainTabList (not in US Market mode)
+          if (myRecommendationWatch.mainTabList.length > 2)
+            Flexible(
+              flex: 4,
+              child: InkWell(
+                onTap: () {
+                  //trackEvent("tab_pressed", {"user_id": getUserEntityId(), "tab_name": "social"});
+                  myRecommendationWatch.updateMainTabIndex(2);
+                  myRecommendationWatch.updateSocialSubTabIndex(0);
+                  myRecommendationWatch.clearDate();
+                  socialListApi(myRecommendationWatch);
+                },
+                child: Container(
+                  height: 30.h,
+                  padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 3.h),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.r),
+                    color: myRecommendationWatch.mainTabSelectIndex == 2
+                        ? Constant.clrPrimary
+                        : Colors.transparent,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        getLocalValue(myRecommendationWatch.mainTabList[2]),
+                        style: TextStyles.txtRegular12(context).copyWith(
+                            color: myRecommendationWatch.mainTabSelectIndex == 2
+                                ? Constant.clrWhiteNew
+                                : Constant.clrBlackNew),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
