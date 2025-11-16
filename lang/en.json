@@ -509,6 +509,8 @@
   "Key_USStocks": "US Stocks",
   "Key_SearchStock": "Search...",
   "Key_NoStocksFound": "No stocks found",
+  "Key_SelectStock": "Select Stock",
+  "Key_NoResultsFound": "No results found",
   "Key_Crypto": "Crypto",
   "Key_AIAssistant": "AI Assistant",
   "Key_AddToMyPortfolio": "Add to My Portfolio",

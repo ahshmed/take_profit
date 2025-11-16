@@ -14,6 +14,7 @@ import '../../repository/currencies/model/currencies_response_model.dart';
 import '../../repository/signal/contract/signal_repository.dart';
 import '../../repository/signal/model/all_signal_list_response_model.dart';
 import '../../repository/signal/model/signal_details_response_model.dart';
+import '../../repository/stock/model/stock_model.dart';
 
 import '../../repository/signal/repository/signal_repository_builder.dart';
 
@@ -398,11 +399,127 @@ class CreateSignalController extends ChangeNotifier {
   CommonResponseModel? commonResponseModel;
   SignalListResponseModel? signalListResponseModel;
 
+  /// Generate dummy US Market stock signals for testing
+  List<SignalList> _generateDummyUSMarketSignals(String status) {
+    final stockList = StockModel.getMockStockList();
+    final dummySignals = <SignalList>[];
+
+    // Create 5-6 dummy signals based on stock data
+    for (int i = 0; i < 6 && i < stockList.length; i++) {
+      final stock = stockList[i];
+      final currentPrice = double.parse(stock.price.replaceAll('\$', '').replaceAll(',', ''));
+
+      // Generate entry price (slightly different from current)
+      final entryPrice = status == 'active'
+          ? currentPrice * (stock.isPositiveChange ? 0.97 : 1.03)
+          : currentPrice * 0.95;
+
+      // Generate stop loss (5-10% below entry)
+      final stopLoss = entryPrice * 0.92;
+
+      // Generate targets (5%, 10%, 15% above entry)
+      final targets = [
+        Target(
+          targetId: '1',
+          targetType: status == 'closed' ? 'achieved' : 'pending',
+          price: '${(entryPrice * 1.05).toStringAsFixed(2)} USDT',
+          toPrice: '',
+          rawPrice: (entryPrice * 1.05).toStringAsFixed(2),
+        ),
+        Target(
+          targetId: '2',
+          targetType: status == 'closed' ? 'achieved' : 'pending',
+          price: '${(entryPrice * 1.10).toStringAsFixed(2)} USDT',
+          toPrice: '',
+          rawPrice: (entryPrice * 1.10).toStringAsFixed(2),
+        ),
+        Target(
+          targetId: '3',
+          targetType: 'pending',
+          price: '${(entryPrice * 1.15).toStringAsFixed(2)} USDT',
+          toPrice: '',
+          rawPrice: (entryPrice * 1.15).toStringAsFixed(2),
+        ),
+      ];
+
+      dummySignals.add(SignalList(
+        signalId: 'dummy_${stock.ticker}_$i',
+        currencyId: stock.ticker,
+        apiCurrencyId: stock.ticker,
+        currencyCode: stock.ticker,
+        currencyName: stock.companyName,
+        currencySymbol: stock.ticker,
+        currencyLogo: '', // Stock icons can be added later
+        walletPercentage: ['5', '10', '15', '20'][i % 4],
+        riskFactor: stock.buyStatus == 'Strong Buy'
+            ? 'Low'
+            : stock.buyStatus == 'Sell'
+                ? 'High'
+                : 'Medium',
+        riskFactorLabel: '',
+        profitStatus: status == 'active'
+            ? (stock.isPositiveChange ? 'profit' : 'loss')
+            : (i % 2 == 0 ? 'profit' : 'loss'),
+        profitLabel: '',
+        livePrice: currentPrice.toStringAsFixed(2),
+        entryPrice: entryPrice.toStringAsFixed(2),
+        stopLoss: stopLoss.toStringAsFixed(2),
+        chartImage: '',
+        description: 'US Market ${stock.ticker} - ${stock.buyStatus}',
+        descriptionEn: 'US Market ${stock.ticker} - ${stock.buyStatus}',
+        descriptionAr: 'سوق الأسهم الأمريكي ${stock.ticker} - ${stock.buyStatus}',
+        status: status,
+        targets: targets,
+        livePriceFromBinance: false,
+        enableNotification: 1,
+      ));
+    }
+
+    return dummySignals;
+  }
+
   /// signal list api
   Future<void> apiSignalList(
       BuildContext context, String status, String recommenderID) async {
     updateIsError(false);
     showLog('apic all status $status');
+
+    // Check if US Market is selected - use dummy data
+    final selectedMarket = getSelectedMarket();
+    final bool isUSMarket = selectedMarket == 'us_market';
+
+    if (isUSMarket) {
+      // Use dummy US Market stock signals
+      updateIsLoading(true);
+
+      // Clear existing lists
+      if (status == 'active') {
+        activeSignalList.clear();
+      } else if (status == 'closed') {
+        closedSignalList.clear();
+      } else {
+        pendingSignalList.clear();
+      }
+
+      // Simulate API delay
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Generate and add dummy stock signals
+      final dummySignals = _generateDummyUSMarketSignals(status);
+      if (status == 'active') {
+        activeSignalList.addAll(dummySignals.where((s) => s.profitStatus == 'profit' || s.profitStatus == 'loss'));
+      } else if (status == 'closed') {
+        closedSignalList.addAll(dummySignals);
+      } else {
+        pendingSignalList.addAll(dummySignals);
+      }
+
+      isHasMoreSignalList = false; // No pagination for dummy data
+      updateIsLoading(false);
+      return; // Exit early, don't call real API
+    }
+
+    // Original crypto signal logic below
     if (isHasMoreSignalList) {
       pageNo = int.parse(
           signalListResponseModel?.data?.pageNumber.toString() ?? "1") +

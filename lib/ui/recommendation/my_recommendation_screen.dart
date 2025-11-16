@@ -48,6 +48,7 @@ import '../home/helper/list_item_with_images_widget.dart';
 import '../home/signals_details_screen.dart';
 import '../notification/notification_screen.dart';
 import '../search/search_screen.dart';
+import '../us_market/select_stock_screen.dart';
 import 'create_signal_screen.dart';
 import 'helper/close_all_signal_button.dart';
 import 'new_btc_scenarios_screen.dart';
@@ -576,9 +577,24 @@ class _MyRecommendationSignalScreenState
                 onTap: () async {
                   await livePriceChangeFunction(isTimerStart: false);
                   await getAllSignalIstApiCallOnPeriodic(isTimerStart: false);
-                  Route route = SlideRightPageRoute(
-                      builder: (context) => const CreateSignalScreen(),
-                      settings: const RouteSettings());
+
+                  // Check selected market
+                  final selectedMarket = getSelectedMarket();
+                  final bool isUSMarket = selectedMarket == 'us_market';
+
+                  Route route;
+                  if (isUSMarket) {
+                    // US Market: Open stock selection screen
+                    route = SlideRightPageRoute(
+                        builder: (context) => const SelectStockScreen(),
+                        settings: const RouteSettings());
+                  } else {
+                    // Crypto: Open create signal screen
+                    route = SlideRightPageRoute(
+                        builder: (context) => const CreateSignalScreen(),
+                        settings: const RouteSettings());
+                  }
+
                   Navigator.of(context).push(route).then((value) async {
                     await livePriceChangeFunction(isTimerStart: true);
                     await getAllSignalIstApiCallOnPeriodic(isTimerStart: true);

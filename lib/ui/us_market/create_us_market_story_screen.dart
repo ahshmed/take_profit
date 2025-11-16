@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../framework/repository/stock/model/stock_model.dart';
 import '../../utils/const.dart';
 import '../../utils/theme_const.dart';
 import '../../utils/widgets/common_button.dart';
@@ -17,7 +18,12 @@ class StoryCard {
 }
 
 class CreateUSMarketStoryScreen extends ConsumerStatefulWidget {
-  const CreateUSMarketStoryScreen({Key? key}) : super(key: key);
+  final StockModel selectedStock;
+
+  const CreateUSMarketStoryScreen({
+    Key? key,
+    required this.selectedStock,
+  }) : super(key: key);
 
   @override
   ConsumerState<CreateUSMarketStoryScreen> createState() => _CreateUSMarketStoryScreenState();
@@ -97,10 +103,87 @@ class _CreateUSMarketStoryScreenState extends ConsumerState<CreateUSMarketStoryS
       ),
       body: Column(
         children: [
+          // Selected Stock Header
+          Container(
+            margin: EdgeInsets.all(16.w),
+            padding: EdgeInsets.all(16.w),
+            decoration: BoxDecoration(
+              color: Constant.clrPrimary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(
+                color: Constant.clrPrimary.withValues(alpha: 0.3),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 48.h,
+                  height: 48.h,
+                  decoration: BoxDecoration(
+                    color: Constant.clrPrimary.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Center(
+                    child: Text(
+                      widget.selectedStock.ticker.substring(0, 2),
+                      style: TextStyles.txtSemiBold14(context).copyWith(
+                        color: Constant.clrPrimary,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.selectedStock.ticker,
+                        style: TextStyles.txtSemiBold16(context).copyWith(
+                          color: Constant.clrPrimary,
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        widget.selectedStock.companyName,
+                        style: TextStyles.txtRegular12(context).copyWith(
+                          color: Constant.clrSigDetByTheme(context),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      widget.selectedStock.price,
+                      style: TextStyles.txtSemiBold14(context).copyWith(
+                        color: Constant.clrSigDetByTheme(context),
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      widget.selectedStock.changePercent,
+                      style: TextStyles.txtRegular12(context).copyWith(
+                        color: widget.selectedStock.isPositiveChange
+                            ? const Color(0xFF10B981)
+                            : const Color(0xFFEF4444),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
           // Story cards list
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.all(16.w),
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
               itemCount: _storyCards.length,
               itemBuilder: (context, index) {
                 return _buildStoryCardForm(index);

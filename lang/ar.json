@@ -509,6 +509,8 @@
   "Key_USStocks": "الأسهم الأمريكية",
   "Key_SearchStock": "بحث...",
   "Key_NoStocksFound": "لا توجد أسهم",
+  "Key_SelectStock": "اختر السهم",
+  "Key_NoResultsFound": "لا توجد نتائج",
   "Key_Crypto": "العملات الرقمية",
   "Key_AIAssistant": "المساعد الذكي",
   "Key_AddToMyPortfolio": "أضف إلى محفظتي",
