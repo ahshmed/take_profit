@@ -1719,7 +1719,7 @@ class _MyRecommendationSignalScreenState
                               ),
                       ),
                       child: Text(
-                        isActive ? 'Key_Valid'.localized : 'Key_InvalidForTrading'.localized,
+                        isActive ? getLocalValue('Key_Valid') : getLocalValue('Key_InvalidForTrading'),
                         style: TextStyles.txtMedium10(context).copyWith(
                           color: Constant.clrWhite,
                         ),

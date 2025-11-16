@@ -947,9 +947,9 @@ class _RecommenderDetailScreenState
                       right: 100.w,
                       bottom: 50.h,
                       child: Text(
-                        index % 2 == 0
-                            ? 'Key_CryptoPromotionalOffers'.localized.replaceAll(' ', '\n')
-                            : 'Key_CryptoBannersVideoAds'.localized.replaceAll(' ', '\n'),
+                        (index % 2 == 0
+                            ? getLocalValue('Key_CryptoPromotionalOffers')
+                            : getLocalValue('Key_CryptoBannersVideoAds')).replaceAll(' ', '\n'),
                         style: TextStyles.txtBold22(context).copyWith(
                           color: Constant.clrWhite,
                           height: 1.2,
@@ -981,7 +981,7 @@ class _RecommenderDetailScreenState
                             ),
                             SizedBox(width: 4.w),
                             Text(
-                              'Key_LearnMore'.localized,
+                              getLocalValue('Key_LearnMore'),
                               style: TextStyles.txtMedium12(context).copyWith(
                                 color: const Color(0xFF5E3FBE),
                               ),
@@ -1154,8 +1154,8 @@ class _RecommenderDetailScreenState
                         ),
                         child: Text(
                           isActive
-                              ? (shouldBlur ? 'Key_InvalidForTrading'.localized : 'Key_Valid'.localized)
-                              : 'Key_InvalidForTrading'.localized,
+                              ? (shouldBlur ? getLocalValue('Key_InvalidForTrading') : getLocalValue('Key_Valid'))
+                              : getLocalValue('Key_InvalidForTrading'),
                           style: TextStyles.txtMedium10(context).copyWith(
                             color: Constant.clrWhite,
                           ),
@@ -1356,7 +1356,7 @@ class _RecommenderDetailScreenState
             Icon(Icons.search_off, size: 64.h, color: Colors.grey.shade400),
             SizedBox(height: 16.h),
             Text(
-              '${'Key_NoResultsFoundFor'.localized} "$searchQuery"',
+              '${getLocalValue('Key_NoResultsFoundFor')} "$searchQuery"',
               style: TextStyles.txtRegular14(context).copyWith(
                 color: Colors.grey.shade600,
               ),
@@ -1463,7 +1463,7 @@ class _RecommenderDetailScreenState
             Icon(Icons.search_off, size: 64.h, color: Colors.grey.shade400),
             SizedBox(height: 16.h),
             Text(
-              '${'Key_NoResultsFoundFor'.localized} "$searchQuery"',
+              '${getLocalValue('Key_NoResultsFoundFor')} "$searchQuery"',
               style: TextStyles.txtRegular14(context).copyWith(
                 color: Colors.grey.shade600,
               ),
@@ -1549,7 +1549,7 @@ class _RecommenderDetailScreenState
             Icon(Icons.search_off, size: 64.h, color: Colors.grey.shade400),
             SizedBox(height: 16.h),
             Text(
-              '${'Key_NoResultsFoundFor'.localized} "$searchQuery"',
+              '${getLocalValue('Key_NoResultsFoundFor')} "$searchQuery"',
               style: TextStyles.txtRegular14(context).copyWith(
                 color: Colors.grey.shade600,
               ),
