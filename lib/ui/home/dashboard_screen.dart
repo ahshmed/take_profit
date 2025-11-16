@@ -49,9 +49,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final String? selectedMarket = getSelectedMarket();
     final bool isUSMarket = selectedMarket == 'us_market';
 
-    // Check if user tapped on market-switching tab (index 4 for guest/trader)
-    if (!isRecommender && index == 4) {
-      // User tapped on the last tab which switches between markets
+    // Check if user tapped on market-switching tab
+    // Index 3 for recommender (4th tab), Index 4 for guest/trader (5th tab)
+    if ((isRecommender && index == 3) || (!isRecommender && index == 4)) {
+      // User tapped on the tab which switches between markets
       if (isUSMarket) {
         // Currently in US Market mode, switch to Crypto
         setSelectedMarket('crypto_signals');
@@ -155,7 +156,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     ];
 
     // Navigation items for Recommender (4 tabs + center button with new styled design)
-    // Recommender: Currencies changes to Stock when US Market selected
+    // Tab 4 toggles between US Market and Crypto
     final List<BottomNavItem> recommenderNavItems = [
       BottomNavItem(
         iconPath: Constant.icHomeN,
@@ -177,12 +178,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         screen: const MyRecommendationSignalScreen(),
       ),
       BottomNavItem(
-        iconPath: Constant.icUsMarketN,
-        label: getLocalValue("Key_Us_Market"),
-        screen: const UsMarketDetailScreen(
-          recommenderID: '',
-          appbarRequired: true,
-        ),
+        iconPath: isUSMarket ? Constant.icCryptoN : Constant.icUsMarketN,
+        label: isUSMarket ? getLocalValue("Key_Crypto") : getLocalValue("Key_Us_Market"),
+        screen: const HomeScreen(), // Will toggle market when clicked
       ),
     ];
 
