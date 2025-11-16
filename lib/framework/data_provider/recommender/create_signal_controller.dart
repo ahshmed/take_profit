@@ -13,7 +13,7 @@ import '../../repository/common/model/common_response_model.dart';
 import '../../repository/currencies/model/currencies_response_model.dart';
 import '../../repository/signal/contract/signal_repository.dart';
 import '../../repository/signal/model/all_signal_list_response_model.dart' as all_signal;
-import '../../repository/signal/model/signal_details_response_model.dart';
+import '../../repository/signal/model/signal_details_response_model.dart' as signal_details;
 import '../../repository/stock/model/stock_model.dart';
 
 import '../../repository/signal/repository/signal_repository_builder.dart';
@@ -785,8 +785,8 @@ class CreateSignalController extends ChangeNotifier {
   }
 
   /// Signal Details Api
-  SignalDetailsResponseModel signalDetailsResponseModel =
-  SignalDetailsResponseModel();
+  signal_details.SignalDetailsResponseModel signalDetailsResponseModel =
+  signal_details.SignalDetailsResponseModel();
 
   Future<void> signalDetailsAPI(BuildContext context, String signalID) async {
     updateIsLoading(true);
@@ -799,7 +799,7 @@ class CreateSignalController extends ChangeNotifier {
 
     apiResult.when(success: (data) async {
       updateIsLoading(false);
-      signalDetailsResponseModel = data as SignalDetailsResponseModel;
+      signalDetailsResponseModel = data as signal_details.SignalDetailsResponseModel;
 
       if (signalDetailsResponseModel.status ==
           ApiEndPoints.apiStatus_200.toString()) {
