@@ -1672,8 +1672,8 @@ class _MyRecommendationSignalScreenState
                     /// Risk Badge
                     Container(
                       width: 97.w,
-                      height: 23.h,
-                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                      height: 26.h,
+                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
                       decoration: BoxDecoration(
                         color: _getRiskBadgeColor(signalData.riskFactor ?? ""),
                         borderRadius: isRTL
@@ -1686,13 +1686,18 @@ class _MyRecommendationSignalScreenState
                                 bottomLeft: Radius.circular(12.r),
                               ),
                       ),
-                      child: Text(
-                        '${signalData.riskFactor ?? "Medium"} Risk',
-                        style: TextStyles.txtSemiBoldG10(context).copyWith(
-                          fontWeight: Constant.fwRegular,
-                          color: Constant.clrWhite,
+                      child: Center(
+                        child: Text(
+                          _getLocalizedRiskLabel(signalData.riskFactor),
+                          style: TextStyles.txtSemiBoldG10(context).copyWith(
+                            fontWeight: Constant.fwRegular,
+                            color: Constant.clrWhite,
+                            height: 1.4,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
                     SizedBox(height: 6.h),
@@ -1700,8 +1705,8 @@ class _MyRecommendationSignalScreenState
                     /// Status Badge (Invalid for Trading / Valid, etc.)
                     Container(
                       width: 97.w,
-                      height: 23.h,
-                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                      height: 26.h,
+                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 2.h),
                       decoration: BoxDecoration(
                         color: isActive
                             ? (signalData.profitStatus == 'profit'
@@ -1718,12 +1723,17 @@ class _MyRecommendationSignalScreenState
                                 bottomLeft: Radius.circular(12.r),
                               ),
                       ),
-                      child: Text(
-                        isActive ? getLocalValue('Key_Valid') : getLocalValue('Key_InvalidForTrading'),
-                        style: TextStyles.txtMedium10(context).copyWith(
-                          color: Constant.clrWhite,
+                      child: Center(
+                        child: Text(
+                          isActive ? getLocalValue('Key_Valid') : getLocalValue('Key_InvalidForTrading'),
+                          style: TextStyles.txtMedium10(context).copyWith(
+                            color: Constant.clrWhite,
+                            height: 1.4,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
                   ],
@@ -1839,5 +1849,23 @@ class _MyRecommendationSignalScreenState
     } else {
       return Color(0xFF10B981); // Green for low
     }
+  }
+
+  /// Get localized risk label
+  String _getLocalizedRiskLabel(String? riskFactor) {
+    if (riskFactor == null || riskFactor.isEmpty) {
+      return getLocalValue('Key_MediumRisk');
+    }
+
+    final riskLower = riskFactor.toLowerCase();
+    if (riskLower.contains("high")) {
+      return getLocalValue('Key_HighRisk');
+    } else if (riskLower.contains("medium")) {
+      return getLocalValue('Key_MediumRisk');
+    } else if (riskLower.contains("low")) {
+      return getLocalValue('Key_LowRisk');
+    }
+
+    return getLocalValue('Key_MediumRisk'); // default
   }
 }
