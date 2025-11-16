@@ -58,7 +58,19 @@ class MyRecommendationScreenController extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<String> mainTabList = ["Key_Recommendations", "Key_BTCScenarios", "Key_Social"];
+  // Dynamic tab list based on selected market
+  // US Market: Only Signals tab
+  // Crypto: All three tabs (Signals, BTC Scenarios, Social)
+  List<String> get mainTabList {
+    final selectedMarket = getSelectedMarket();
+    final bool isUSMarket = selectedMarket == 'us_market';
+
+    if (isUSMarket) {
+      return ["Key_Recommendations"]; // Only Signals for US Market
+    } else {
+      return ["Key_Recommendations", "Key_BTCScenarios", "Key_Social"]; // All tabs for Crypto
+    }
+  }
 
   List<String> signalSubTabList = ["Key_Pending", "Key_Active", "Key_Closed"];
 
