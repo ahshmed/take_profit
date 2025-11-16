@@ -607,7 +607,7 @@ class _RecommenderDetailScreenState
                           ?.isSubscribed ==
                           "1"
                           ? getLocalValue("Key_Subscribed")
-                          : 'Subscribe',
+                          : getLocalValue("Key_Subscribe"),
                       style: TextStyles.txtMedG12(context).copyWith(
                         color: Constant.clrWhite,
                       ),
@@ -949,12 +949,13 @@ class _RecommenderDetailScreenState
                         children: [
                           Text(
                             index % 2 == 0
-                                ? 'Crypto\nPromotional\nOffers'
-                                : 'Crypto Banners\n& Video Ads',
+                                ? 'Key_CryptoPromotionalOffers'.localized.replaceAll(' ', '\n')
+                                : 'Key_CryptoBannersVideoAds'.localized.replaceAll(' ', '\n'),
                             style: TextStyles.txtBold22(context).copyWith(
                               color: Constant.clrWhite,
                               height: 1.2,
                             ),
+                            textAlign: TextAlign.start,
                           ),
                         ],
                       ),
@@ -980,7 +981,7 @@ class _RecommenderDetailScreenState
                             ),
                             SizedBox(width: 4.w),
                             Text(
-                              'Learn More',
+                              'Key_LearnMore'.localized,
                               style: TextStyles.txtMedium12(context).copyWith(
                                 color: const Color(0xFF5E3FBE),
                               ),
@@ -1355,7 +1356,7 @@ class _RecommenderDetailScreenState
             Icon(Icons.search_off, size: 64.h, color: Colors.grey.shade400),
             SizedBox(height: 16.h),
             Text(
-              'No results found for "$searchQuery"',
+              '${'Key_NoResultsFoundFor'.localized} "$searchQuery"',
               style: TextStyles.txtRegular14(context).copyWith(
                 color: Colors.grey.shade600,
               ),
@@ -1462,7 +1463,7 @@ class _RecommenderDetailScreenState
             Icon(Icons.search_off, size: 64.h, color: Colors.grey.shade400),
             SizedBox(height: 16.h),
             Text(
-              'No results found for "$searchQuery"',
+              '${'Key_NoResultsFoundFor'.localized} "$searchQuery"',
               style: TextStyles.txtRegular14(context).copyWith(
                 color: Colors.grey.shade600,
               ),
@@ -1548,7 +1549,7 @@ class _RecommenderDetailScreenState
             Icon(Icons.search_off, size: 64.h, color: Colors.grey.shade400),
             SizedBox(height: 16.h),
             Text(
-              'No results found for "$searchQuery"',
+              '${'Key_NoResultsFoundFor'.localized} "$searchQuery"',
               style: TextStyles.txtRegular14(context).copyWith(
                 color: Colors.grey.shade600,
               ),
