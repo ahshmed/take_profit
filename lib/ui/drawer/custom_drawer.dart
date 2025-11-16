@@ -23,6 +23,7 @@ import '../../utils/sliderightroute.dart';
 import '../../utils/theme_const.dart';
 import '../../utils/widgets/cache_image.dart';
 import '../../utils/widgets/common_image_asset.dart';
+import '../home/dashboard_screen.dart';
 import '../home/home_screen.dart';
 import '../profile/profile_screen.dart';
 import 'drawer_menu.dart';
@@ -240,30 +241,29 @@ class CustomDrawerState extends ConsumerState<CustomDrawer>  {
                             _updateSettingsApi(
                                 settingsWatch, true, isEngEnable);
                           }
+
+                          // Save language preference
                           await saveLocalData(KEY_APP_LANGUAGE,
                               drawerWatch.isEngEnable == true ? "en" : "ar");
 
+                          // Update locale - this will trigger MaterialApp to rebuild
                           await context.setLocale(Locale(
                               drawerWatch.isEngEnable == true ? "en" : "ar"));
-
-                          // Reset dashboard to home screen
-                          dashboardWatch.clearProvider();
-                          dashboardWatch.bottomTabInit();
-                          dashboardWatch.tabBody = const HomeScreen();
-                          await recommenderDetailsApiCall();
-                          dashboardWatch.updateWidget();
-                          drawerWatch.updateUi();
 
                           // Close drawer first
                           ZoomDrawer.of(context)!.close();
 
-                          // Wait for drawer to close and state to update, then navigate to home
-                          await Future.delayed(const Duration(milliseconds: 300));
+                          // Wait for drawer animation to complete
+                          await Future.delayed(const Duration(milliseconds: 100));
 
-                          // Pop all routes until we reach the dashboard (first route)
-                          if (Navigator.of(context).canPop()) {
-                            Navigator.of(context).popUntil((route) => route.isFirst);
-                          }
+                          // Navigate to a fresh dashboard, removing all previous routes
+                          // This forces everything to rebuild with the new locale
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder: (context) => const DashboardScreen(),
+                            ),
+                            (route) => false, // Remove all previous routes
+                          );
                         },
                       )
                     ],
