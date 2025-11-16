@@ -1153,8 +1153,8 @@ class _RecommenderDetailScreenState
                         ),
                         child: Text(
                           isActive
-                              ? (shouldBlur ? 'Invalid for Trading' : 'Valid')
-                              : 'Invalid for Trading',
+                              ? (shouldBlur ? 'Key_InvalidForTrading'.localized : 'Key_Valid'.localized)
+                              : 'Key_InvalidForTrading'.localized,
                           style: TextStyles.txtMedium10(context).copyWith(
                             color: Constant.clrWhite,
                           ),

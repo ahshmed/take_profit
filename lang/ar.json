@@ -347,6 +347,8 @@
   "Key_AccountNumberRangeValidation": "يجب أن يكون رقم الحساب 13 حرفًا.",
   "Key_ConfirmAccountNumberRangeValidation": "تأكيد رقم الحساب يجب أن يكون طوله 13 حرفًا.",
   "Key_ItIsVoid": "غير صالح",
+  "Key_Valid": "صالح",
+  "Key_InvalidForTrading": "غير صالح للتداول",
   "Key_CouldNotFindAnyRecommender": "لا يمكن العثور على أي موصي.",
   "Key_ItsEmpty": "انها فارغة",
   "Key_NoRecommenderMatch": "لا يوجد تطابق مع أي موصي",

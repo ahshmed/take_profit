@@ -347,6 +347,8 @@
   "Key_AccountNumberRangeValidation": "Account number should be of 13 characters long.",
   "Key_ConfirmAccountNumberRangeValidation": "Confirm account number should be of 13 characters long.",
   "Key_ItIsVoid": "It is Void",
+  "Key_Valid": "Valid",
+  "Key_InvalidForTrading": "Invalid for Trading",
   "Key_CouldNotFindAnyRecommender": "Couldn't find any recommender.",
   "Key_ItsEmpty": "It's Empty",
   "Key_NoRecommenderMatch": "No recommender matching right now.",
