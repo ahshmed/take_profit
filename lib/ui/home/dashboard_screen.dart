@@ -49,8 +49,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final String? selectedMarket = getSelectedMarket();
     final bool isUSMarket = selectedMarket == 'us_market';
 
-    // For recommender: Tab 2 (index 2) toggles market
-    if (isRecommender && index == 2) {
+    // For recommender: Tab 3 (index 3) toggles market
+    if (isRecommender && index == 3) {
       // Toggle market
       if (isUSMarket) {
         // Switch to Crypto
@@ -155,11 +155,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
     ];
 
-    // Navigation items for Recommender (3 tabs + center button - dynamic based on market)
+    // Navigation items for Recommender (4 tabs + center button - dynamic based on market)
     // Home tab always labeled "Home", but content changes based on market
+    // Last tab toggles between markets
     final List<BottomNavItem> recommenderNavItems = isUSMarket
         ? [
-      // US Market Mode: Home (shows US Market), Stock, Crypto
+      // US Market Mode: Home (shows US Market), Stock, Recommendations, Crypto (toggles to Crypto)
       BottomNavItem(
         iconPath: Constant.icHomeN,
         label: getLocalValue("Key_Home"),
@@ -174,13 +175,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         screen: const StockScreen(),
       ),
       BottomNavItem(
+        iconPath: Constant.icRecommendations,
+        label: getLocalValue("Key_Recommendations"),
+        screen: const MyRecommendationSignalScreen(),
+      ),
+      BottomNavItem(
         iconPath: Constant.icCryptoN,
         label: getLocalValue("Key_Crypto"),
-        screen: const HomeScreen(), // Crypto home
+        screen: const HomeScreen(), // Toggles to Crypto mode
       ),
     ]
         : [
-      // Crypto Mode: Home (shows Crypto), Currencies, US Market
+      // Crypto Mode: Home (shows Crypto), Currencies, Recommendations, US Market (toggles to US Market)
       BottomNavItem(
         iconPath: Constant.icHomeN,
         label: getLocalValue("Key_Home"),
@@ -190,6 +196,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         iconPath: Constant.icCurrenciesN,
         label: getLocalValue("Key_Currencies"),
         screen: const CurrenciesScreen(isDrawer: true),
+      ),
+      BottomNavItem(
+        iconPath: Constant.icRecommendations,
+        label: getLocalValue("Key_Recommendations"),
+        screen: const MyRecommendationSignalScreen(),
       ),
       BottomNavItem(
         iconPath: Constant.icUsMarketN,
