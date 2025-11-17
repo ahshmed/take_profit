@@ -50,7 +50,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final bool isUSMarket = selectedMarket == 'us_market';
 
     // For recommender: Tab 3 (index 3) toggles market
-    if (isRecommender && index == 3) {
+    // For guest/trader: Tab 4 (index 4) toggles market
+    final toggleIndex = isRecommender ? 3 : 4;
+
+    if (index == toggleIndex) {
       // Toggle market
       if (isUSMarket) {
         // Switch to Crypto
