@@ -141,7 +141,7 @@ class RecommenderBottomNavBar extends ConsumerWidget {
           ),
         ),
         // Center space for floating button
-        SizedBox(width: 64.w),
+        SizedBox(width: 56.w),
         // Right tabs (1, 2)
         Expanded(
           child: _buildNavItem(
