@@ -133,8 +133,36 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
     ];
 
-    // Navigation items for Recommender (4 tabs + center button with new styled design)
-    final List<BottomNavItem> recommenderNavItems = [
+    // Navigation items for Recommender (4 tabs + center button - dynamic based on market)
+    final List<BottomNavItem> recommenderNavItems = isUSMarket
+        ? [
+      // US Market Mode: Home (US Market), Stock, Crypto, Profile
+      BottomNavItem(
+        iconPath: Constant.icUsMarketN,
+        label: getLocalValue("Key_Us_Market"),
+        screen: const UsMarketDetailScreen(
+          recommenderID: '',
+          appbarRequired: false,  // Shows back button + "US Market" title
+        ),
+      ),
+      BottomNavItem(
+        iconPath: Constant.icCurrenciesN,
+        label: getLocalValue("Key_Stock"),
+        screen: const StockScreen(),
+      ),
+      BottomNavItem(
+        iconPath: Constant.icCryptoN,
+        label: getLocalValue("Key_Crypto"),
+        screen: const HomeScreen(), // Crypto home
+      ),
+      BottomNavItem(
+        iconPath: Constant.icProfile,
+        label: getLocalValue("Key_Profile"),
+        screen: const ProfileScreen(),
+      ),
+    ]
+        : [
+      // Crypto Mode: Home (Crypto), Currencies, Recommendations, Profile
       BottomNavItem(
         iconPath: Constant.icHomeN,
         label: getLocalValue("Key_Home"),

@@ -275,15 +275,15 @@ class _RecommenderDetailScreenState
 
                     SizedBox(height: 20.h),
 
-                    /// Search Bar
-                    buildSearchBar(),
+                    /// Search Bar - HIDDEN for recommender users
+                    // buildSearchBar(),
 
-                    SizedBox(height: 20.h),
+                    // SizedBox(height: 20.h),
 
-                    /// Gain History Section
-                    buildGainHistorySection(),
+                    /// Gain History Section - HIDDEN for recommender users
+                    // buildGainHistorySection(),
 
-                    SizedBox(height: 20.h),
+                    // SizedBox(height: 20.h),
 
                     /// Consultation and Subscribe Buttons
                     Visibility(
@@ -309,7 +309,7 @@ class _RecommenderDetailScreenState
                           : socialWatch.isLoadingPagination,
                       forPagination: true,
                     ),
-                    SizedBox(height: 180.h)
+                    SizedBox(height: 24.h)
                   ],
                 ),
               ),
@@ -607,7 +607,7 @@ class _RecommenderDetailScreenState
                           ?.isSubscribed ==
                           "1"
                           ? getLocalValue("Key_Subscribed")
-                          : 'Subscribe',
+                          : getLocalValue("Key_Subscribe"),
                       style: TextStyles.txtMedG12(context).copyWith(
                         color: Constant.clrWhite,
                       ),
@@ -685,6 +685,9 @@ class _RecommenderDetailScreenState
                           ? FontWeight.w400
                           : FontWeight.w400,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 8.h),
                   Container(
@@ -703,88 +706,96 @@ class _RecommenderDetailScreenState
             ),
           ),
 
-          /// BTC Scenarios Tab
-          Flexible(
-            flex: 5,
-            child: InkWell(
-              onTap: () {
-                getUserStatus() == guest
-                    ? getStartedDialog(context)
-                    : recommenderWatch.updateMainTabIndex(1);
-                getBTCScenariosList(myRecommendationWatch, widget.recommenderID,
-                    removeOld: true);
-                recommenderWatch.clearDate();
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    getLocalValue(recommenderWatch.mainTabList[1]),
-                    style: TextStyles.txtBold14(context).copyWith(
-                      color: recommenderWatch.mainTabSelectIndex == 1
-                          ? Constant.clrPrimary
-                          : Constant.clrHomeUnselectedColor,
-                      fontWeight: recommenderWatch.mainTabSelectIndex == 1
-                          ? FontWeight.w400
-                          : FontWeight.w400,
+          /// BTC Scenarios Tab - Only show if exists in mainTabList (not in US Market mode)
+          if (recommenderWatch.mainTabList.length > 1)
+            Flexible(
+              flex: 5,
+              child: InkWell(
+                onTap: () {
+                  getUserStatus() == guest
+                      ? getStartedDialog(context)
+                      : recommenderWatch.updateMainTabIndex(1);
+                  getBTCScenariosList(myRecommendationWatch, widget.recommenderID,
+                      removeOld: true);
+                  recommenderWatch.clearDate();
+                },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      getLocalValue(recommenderWatch.mainTabList[1]),
+                      style: TextStyles.txtBold14(context).copyWith(
+                        color: recommenderWatch.mainTabSelectIndex == 1
+                            ? Constant.clrPrimary
+                            : Constant.clrHomeUnselectedColor,
+                        fontWeight: recommenderWatch.mainTabSelectIndex == 1
+                            ? FontWeight.w400
+                            : FontWeight.w400,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Container(
-                    height: 3.h,
-                    decoration: BoxDecoration(
-                      color: recommenderWatch.mainTabSelectIndex == 1
-                          ? Constant.clrPrimary
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(3.r),
+                    SizedBox(height: 8.h),
+                    Container(
+                      height: 3.h,
+                      decoration: BoxDecoration(
+                        color: recommenderWatch.mainTabSelectIndex == 1
+                            ? Constant.clrPrimary
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(3.r),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
 
-          /// Social Tab
-          Flexible(
-            flex: 4,
-            child: InkWell(
-              onTap: () {
-                recommenderWatch.updateMainTabIndex(2);
-                recommenderWatch.clearDate();
-                socialListApi(recommenderWatch);
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    getLocalValue(recommenderWatch.mainTabList[2]),
-                    style: TextStyles.txtBold14(context).copyWith(
-                      color: recommenderWatch.mainTabSelectIndex == 2
-                          ? Constant.clrPrimary
-                          : Constant.clrHomeUnselectedColor,
-                      fontWeight: recommenderWatch.mainTabSelectIndex == 2
-                          ? FontWeight.w400
-                          : FontWeight.w400,
+          /// Social Tab - Only show if exists in mainTabList (not in US Market mode)
+          if (recommenderWatch.mainTabList.length > 2)
+            Flexible(
+              flex: 4,
+              child: InkWell(
+                onTap: () {
+                  recommenderWatch.updateMainTabIndex(2);
+                  recommenderWatch.clearDate();
+                  socialListApi(recommenderWatch);
+                },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      getLocalValue(recommenderWatch.mainTabList[2]),
+                      style: TextStyles.txtBold14(context).copyWith(
+                        color: recommenderWatch.mainTabSelectIndex == 2
+                            ? Constant.clrPrimary
+                            : Constant.clrHomeUnselectedColor,
+                        fontWeight: recommenderWatch.mainTabSelectIndex == 2
+                            ? FontWeight.w400
+                            : FontWeight.w400,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Container(
-                    height: 3.h,
-                    decoration: BoxDecoration(
-                      color: recommenderWatch.mainTabSelectIndex == 2
-                          ? Constant.clrPrimary
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(3.r),
+                    SizedBox(height: 8.h),
+                    Container(
+                      height: 3.h,
+                      decoration: BoxDecoration(
+                        color: recommenderWatch.mainTabSelectIndex == 2
+                            ? Constant.clrPrimary
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(3.r),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -896,7 +907,7 @@ class _RecommenderDetailScreenState
   /// Horizontal Ad Banner - Appears AFTER first card
   Widget buildHorizontalAdBanner() {
     return Container(
-      height: 120.h,
+      height: 140.h,
       margin: EdgeInsets.symmetric(vertical: 16.h),
       child: PageView.builder(
         controller: _adPageController,
@@ -932,22 +943,22 @@ class _RecommenderDetailScreenState
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.all(16.w),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            index % 2 == 0
-                                ? 'Crypto\nPromotional\nOffers'
-                                : 'Crypto Banners\n& Video Ads',
-                            style: TextStyles.txtBold22(context).copyWith(
-                              color: Constant.clrWhite,
-                              height: 1.2,
-                            ),
-                          ),
-                        ],
+                    Positioned(
+                      left: 16.w,
+                      top: 16.h,
+                      right: 100.w,
+                      bottom: 45.h,
+                      child: Text(
+                        (index % 2 == 0
+                            ? getLocalValue('Key_CryptoPromotionalOffers')
+                            : getLocalValue('Key_CryptoBannersVideoAds')).replaceAll(' ', '\n'),
+                        style: TextStyles.txtBold22(context).copyWith(
+                          color: Constant.clrWhite,
+                          height: 1.1,
+                        ),
+                        textAlign: TextAlign.start,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     Positioned(
@@ -963,6 +974,7 @@ class _RecommenderDetailScreenState
                           borderRadius: BorderRadius.circular(20.r),
                         ),
                         child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               Icons.monetization_on,
@@ -971,7 +983,7 @@ class _RecommenderDetailScreenState
                             ),
                             SizedBox(width: 4.w),
                             Text(
-                              'Learn More',
+                              getLocalValue('Key_LearnMore'),
                               style: TextStyles.txtMedium12(context).copyWith(
                                 color: const Color(0xFF5E3FBE),
                               ),
@@ -1096,8 +1108,8 @@ class _RecommenderDetailScreenState
                       /// Risk Badge
                       Container(
                         width: 97.w,
-                        height: 23.h,
-                        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                        height: 26.h,
+                        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
                         decoration: BoxDecoration(
                           color: _getRiskBadgeColor(signalData.riskFactor ?? ""),
                           borderRadius: isRTL
@@ -1110,13 +1122,18 @@ class _RecommenderDetailScreenState
                             bottomLeft: Radius.circular(12.r),
                           ),
                         ),
-                        child: Text(
-                          '${signalData.riskFactor ?? "Medium"} Risk',
-                          style: TextStyles.txtSemiBoldG10(context).copyWith(
-                            fontWeight: Constant.fwRegular,
-                            color: Constant.clrWhite,
+                        child: Center(
+                          child: Text(
+                            _getLocalizedRiskLabel(signalData.riskFactor),
+                            style: TextStyles.txtSemiBoldG10(context).copyWith(
+                              fontWeight: Constant.fwRegular,
+                              color: Constant.clrWhite,
+                              height: 1.4,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          textAlign: TextAlign.center,
                         ),
                       ),
                       SizedBox(height: 6.h),
@@ -1124,8 +1141,8 @@ class _RecommenderDetailScreenState
                       /// Status Badge (Invalid for Trading / Valid, etc.)
                       Container(
                         width: 97.w,
-                        height: 23.h,
-                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                        height: 26.h,
+                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 2.h),
                         decoration: BoxDecoration(
                           color: isActive
                               ? (signalData.profitStatus == 'profit'
@@ -1142,14 +1159,19 @@ class _RecommenderDetailScreenState
                             bottomLeft: Radius.circular(12.r),
                           ),
                         ),
-                        child: Text(
-                          isActive
-                              ? (shouldBlur ? 'Invalid for Trading' : 'Valid')
-                              : 'Invalid for Trading',
-                          style: TextStyles.txtMedium10(context).copyWith(
-                            color: Constant.clrWhite,
+                        child: Center(
+                          child: Text(
+                            isActive
+                                ? (shouldBlur ? getLocalValue('Key_InvalidForTrading') : getLocalValue('Key_Valid'))
+                                : getLocalValue('Key_InvalidForTrading'),
+                            style: TextStyles.txtMedium10(context).copyWith(
+                              color: Constant.clrWhite,
+                              height: 1.4,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          textAlign: TextAlign.center,
                         ),
                       ),
                     ],
@@ -1323,6 +1345,24 @@ class _RecommenderDetailScreenState
     }
   }
 
+  /// Get localized risk label
+  String _getLocalizedRiskLabel(String? riskFactor) {
+    if (riskFactor == null || riskFactor.isEmpty) {
+      return getLocalValue('Key_MediumRisk');
+    }
+
+    final riskLower = riskFactor.toLowerCase();
+    if (riskLower.contains("high")) {
+      return getLocalValue('Key_HighRisk');
+    } else if (riskLower.contains("medium")) {
+      return getLocalValue('Key_MediumRisk');
+    } else if (riskLower.contains("low")) {
+      return getLocalValue('Key_LowRisk');
+    }
+
+    return getLocalValue('Key_MediumRisk'); // default
+  }
+
   /// Active List with ad AFTER first card and search filter
   Widget signalsTabActiveList(RecommenderScreenController recommenderWatch) {
     // Filter signals based on search query
@@ -1346,7 +1386,7 @@ class _RecommenderDetailScreenState
             Icon(Icons.search_off, size: 64.h, color: Colors.grey.shade400),
             SizedBox(height: 16.h),
             Text(
-              'No results found for "$searchQuery"',
+              '${getLocalValue('Key_NoResultsFoundFor')} "$searchQuery"',
               style: TextStyles.txtRegular14(context).copyWith(
                 color: Colors.grey.shade600,
               ),
@@ -1453,7 +1493,7 @@ class _RecommenderDetailScreenState
             Icon(Icons.search_off, size: 64.h, color: Colors.grey.shade400),
             SizedBox(height: 16.h),
             Text(
-              'No results found for "$searchQuery"',
+              '${getLocalValue('Key_NoResultsFoundFor')} "$searchQuery"',
               style: TextStyles.txtRegular14(context).copyWith(
                 color: Colors.grey.shade600,
               ),
@@ -1539,7 +1579,7 @@ class _RecommenderDetailScreenState
             Icon(Icons.search_off, size: 64.h, color: Colors.grey.shade400),
             SizedBox(height: 16.h),
             Text(
-              'No results found for "$searchQuery"',
+              '${getLocalValue('Key_NoResultsFoundFor')} "$searchQuery"',
               style: TextStyles.txtRegular14(context).copyWith(
                 color: Colors.grey.shade600,
               ),

@@ -236,24 +236,41 @@ class CustomDrawerState extends ConsumerState<CustomDrawer>  {
                         onChanged: (isEngEnable) async {
                           drawerWatch.updateLanguageToggle(isEngEnable);
                           showLog("switch val: $isEngEnable");
+
+                          // Update server settings if logged in
                           if (getUserStatus() != guest) {
                             _updateSettingsApi(
                                 settingsWatch, true, isEngEnable);
                           }
+
+                          // Save language preference
                           await saveLocalData(KEY_APP_LANGUAGE,
                               drawerWatch.isEngEnable == true ? "en" : "ar");
 
+                          // Update locale - this will trigger MaterialApp to rebuild
                           await context.setLocale(Locale(
                               drawerWatch.isEngEnable == true ? "en" : "ar"));
-                          dashboardWatch.clearProvider();
-                           dashboardWatch.bottomTabInit();
-                          dashboardWatch.tabBody = const HomeScreen();
-                          // _getTrendingList();
-                          await recommenderDetailsApiCall();
-                          dashboardWatch.updateWidget();
-                          drawerWatch.updateUi();
 
-                          ZoomDrawer.of(context)!.toggle();
+                          // Close drawer
+                          ZoomDrawer.of(context)!.close();
+
+                          // Wait a bit for the locale change to propagate
+                          await Future.delayed(const Duration(milliseconds: 500));
+
+                          // Force rebuild of the entire widget tree without navigation
+                          if (mounted) {
+                            // Reset dashboard state
+                            dashboardWatch.clearProvider();
+                            dashboardWatch.bottomTabInit();
+                            dashboardWatch.tabBody = const HomeScreen();
+                            dashboardWatch.updateWidget();
+                            drawerWatch.updateUi();
+
+                            // Pop to root if not already there
+                            while (Navigator.of(context).canPop()) {
+                              Navigator.of(context).pop();
+                            }
+                          }
                         },
                       )
                     ],
@@ -541,11 +558,11 @@ class CustomDrawerState extends ConsumerState<CustomDrawer>  {
   Future recommenderDetailsApiCall() async {
     final homeWatch = ref.watch(homeProvider);
     final recommenderWatch = ref.watch(recommenderProvider);
-    if (isInternetConnectionOn) {
-      await recommenderWatch.recommenderDetailAPI(
-          context,
-          homeWatch.homeRecommenderDetailsResponseModel?.data?.recommenderId ??
-              '');
+    final recommenderId = homeWatch.homeRecommenderDetailsResponseModel?.data?.recommenderId;
+
+    // Only call API if we have a valid recommender ID
+    if (isInternetConnectionOn && recommenderId != null && recommenderId.trim().isNotEmpty) {
+      await recommenderWatch.recommenderDetailAPI(context, recommenderId);
     }
   }
 

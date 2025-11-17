@@ -2,7 +2,9 @@
 
 import 'dart:async';
 import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:badges/badges.dart' as badge;
+import 'package:blur/blur.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -33,6 +35,7 @@ import '../../utils/darkmode/dark_provider.dart';
 import '../../utils/no_internet_builder.dart';
 import '../../utils/sliderightroute.dart';
 import '../../utils/theme_const.dart';
+import '../../utils/widgets/cache_image.dart';
 import '../../utils/widgets/common_button.dart';
 import '../../utils/widgets/common_image_asset.dart';
 import '../../utils/widgets/common_svg.dart';
@@ -45,6 +48,7 @@ import '../home/helper/list_item_with_images_widget.dart';
 import '../home/signals_details_screen.dart';
 import '../notification/notification_screen.dart';
 import '../search/search_screen.dart';
+import '../us_market/select_stock_screen.dart';
 import 'create_signal_screen.dart';
 import 'helper/close_all_signal_button.dart';
 import 'new_btc_scenarios_screen.dart';
@@ -309,7 +313,7 @@ class _MyRecommendationSignalScreenState
       ),
       child: Row(
         children: [
-          /// Signals Tab
+          /// Signals Tab (always shown)
           Flexible(
             flex: 3,
             child: InkWell(
@@ -345,80 +349,82 @@ class _MyRecommendationSignalScreenState
             ),
           ),
 
-          /// BTC Scenarios Tab
-          Flexible(
-            flex: 5,
-            child: InkWell(
-              onTap: () {
-                //trackEvent("tab_pressed", {"user_id": getUserEntityId(), "tab_name": "btc"});
-                getUserStatus() == guest
-                    ? getStartedDialog(context)
-                    : myRecommendationWatch.updateMainTabIndex(1);
-                myRecommendationWatch.clearDate();
-                getBTCScenariosList(myRecommendationWatch, getUserEntityId());
-              },
-              child: Container(
-                height: 30.h,
-                padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 3.h),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.r),
-                  color: myRecommendationWatch.mainTabSelectIndex == 1
-                      ? Constant.clrPrimary
-                      : Colors.transparent,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      getLocalValue(myRecommendationWatch.mainTabList[1]),
-                      style: TextStyles.txtRegular12(context).copyWith(
-                          color: myRecommendationWatch.mainTabSelectIndex == 1
-                              ? Constant.clrWhiteNew
-                              : Constant.clrBlackNew),
-                    ),
-                  ],
+          /// BTC Scenarios Tab - Only show if exists in mainTabList (not in US Market mode)
+          if (myRecommendationWatch.mainTabList.length > 1)
+            Flexible(
+              flex: 5,
+              child: InkWell(
+                onTap: () {
+                  //trackEvent("tab_pressed", {"user_id": getUserEntityId(), "tab_name": "btc"});
+                  getUserStatus() == guest
+                      ? getStartedDialog(context)
+                      : myRecommendationWatch.updateMainTabIndex(1);
+                  myRecommendationWatch.clearDate();
+                  getBTCScenariosList(myRecommendationWatch, getUserEntityId());
+                },
+                child: Container(
+                  height: 30.h,
+                  padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 3.h),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.r),
+                    color: myRecommendationWatch.mainTabSelectIndex == 1
+                        ? Constant.clrPrimary
+                        : Colors.transparent,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        getLocalValue(myRecommendationWatch.mainTabList[1]),
+                        style: TextStyles.txtRegular12(context).copyWith(
+                            color: myRecommendationWatch.mainTabSelectIndex == 1
+                                ? Constant.clrWhiteNew
+                                : Constant.clrBlackNew),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
 
-          /// Social Tab
-          Flexible(
-            flex: 4,
-            child: InkWell(
-              onTap: () {
-                //trackEvent("tab_pressed", {"user_id": getUserEntityId(), "tab_name": "social"});
-                myRecommendationWatch.updateMainTabIndex(2);
-                myRecommendationWatch.updateSocialSubTabIndex(0);
-                myRecommendationWatch.clearDate();
-                socialListApi(myRecommendationWatch);
-              },
-              child: Container(
-                height: 30.h,
-                padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 3.h),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.r),
-                  color: myRecommendationWatch.mainTabSelectIndex == 2
-                      ? Constant.clrPrimary
-                      : Colors.transparent,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      getLocalValue(myRecommendationWatch.mainTabList[2]),
-                      style: TextStyles.txtRegular12(context).copyWith(
-                          color: myRecommendationWatch.mainTabSelectIndex == 2
-                              ? Constant.clrWhiteNew
-                              : Constant.clrBlackNew),
-                    ),
-                  ],
+          /// Social Tab - Only show if exists in mainTabList (not in US Market mode)
+          if (myRecommendationWatch.mainTabList.length > 2)
+            Flexible(
+              flex: 4,
+              child: InkWell(
+                onTap: () {
+                  //trackEvent("tab_pressed", {"user_id": getUserEntityId(), "tab_name": "social"});
+                  myRecommendationWatch.updateMainTabIndex(2);
+                  myRecommendationWatch.updateSocialSubTabIndex(0);
+                  myRecommendationWatch.clearDate();
+                  socialListApi(myRecommendationWatch);
+                },
+                child: Container(
+                  height: 30.h,
+                  padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 3.h),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.r),
+                    color: myRecommendationWatch.mainTabSelectIndex == 2
+                        ? Constant.clrPrimary
+                        : Colors.transparent,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        getLocalValue(myRecommendationWatch.mainTabList[2]),
+                        style: TextStyles.txtRegular12(context).copyWith(
+                            color: myRecommendationWatch.mainTabSelectIndex == 2
+                                ? Constant.clrWhiteNew
+                                : Constant.clrBlackNew),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -571,9 +577,24 @@ class _MyRecommendationSignalScreenState
                 onTap: () async {
                   await livePriceChangeFunction(isTimerStart: false);
                   await getAllSignalIstApiCallOnPeriodic(isTimerStart: false);
-                  Route route = SlideRightPageRoute(
-                      builder: (context) => const CreateSignalScreen(),
-                      settings: const RouteSettings());
+
+                  // Check selected market
+                  final selectedMarket = getSelectedMarket();
+                  final bool isUSMarket = selectedMarket == 'us_market';
+
+                  Route route;
+                  if (isUSMarket) {
+                    // US Market: Open stock selection screen
+                    route = SlideRightPageRoute(
+                        builder: (context) => const SelectStockScreen(),
+                        settings: const RouteSettings());
+                  } else {
+                    // Crypto: Open create signal screen
+                    route = SlideRightPageRoute(
+                        builder: (context) => const CreateSignalScreen(),
+                        settings: const RouteSettings());
+                  }
+
                   Navigator.of(context).push(route).then((value) async {
                     await livePriceChangeFunction(isTimerStart: true);
                     await getAllSignalIstApiCallOnPeriodic(isTimerStart: true);
@@ -657,22 +678,9 @@ class _MyRecommendationSignalScreenState
                                     await getAllSignalIstApiCallOnPeriodic();
                                   });
                                 },
-                          child: ListItemWidget(
-                            isSameUser: '1',
-                            subtitle: activeSignalObj.currencySymbol,
-                            userType: getUserStatus(),
-                            title: activeSignalObj.currencyName,
-                            entryPrice: activeSignalObj.entryPrice,
-                            imageName: activeSignalObj.currencyLogo,
-                            currencyCode: activeSignalObj.currencyCode,
-                            livePrice: activeSignalObj.livePrice,
-                            stopLoss: activeSignalObj.stopLoss,
-                            activeItem: true,
-                            inProfitStatus: activeSignalObj.profitStatus,
-                            inProfitLabel: activeSignalObj.profitLabel,
-                            riskType: activeSignalObj.riskFactor,
-                            recommenderId: getUserEntityId(),
-                            showData: getUserStatus() != guest,
+                          child: buildSignalCard(
+                            activeSignalObj,
+                            isActive: true,
                           ),
                         );
                       },
@@ -758,22 +766,9 @@ class _MyRecommendationSignalScreenState
                             await getAllSignalIstApiCallOnPeriodic();
                           });
                         },
-                        child: ListItemWidget(
-                          isSameUser: '1',
-                          subtitle: closedSignalObj.currencySymbol,
-                          userType: getUserStatus(),
-                          title: closedSignalObj.currencyName,
-                          entryPrice: closedSignalObj.entryPrice,
-                          imageName: closedSignalObj.currencyLogo,
-                          currencyCode: closedSignalObj.currencyCode,
-                          livePrice: closedSignalObj.livePrice,
-                          stopLoss: closedSignalObj.stopLoss,
-                          activeItem: false,
-                          inProfitStatus: closedSignalObj.profitStatus,
-                          inProfitLabel: closedSignalObj.profitLabel,
-                          riskType: closedSignalObj.riskFactor,
-                          recommenderId: getUserEntityId(),
-                          showData: commonWatch.showClosedSignal || getUserStatus() != guest,
+                        child: buildSignalCard(
+                          closedSignalObj,
+                          isActive: false,
                         ),
                       );
                     },
@@ -835,22 +830,9 @@ class _MyRecommendationSignalScreenState
                         await getAllSignalIstApiCallOnPeriodic();
                       });
                     },
-                    child: ListItemWidget(
-                      isSameUser: '1',
-                      subtitle: pendingSignalObj.currencySymbol,
-                      userType: getUserStatus(),
-                      title: pendingSignalObj.currencyName,
-                      entryPrice: pendingSignalObj.entryPrice,
-                      imageName: pendingSignalObj.currencyLogo,
-                      currencyCode: pendingSignalObj.currencyCode,
-                      livePrice: pendingSignalObj.livePrice,
-                      stopLoss: pendingSignalObj.stopLoss,
-                      activeItem: true,
-                      inProfitStatus: pendingSignalObj.profitStatus,
-                      inProfitLabel: pendingSignalObj.profitLabel,
-                      riskType: pendingSignalObj.riskFactor,
-                      recommenderId: getUserEntityId(),
-                      showData: getUserStatus() != guest,
+                    child: buildSignalCard(
+                      pendingSignalObj,
+                      isActive: true,
                     ),
                   );
                 },
@@ -1628,5 +1610,280 @@ class _MyRecommendationSignalScreenState
         }
       }
     }
+  }
+
+  /// Signal Card Widget (same design as Recommender Details Screen)
+  Widget buildSignalCard(SignalList signalData, {required bool isActive}) {
+    final isRTL = Directionality.of(context) == ui.TextDirection.rtl;
+    final commonWatch = ref.watch(commonProvider);
+
+    // For my recommendation screen, show data since user is the recommender
+    final bool shouldBlur = false;
+
+    Widget cardContent = Container(
+      margin: EdgeInsets.only(bottom: 16.h),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16.13.r),
+        color: Constant.clrHomeCardByTheme(context),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 16.h),
+
+          /// Currency Header with badges on opposite side
+          Directionality(
+            textDirection: isRTL ? ui.TextDirection.rtl : ui.TextDirection.ltr,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// Currency Logo
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25.r),
+                    child: CacheImage(
+                      imageURL: signalData.currencyLogo ?? "",
+                      height: 50.h,
+                      width: 50.h,
+                      contentMode: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+
+                /// Currency Name and Timestamp - Expanded to take available space
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: isRTL ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${signalData.currencyName ?? ""} (${signalData.currencySymbol ?? ""})",
+                        style: TextStyles.txtSemiBold14(context).copyWith(
+                          color: Constant.clrSigDetByTheme(context),
+                          fontWeight: Constant.fwMedium,
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        '01/11/2022 14:35', // PLACEHOLDER - TO BE LINKED WITH API
+                        style: TextStyles.txtMedGI12(context).copyWith(
+                          fontSize: 11.sp,
+                          color: Constant.clrHeaderSubSignDetailsColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                /// Status Badges Stack
+                Column(
+                  crossAxisAlignment: isRTL ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+                  children: [
+                    /// Risk Badge
+                    Container(
+                      width: 97.w,
+                      height: 26.h,
+                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
+                      decoration: BoxDecoration(
+                        color: _getRiskBadgeColor(signalData.riskFactor ?? ""),
+                        borderRadius: isRTL
+                            ? BorderRadius.only(
+                                topRight: Radius.circular(12.r),
+                                bottomRight: Radius.circular(12.r),
+                              )
+                            : BorderRadius.only(
+                                topLeft: Radius.circular(12.r),
+                                bottomLeft: Radius.circular(12.r),
+                              ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          _getLocalizedRiskLabel(signalData.riskFactor),
+                          style: TextStyles.txtSemiBoldG10(context).copyWith(
+                            fontWeight: Constant.fwRegular,
+                            color: Constant.clrWhite,
+                            height: 1.4,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 6.h),
+
+                    /// Status Badge (Invalid for Trading / Valid, etc.)
+                    Container(
+                      width: 97.w,
+                      height: 26.h,
+                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 2.h),
+                      decoration: BoxDecoration(
+                        color: isActive
+                            ? (signalData.profitStatus == 'profit'
+                                ? const Color(0xFF10B981)
+                                : const Color(0xFFEF4444))
+                            : const Color(0xFFEF4444),
+                        borderRadius: isRTL
+                            ? BorderRadius.only(
+                                topRight: Radius.circular(12.r),
+                                bottomRight: Radius.circular(12.r),
+                              )
+                            : BorderRadius.only(
+                                topLeft: Radius.circular(12.r),
+                                bottomLeft: Radius.circular(12.r),
+                              ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          isActive ? getLocalValue('Key_Valid') : getLocalValue('Key_InvalidForTrading'),
+                          style: TextStyles.txtMedium10(context).copyWith(
+                            color: Constant.clrWhite,
+                            height: 1.4,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 16.h),
+
+          /// Free Text Section - PLACEHOLDER (To be linked with API later)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Text(
+              '[Free text goes here. It\'s provided from the backend api]',
+              style: TextStyles.txtSemiBoldG12(context).copyWith(
+                fontWeight: Constant.fwRegular,
+                color: const Color(0xFFEF4444),
+              ),
+            ),
+          ),
+
+          SizedBox(height: 8.h),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Divider(color: Constant.clrSigDetDividerByTheme(context)),
+          ),
+
+          /// Price Details Section
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Column(
+              children: [
+                /// Live Price
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Key_LivePrice'.localized,
+                      style: TextStyles.txtMedG12(context).copyWith(
+                        color: Constant.clrNotifSelectBColor,
+                      ),
+                    ),
+                    Text(
+                      '${signalData.livePrice ?? "0"} USDT',
+                      style: TextStyles.txtSemiBold14(context).copyWith(
+                        fontWeight: Constant.fwRegular,
+                        color: Constant.clrNotifSelectBColor,
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 4.h),
+                Divider(color: Constant.clrSigDetDividerByTheme(context)),
+                /// Entry Price
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Key_EntryPrice'.localized,
+                      style: TextStyles.txtMedG12(context).copyWith(
+                        color: Constant.clrSigDetEntByTheme(context),
+                      ),
+                    ),
+                    Text(
+                      '${signalData.entryPrice ?? "0"} USDT',
+                      style: TextStyles.txtSemiBold14(context).copyWith(
+                        fontWeight: Constant.fwRegular,
+                        color: Constant.clrSigDetEntByTheme(context),
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 4.h),
+                Divider(color: Constant.clrSigDetDividerByTheme(context)),
+                /// Stop Loss
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Key_StopLoss'.localized,
+                      style: TextStyles.txtMedG12(context).copyWith(
+                        color: Constant.clrSignOutRColor,
+                      ),
+                    ),
+                    Text(
+                      '${signalData.stopLoss ?? "0"} USDT',
+                      style: TextStyles.txtSemiBold14(context).copyWith(
+                        fontWeight: Constant.fwRegular,
+                        color: Constant.clrSignOutRColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(height: 16.h),
+        ],
+      ),
+    );
+
+    return cardContent;
+  }
+
+  Color _getRiskBadgeColor(String riskLabel) {
+    if (riskLabel.toLowerCase().contains("high")) {
+      return Color(0xFFEF4444);
+    } else if (riskLabel.toLowerCase().contains("medium")) {
+      return Constant.clrHomeLabelColor; // Purple/Blue for medium
+    } else {
+      return Color(0xFF10B981); // Green for low
+    }
+  }
+
+  /// Get localized risk label
+  String _getLocalizedRiskLabel(String? riskFactor) {
+    if (riskFactor == null || riskFactor.isEmpty) {
+      return getLocalValue('Key_MediumRisk');
+    }
+
+    final riskLower = riskFactor.toLowerCase();
+    if (riskLower.contains("high")) {
+      return getLocalValue('Key_HighRisk');
+    } else if (riskLower.contains("medium")) {
+      return getLocalValue('Key_MediumRisk');
+    } else if (riskLower.contains("low")) {
+      return getLocalValue('Key_LowRisk');
+    }
+
+    return getLocalValue('Key_MediumRisk'); // default
   }
 }

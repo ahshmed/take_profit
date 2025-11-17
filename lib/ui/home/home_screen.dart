@@ -15,6 +15,7 @@ import '../../framework/data_provider/home/home_provider.dart';
 import '../../framework/data_provider/notification/notification_controller.dart';
 import '../../framework/data_provider/notification/notification_provider.dart';
 import '../../framework/data_provider/profile/profile_provider.dart';
+import '../../framework/data_provider/select_market/market_providers.dart';
 import '../../utils/const.dart';
 import '../../utils/darkmode/dark_provider.dart';
 import '../../utils/no_internet_builder.dart';

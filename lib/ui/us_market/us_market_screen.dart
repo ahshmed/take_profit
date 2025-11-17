@@ -7,9 +7,11 @@ import 'package:blur/blur.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:take_profit/ui/us_market/us_market_details_screen.dart';
 import 'package:take_profit/utils/extension/string_extension.dart';
 import '../../framework/data_provider/notification/notification_provider.dart';
+import '../../framework/data_provider/portfolio/portfolio_provider.dart';
 import '../../framework/data_provider/profile/profile_provider.dart';
 import '../../framework/data_provider/stock/stock_provider.dart'; // ADD THIS
 import '../../framework/repository/stock/model/stock_model.dart'; // ADD THIS
@@ -18,11 +20,15 @@ import '../../utils/no_internet_builder.dart';
 import '../../utils/sliderightroute.dart';
 import '../../utils/theme_const.dart';
 import '../../utils/widgets/cache_image.dart';
+import '../../utils/widgets/common_image_asset.dart';
 import '../../utils/widgets/commonappbar.dart';
 import '../../utils/widgets/dialog_progressbar.dart';
 import '../../utils/widgets/empty_state_widget.dart';
 import '../notification/notification_screen.dart';
+import '../request_analysis/requesting_for_analysis_screen.dart';
+import '../search/search_screen.dart';
 import '../stock/stock_screen.dart';
+import 'portfolio_screen.dart';
 
 // REMOVE the StockData class - we'll use StockModel instead
 
@@ -118,253 +124,675 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
   Widget build(BuildContext context) {
     final notificationWatch = ref.watch(notificationProvider);
     final profileWatch = ref.watch(profileProvider);
-    // CRITICAL FIX: Watch the stock provider
     final stockWatch = ref.watch(stockProvider);
 
     return Stack(
       children: [
         Scaffold(
           backgroundColor: Constant.clrHomeScreenByTheme(context),
-          // CRITICAL FIX: Show different app bars based on appbarRequired
-          appBar: (widget.appbarRequired)
-              ? CommonAppBar(
-            title: getLocalValue("Key_RecommenderDetail"),
-            isTitleCenter: true,
-            appBar: AppBar(
-                backgroundColor: Constant.clrHomeScreenByTheme(context),
-                toolbarHeight: 64.h),
-            isDrawer: false,
-          )
-              : const PreferredSize(
-              preferredSize: Size(0, 0),
-              child: Offstage()),
-          body: NoInternetBuilder(child: bodyWidget(stockWatch)),
+          // Always show the custom header in both scenarios
+          appBar: _buildCustomHeader(context, profileWatch, notificationWatch),
+          body: NoInternetBuilder(child: bodyWidget(stockWatch, profileWatch)),
         ),
-        // CRITICAL FIX: Show loading indicator from provider
         DialogProgressBar(isLoading: stockWatch.isLoading),
       ],
     );
   }
 
-  // Simple App Bar (Back button + Title) - Used when US Market is HOME
-  PreferredSizeWidget _buildSimpleAppBar(BuildContext context) {
+  /// Custom Header matching Home Screen exactly
+  PreferredSizeWidget _buildCustomHeader(
+      BuildContext context, profileWatch, notificationWatch) {
+    // Format username like home screen
+    final String userName = getUserStatus() == guest
+        ? 'Key_TakeProfit'.localized
+        : ((getAppLanguage() == 'ar')
+        ? (profileWatch.profileDetailResponseModel?.data?.nameAr ?? "")
+        : (profileWatch.profileDetailResponseModel?.data?.nameEn ?? ""));
+
     return AppBar(
       backgroundColor: Constant.clrHomeScreenByTheme(context),
       elevation: 0,
-      centerTitle: true,
-      leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back,
-          color: Constant.clrTitlePageByTheme(context),
+      toolbarHeight: 64.h,
+      automaticallyImplyLeading: false,
+      leadingWidth: 56.w,
+      leading: HeroMode(
+        enabled: false, // Disable Hero animation to prevent duplicate tag conflicts
+        child: Padding(
+          padding: EdgeInsets.only(left: 10.w),
+          child: GestureDetector(
+            onTap: () {
+              // Open drawer like in home screen
+              ZoomDrawer.of(context)?.toggle.call();
+            },
+            child: Container(
+              decoration: const BoxDecoration(shape: BoxShape.circle),
+              padding: EdgeInsets.all(4.w),
+              child: Center(
+                child: _buildDrawerLeadingAvatar(profileWatch),
+              ),
+            ),
+          ),
         ),
-        onPressed: () => Navigator.of(context).pop(),
       ),
-      title: Text(
-        getLocalValue("Key_UsMarket"),
-        style: TextStyles.txtSemiBold18(context).copyWith(
-          color: Constant.clrTitlePageByTheme(context),
-          fontWeight: Constant.fwMedium,
+      title: Padding(
+        padding: EdgeInsets.only(left: 4.w),
+        child: Text(
+          getLocalValue("Key_Hi") + userName,
+          style: TextStyles.txtRegular16(context).copyWith(
+            color: Constant.clrTitlePageByTheme(context),
+          ),
+          overflow: TextOverflow.ellipsis,
         ),
       ),
-    );
-  }
-
-  // Full App Bar with profile and notifications
-  // PreferredSizeWidget _buildFullAppBar(
-  //     BuildContext context, notificationWatch) {
-  //   final profileWatch = ref.watch(profileProvider);
-  //   return CommonAppBar(
-  //     appBar: AppBar(
-  //       elevation: 0,
-  //       backgroundColor: Constant.clrHomeScreenByTheme(context),
-  //       title: Text(
-  //         getLocalValue("Key_UsMarket"),
-  //         style: TextStyles.txtSemiBold18(context).copyWith(
-  //           color: Constant.clrTitlePageByTheme(context),
-  //           fontWeight: Constant.fwMedium,
-  //         ),
-  //       ),
-  //       leading: GestureDetector(
-  //         onTap: () {
-  //           // You can add an action here, e.g., open profile screen
-  //         },
-  //         child: Padding(
-  //           padding: EdgeInsets.only(left: 16.w),
-  //           child: CircleAvatar(
-  //             radius: 20.r,
-  //             backgroundColor: Constant.clrHomeScreenByTheme(context),
-  //             child: ClipOval(
-  //               child: CacheImage(
-  //                 imageURL: profileWatch.profileData.data?.profilePic ?? '',
-  //                 width: 40.w,
-  //                 height: 40.h,
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //       actions: [
-  //         badge.Badge(
-  //           showBadge: notificationWatch.notificationCount > 0,
-  //           position: badge.BadgePosition.topEnd(top: 8, end: 8),
-  //           badgeContent: Text(
-  //             notificationWatch.notificationCount.toString(),
-  //             style: const TextStyle(color: Colors.white, fontSize: 10),
-  //           ),
-  //           child: IconButton(
-  //             icon: Icon(
-  //               Icons.notifications_outlined,
-  //               color: Constant.clrTitlePageByTheme(context),
-  //             ),
-  //             onPressed: () {
-  //               Route route = SlideRightPageRoute(
-  //                 builder: (context) => const NotificationScreen(),
-  //                 settings: const RouteSettings(),
-  //               );
-  //               Navigator.of(context).push(route);
-  //             },
-  //           ),
-  //         ),
-  //         SizedBox(width: 8.w),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  // CRITICAL FIX: Pass stockWatch to bodyWidget
-  Widget bodyWidget(stockWatch) {
-    return Column(
-      children: [
-        SizedBox(height: 16.h),
-        buildSearchBar(stockWatch), // Pass stockWatch
-        SizedBox(height: 16.h),
-        buildTabBar(),
-        Expanded(
-          child: buildStockListView(stockWatch), // Pass stockWatch
+      titleSpacing: 0,
+      actions: [
+        // Search Icon - using image asset like home screen
+        IconButton(
+          onPressed: () {
+            final route = SlideRightPageRoute(
+              builder: (context) => const SearchStockScreen(),
+              settings: const RouteSettings(),
+            );
+            Navigator.of(context).push(route);
+          },
+          style: IconButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: Size(39.81.h, 39.81.h),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          splashRadius: 18,
+          icon: CommonImageAsset(
+            strIcon: Constant.icSearchN,
+            width: 39.81.h,
+            height: 39.81.h,
+            clrImg: Constant.clrTitlePageByTheme(context),
+          ),
         ),
+        SizedBox(width: 5.w),
+        // Notification Icon - only show for non-guest users
+        if (getUserStatus() != guest)
+          IconButton(
+            onPressed: () {
+              final route = SlideRightPageRoute(
+                builder: (context) => const NotificationScreen(),
+                settings: const RouteSettings(),
+              );
+              Navigator.of(context).push(route);
+            },
+            style: IconButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: Size(39.81.h, 39.81.h),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            splashRadius: 18,
+            icon: _buildNotificationIcon(notificationWatch),
+          ),
+        if (getUserStatus() != guest) SizedBox(width: 4.w),
       ],
     );
   }
 
-  /// Search Bar
-  Widget buildSearchBar(stockWatch) {
+  /// Build notification icon with badge (matching currencies screen pattern)
+  Widget _buildNotificationIcon(notificationWatch) {
+    final hasNotifications =
+        (notificationWatch.notificationCountResponseModel.data?.count != '0') &&
+            (notificationWatch.notificationCountResponseModel.data != null);
+
+    if (!hasNotifications) {
+      return Image.asset(
+        Constant.icNotificationN,
+        width: 39.81.h,
+        height: 39.81.h,
+        color: Constant.clrTitlePageByTheme(context),
+      );
+    }
+
+    return badge.Badge(
+      position: badge.BadgePosition.topEnd(top: 1, end: 6),
+      badgeStyle: const badge.BadgeStyle(
+        badgeColor: Colors.red,
+        padding: EdgeInsets.all(4),
+        elevation: 0,
+      ),
+      badgeContent: Text(
+        notificationWatch.notificationCountResponseModel.data?.count ?? '',
+        style: TextStyles.txtRegular10(context).copyWith(
+          color: Constant.clrWhite,
+        ),
+      ),
+      child: Image.asset(
+        Constant.icNotificationN,
+        width: 39.81.h,
+        height: 39.81.h,
+        color: Constant.clrTitlePageByTheme(context),
+      ),
+    );
+  }
+
+  /// Drawer Leading Avatar (matching CommonAppBar)
+  Widget _buildDrawerLeadingAvatar(profileWatch) {
+    final String? imageUrl = profileWatch.profileDetailResponseModel?.data?.profileImage;
+    final double avatarSize = 28.r;
+    final bool isGuestUser = getUserStatus() == guest;
+    final bool hasImage = imageUrl != null && imageUrl.isNotEmpty;
+    final bool showGuestAvatar = isGuestUser || !hasImage;
+
+    Widget avatar;
+    if (showGuestAvatar) {
+      avatar = SizedBox.square(
+        dimension: avatarSize,
+        child: ClipOval(
+          child: Image.asset(
+            Constant.icGuestN,
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+          ),
+        ),
+      );
+    } else {
+      avatar = SizedBox.square(
+        dimension: avatarSize,
+        child: ClipOval(
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+            errorBuilder: (context, error, stackTrace) => Image.asset(
+              Constant.icGuestN,
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      width: avatarSize,
+      height: avatarSize,
+      child: avatar,
+    );
+  }
+
+
+  // Body Widget with complete redesigned layout
+  Widget bodyWidget(stockWatch, profileWatch) {
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Column(
+        children: [
+          SizedBox(height: 16.h),
+          // Banner Section
+          buildBannerSection(),
+          SizedBox(height: 16.h),
+          // Action Buttons
+          buildActionButtons(),
+          SizedBox(height: 24.h),
+          // Category Tabs with Underline
+          buildUnderlineTabs(),
+          SizedBox(height: 16.h),
+          // Investment Cards
+          buildInvestmentCards(stockWatch),
+          // Add bottom padding to ensure promotional banner is fully visible
+          SizedBox(height: 200.h),
+        ],
+      ),
+    );
+  }
+
+  /// Banner Section with Bitcoin Image
+  Widget buildBannerSection() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: TextField(
-        controller: _searchController,
-        onChanged: (value) {
-          setState(() {
-            searchQuery = value;
-          });
-          // CRITICAL FIX: Use provider search instead of local search
-          ref.read(stockProvider).searchStocks(value);
-        },
-        decoration: InputDecoration(
-          hintText: getLocalValue('Key_Search'),
-          hintStyle: TextStyles.txtRegular14(context).copyWith(
-            color: Constant.clrDarkByScaffoldTheme(context).withOpacity(0.5),
+      child: Container(
+        width: double.infinity,
+        height: 125.h,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.r),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFE6B35A), // Gold
+              Color(0xFFD4A049), // Darker gold
+            ],
           ),
-          prefixIcon: Icon(
-            Icons.search,
-            color: Constant.clrDarkByScaffoldTheme(context),
-          ),
-          suffixIcon: searchQuery.isNotEmpty
-              ? IconButton(
-            icon: Icon(
-              Icons.clear,
-              color: Constant.clrDarkByScaffoldTheme(context),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-            onPressed: () {
-              setState(() {
-                _searchController.clear();
-                searchQuery = "";
-              });
-              // CRITICAL FIX: Clear provider search
-              ref.read(stockProvider).clearSearch();
-            },
-          )
-              : null,
-          filled: true,
-          fillColor: Constant.clrHomeScreenByTheme(context),
-          border: OutlineInputBorder(
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Bitcoin Icon/Pattern Background
+            Positioned(
+              right: -20,
+              top: -20,
+              child: Opacity(
+                opacity: 0.3,
+                child: Icon(
+                  Icons.currency_bitcoin,
+                  size: 150.h,
+                  color: Constant.clrWhite,
+                ),
+              ),
+            ),
+            // Text Content
+            Padding(
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Key_3DGoldBitcoin'.localized,
+                    style: TextStyles.txtBold22(context).copyWith(
+                      color: Constant.clrWhite,
+                      fontSize: 24.sp,
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'Key_InvestInFuture'.localized,
+                    style: TextStyles.txtRegular14(context).copyWith(
+                      color: Constant.clrWhite.withOpacity(0.9),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Action Buttons Section
+  Widget buildActionButtons() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: Column(
+        children: [
+          // First Row: Consultation and Subscribe
+          Row(
+            children: [
+              Expanded(
+                child: _buildButton(
+                  text: 'Key_Consultation'.localized,
+                  isPrimary: false,
+                  color: Constant.clrPrimary,
+                  onTap: () async {
+                    showLog("===== CONSULTATION BUTTON TAPPED =====");
+
+                    // Check if user is guest
+                    if (getUserStatus() == guest) {
+                      showLog("User is guest, showing dialog");
+                      getStartedDialog(context, canPop: false);
+                      return;
+                    }
+
+                    showLog("User is logged in, navigating to RequestingForAnalysisScreen");
+                    showLog("RecommenderID: '${widget.recommenderID}'");
+
+                    // Navigate to Request Analysis Screen
+                    try {
+                      Route route = SlideRightPageRoute(
+                        builder: (context) => RequestingForAnalysisScreen(
+                          fromScreen: ScreenName.USMarketScreen,
+                          recommenderID: widget.recommenderID.isEmpty ? "0" : widget.recommenderID,
+                        ),
+                        settings: const RouteSettings(),
+                      );
+                      await Navigator.push(context, route);
+                      showLog("Navigation completed successfully");
+                    } catch (e) {
+                      showLog("Navigation error: $e");
+                    }
+                  },
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: _buildButton(
+                  text: 'Key_Subscribe'.localized,
+                  isPrimary: true,
+                  color: const Color(0xFFE6B35A), // Gold
+                  onTap: () {},
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          // Second Row: TakeProfit Investments and Your Portfolio
+          Row(
+            children: [
+              Expanded(
+                child: _buildButton(
+                  text: 'Key_TakeProfitInvestments'.localized,
+                  isPrimary: true,
+                  color: Constant.clrBlackOrigin,
+                  onTap: () {},
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: _buildButton(
+                  text: 'Key_YourPortfolioBtn'.localized,
+                  isPrimary: false,
+                  color: Constant.clrGrey,
+                  onTap: () {
+                    // Check if user is guest
+                    if (getUserStatus() == guest) {
+                      getStartedDialog(context);
+                      return;
+                    }
+
+                    // Navigate to Portfolio Screen
+                    Route route = SlideRightPageRoute(
+                      builder: (context) => const PortfolioScreen(),
+                      settings: const RouteSettings(),
+                    );
+                    Navigator.of(context).push(route);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Helper: Build Button
+  Widget _buildButton({
+    required String text,
+    required bool isPrimary,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    // Check if this is the consultation button to add dotted border
+    // Check for both English and Arabic
+    final bool isConsultation = text.toLowerCase().contains('consult') ||
+                                 text.contains('استشارة') ||
+                                 text == 'Key_Consultation'.localized;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          showLog("Button tapped: $text");
+          onTap();
+        },
+        borderRadius: BorderRadius.circular(12.r),
+        child: Ink(
+          height: 48.h,
+          decoration: BoxDecoration(
+            color: isPrimary ? color : Constant.clrCardBGByTheme(context),
             borderRadius: BorderRadius.circular(12.r),
-            borderSide: BorderSide.none,
+            // Only solid border for non-consultation outlined buttons
+            border: isPrimary || isConsultation
+                ? null
+                : Border.all(color: color, width: 1.5),
+          ),
+          child: Stack(
+            children: [
+              if (isConsultation && !isPrimary)
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: DottedBorderPainter(
+                      color: color,
+                      strokeWidth: 1.5,
+                      radius: 12.r,
+                    ),
+                  ),
+                ),
+              Center(
+                child: Text(
+                  text,
+                  style: TextStyles.txtMedium14(context).copyWith(
+                    color: isPrimary ? Constant.clrWhite : color,
+                    fontWeight: Constant.fwSemiBold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  /// Tab Bar
-  Widget buildTabBar() {
+  /// Modern Search Bar matching the design
+  Widget buildSearchBar(stockWatch) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: Container(
+        height: 48.h,
+        decoration: BoxDecoration(
+          color: Constant.clrHomeCardByTheme(context),
+          borderRadius: BorderRadius.circular(12.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: TextField(
+          controller: _searchController,
+          onChanged: (value) {
+            setState(() {
+              searchQuery = value;
+            });
+            // CRITICAL FIX: Use provider search instead of local search
+            ref.read(stockProvider).searchStocks(value);
+          },
+          style: TextStyles.txtRegular14(context).copyWith(
+            color: Constant.clrTitlePageByTheme(context),
+          ),
+          decoration: InputDecoration(
+            hintText: getLocalValue('Key_Search'),
+            hintStyle: TextStyles.txtRegular14(context).copyWith(
+              color: Constant.clrTitlePageByTheme(context).withOpacity(0.4),
+            ),
+            prefixIcon: Icon(
+              Icons.search,
+              color: Constant.clrTitlePageByTheme(context).withOpacity(0.5),
+              size: 22.h,
+            ),
+            suffixIcon: searchQuery.isNotEmpty
+                ? IconButton(
+              icon: Icon(
+                Icons.clear,
+                color: Constant.clrBlackOrigin.withOpacity(0.5),
+                size: 20.h,
+              ),
+              onPressed: () {
+                setState(() {
+                  _searchController.clear();
+                  searchQuery = "";
+                });
+                // CRITICAL FIX: Clear provider search
+                ref.read(stockProvider).clearSearch();
+              },
+            )
+                : null,
+            filled: false,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Underline-Style Tabs
+  Widget buildUnderlineTabs() {
     return Container(
       height: 50.h,
       padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: tabList.length,
-        itemBuilder: (context, index) {
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: List.generate(tabList.length, (index) {
           bool isSelected = selectedTabIndex == index;
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                selectedTabIndex = index;
-              });
-            },
-            child: Container(
-              margin: EdgeInsets.only(right: 8.w),
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? Constant.clrPrimary
-                    : Constant.clrHomeScreenByTheme(context),
-                borderRadius: BorderRadius.circular(20.r),
-              ),
-              child: Center(
-                child: Text(
-                  getLocalValue(tabList[index]),
-                  style: TextStyles.txtMedium12(context).copyWith(
-                    color: isSelected
-                        ? Colors.white
-                        : Constant.clrDarkByScaffoldTheme(context),
+          return Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedTabIndex = index;
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: isSelected
+                          ? Constant.clrPrimary
+                          : Colors.transparent,
+                      width: 2,
+                    ),
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    getLocalValue(tabList[index]),
+                    style: TextStyles.txtMedium12(context).copyWith(
+                      color: isSelected
+                          ? Constant.clrPrimary
+                          : Constant.clrBlackOrigin.withOpacity(0.6),
+                      fontWeight: isSelected ? Constant.fwSemiBold : Constant.fwMedium,
+                      fontSize: 12.sp,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
             ),
           );
-        },
+        }),
       ),
     );
   }
 
-  /// Stock List View
-  Widget buildStockListView(stockWatch) {
-    // CRITICAL FIX: Use filteredStockList from provider
+  /// Investment Cards Section
+  Widget buildInvestmentCards(stockWatch) {
     final stockList = stockWatch.filteredStockList;
-
-    // Filter by selected tab
     final List<StockModel> filteredList = _filterStocksByTab(stockList);
 
     if (filteredList.isEmpty && !stockWatch.isLoading) {
-      return EmptyStateWidget(
-        emptyStateFor: EmptyState.noSearchFound,
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: 50.h),
+        child: EmptyStateWidget(
+          emptyStateFor: EmptyState.noSearchFound,
+        ),
       );
     }
 
-    return ListView.builder(
-      controller: _scrollController,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      itemCount: filteredList.length + 1, // +1 for ad banner
-      itemBuilder: (context, index) {
-        if (index == 3) {
-          return buildHorizontalAdBanner();
-        }
+    return Column(
+      children: [
+        ...filteredList.asMap().entries.map((entry) {
+          int index = entry.key;
+          StockModel stock = entry.value;
 
-        final actualIndex = index > 3 ? index - 1 : index;
-        if (actualIndex >= filteredList.length) return const SizedBox.shrink();
+          // Add promotional banner after FIRST card (index 0)
+          if (index == 0) {
+            return Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: buildInvestmentCard(stock),
+                ),
+                SizedBox(height: 16.h),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: buildPromotionalBanner(),
+                ),
+                SizedBox(height: 16.h),
+              ],
+            );
+          }
 
-        return buildStockCard(filteredList[actualIndex]);
-      },
+          return Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: buildInvestmentCard(stock),
+              ),
+              SizedBox(height: 16.h),
+            ],
+          );
+        }).toList(),
+      ],
+    );
+  }
+
+  /// Promotional Banner (With Padding)
+  Widget buildPromotionalBanner() {
+    return Container(
+      width: double.infinity,
+      height: 140.h,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16.r),
+        gradient: const LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [
+            Color(0xFF5E3FBE), // Purple
+            Color(0xFF2A1A5E), // Dark purple
+          ],
+        ),
+      ),
+      child: Stack(
+        children: [
+          // Bitcoin icons in background
+          Positioned(
+            right: -30,
+            top: 10,
+            child: Opacity(
+              opacity: 0.2,
+              child: Icon(
+                Icons.currency_bitcoin,
+                size: 100.h,
+                color: Constant.clrWhite,
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Key_CryptoPromotionalOffers'.localized,
+                  style: TextStyles.txtBold22(context).copyWith(
+                    color: Constant.clrWhite,
+                    fontSize: 20.sp,
+                    height: 1.2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -405,230 +833,361 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     }).toList();
   }
 
-  /// Stock Card
-  Widget buildStockCard(StockModel stockData) {
+  /// Investment Card matching the detailed design
+  Widget buildInvestmentCard(StockModel stockData) {
+    final now = DateTime.now();
+    final dateTime = '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year} ${now.hour}:${now.minute.toString().padLeft(2, '0')}';
+
     Widget cardContent = Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Constant.clrHomeScreenByTheme(context),
-        borderRadius: BorderRadius.circular(16.13.r),
-        border: Border.all(
-          color: Constant.clrDarkByScaffoldTheme(context).withOpacity(0.1),
-          width: 1,
-        ),
+        color: Constant.clrHomeCardByTheme(context),
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          /// Header Row
-          Row(
-            children: [
-              /// Company Logo (placeholder for now)
-              Container(
-                width: 48.w,
-                height: 48.h,
-                decoration: BoxDecoration(
-                  color: Constant.clrPrimary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Center(
-                  child: Text(
-                    stockData.ticker.substring(0, 1),
-                    style: TextStyles.txtBold16(context).copyWith(
-                      color: Constant.clrPrimary,
-                    ),
+          // Main content with padding
+          Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Date and Time
+                Text(
+                  dateTime,
+                  style: TextStyles.txtRegular12(context).copyWith(
+                    color: Constant.clrTitlePageByTheme(context).withOpacity(0.5),
+                    fontSize: 11.sp,
                   ),
                 ),
-              ),
-              SizedBox(width: 12.w),
+                SizedBox(height: 12.h),
 
-              /// Company Name & Ticker
-              Expanded(
-                child: Column(
+                // Investment Title with Logo (without tags, they're positioned absolutely)
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      stockData.companyName,
-                      style: TextStyles.txtSemiBold16(context).copyWith(
-                        color: Constant.clrDarkByScaffoldTheme(context),
+                    // Company Logo
+                    _buildStockLogo(stockData.ticker),
+                    SizedBox(width: 12.w),
+                    // Company Name and Price
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${stockData.companyName} (${stockData.ticker})',
+                            style: TextStyles.txtSemiBold16(context).copyWith(
+                              color: Constant.clrTitlePageByTheme(context),
+                              fontSize: 15.sp,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 8.h),
+                          // Price in Blue
+                          Text(
+                            stockData.price,
+                            style: TextStyles.txtSemiBold18(context).copyWith(
+                              color: Constant.clrBlue,
+                              fontSize: 18.sp,
+                            ),
+                          ),
+                        ],
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      stockData.ticker,
-                      style: TextStyles.txtRegular12(context).copyWith(
-                        color: Constant.clrDarkByScaffoldTheme(context)
-                            .withOpacity(0.6),
-                      ),
-                    ),
+                    // Add spacing for status tags so text doesn't overlap
+                    SizedBox(width: 105.w),
                   ],
                 ),
-              ),
 
-              /// Favorite Icon
-              IconButton(
-                icon: Icon(
-                  stockData.isFavorite
-                      ? Icons.favorite
-                      : Icons.favorite_border,
-                  color: stockData.isFavorite
-                      ? Colors.red
-                      : Constant.clrDarkByScaffoldTheme(context)
-                      .withOpacity(0.6),
-                ),
-                onPressed: () {
-                  // CRITICAL FIX: Use provider to toggle favorite
-                  ref.read(stockProvider).toggleFavorite(stockData.ticker);
-                },
-              ),
-            ],
-          ),
+                SizedBox(height: 16.h),
 
-          SizedBox(height: 16.h),
-
-          /// Price & Change
-          Row(
-            children: [
-              Text(
-                stockData.price,
-                style: TextStyles.txtMedium24(context).copyWith(
-                  color: Constant.clrDarkByScaffoldTheme(context),
-                ),
-              ),
-              SizedBox(width: 8.w),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: stockData.isPositiveChange
-                      ? const Color(0xFF10B981).withOpacity(0.1)
-                      : const Color(0xFFEF4444).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(6.r),
-                ),
-                child: Text(
-                  stockData.changePercent,
-                  style: TextStyles.txtMedium12(context).copyWith(
-                    color: stockData.isPositiveChange
-                        ? const Color(0xFF10B981)
-                        : const Color(0xFFEF4444),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          SizedBox(height: 12.h),
-
-          /// Buy Status & Compliance Status Tags
-          Row(
-            children: [
-              /// Buy Status Badge
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-                decoration: BoxDecoration(
-                  color: _getBuyStatusColor((stockData as dynamic).buyStatus ?? 'Hold')
-                      .withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(6.r),
-                  border: Border.all(
-                    color: _getBuyStatusColor((stockData as dynamic).buyStatus ?? 'Hold'),
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  (stockData as dynamic).buyStatus ?? 'Hold',
-                  style: TextStyles.txtMedium10(context).copyWith(
-                    color: _getBuyStatusColor((stockData as dynamic).buyStatus ?? 'Hold'),
-                  ),
-                ),
-              ),
-              SizedBox(width: 8.w),
-
-              /// Compliance Status Badge
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-                decoration: BoxDecoration(
-                  color: _getComplianceColor(
-                      (stockData as dynamic).complianceStatus ?? 'Sharia Compliant')
-                      .withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(6.r),
-                  border: Border.all(
-                    color: _getComplianceColor(
-                        (stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
+                // Action Buttons
+                Row(
                   children: [
-                    Icon(
-                      ((stockData as dynamic).complianceStatus ?? 'Sharia Compliant')
-                          .toString()
-                          .toLowerCase()
-                          .contains('sharia compliant')
-                          ? Icons.verified
-                          : Icons.info_outline,
-                      size: 14.h,
-                      color: _getComplianceColor(
-                          (stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          // Check if card should be blurred
+                          final shouldBlur = _shouldBlurCard();
+
+                          if (shouldBlur) {
+                            // Show appropriate dialog based on user status
+                            if (getUserStatus() == guest) {
+                              getStartedDialog(context);
+                            }
+                            // TODO: Add subscription dialog when US Market subscription is implemented
+                            return;
+                          }
+
+                          // Add to portfolio action
+                          try {
+                            // Parse the buy price from the current price string
+                            final priceString = stockData.price.replaceAll(RegExp(r'[^\d.]'), '');
+                            final buyPrice = double.parse(priceString);
+
+                            // Add stock to portfolio
+                            ref.read(portfolioProvider).addToPortfolio(
+                              ticker: stockData.ticker,
+                              companyName: stockData.companyName,
+                              currentPrice: stockData.price,
+                              buyPrice: buyPrice,
+                              buyStatus: (stockData as dynamic).buyStatus ?? 'Hold',
+                              complianceStatus: (stockData as dynamic).complianceStatus ?? 'Sharia Compliant',
+                              dateTime: dateTime,
+                            );
+
+                            // Show success message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  '${stockData.ticker} ${'Key_AddedToPortfolio'.localized}',
+                                  style: TextStyles.txtRegular14(context).copyWith(
+                                    color: Constant.clrWhite,
+                                  ),
+                                ),
+                                backgroundColor: const Color(0xFF32C671),
+                                duration: const Duration(seconds: 2),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          } catch (e) {
+                            // Show error message if something goes wrong
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Key_ErrorAddingToPortfolio'.localized,
+                                  style: TextStyles.txtRegular14(context).copyWith(
+                                    color: Constant.clrWhite,
+                                  ),
+                                ),
+                                backgroundColor: const Color(0xFFE74C3C),
+                                duration: const Duration(seconds: 2),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
+                        },
+                        child: Container(
+                          height: 42.h,
+                          decoration: BoxDecoration(
+                            color: Constant.clrCardBGByTheme(context),
+                            borderRadius: BorderRadius.circular(8.r),
+                            border: Border.all(color: Constant.clrPrimary, width: 1.5),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Key_AddToPortfolio'.localized,
+                              style: TextStyles.txtMedium12(context).copyWith(
+                                color: Constant.clrPrimary,
+                                fontWeight: Constant.fwSemiBold,
+                                fontSize: 12.sp,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                    SizedBox(width: 4.w),
-                    Text(
-                      (stockData as dynamic).complianceStatus ?? 'Sharia Compliant',
-                      style: TextStyles.txtMedium10(context).copyWith(
-                        color: _getComplianceColor(
-                            (stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          // Check if card should be blurred
+                          final shouldBlur = _shouldBlurCard();
+
+                          if (shouldBlur) {
+                            // Show appropriate dialog based on user status
+                            if (getUserStatus() == guest) {
+                              getStartedDialog(context);
+                            }
+                            // TODO: Add subscription dialog when US Market subscription is implemented
+                            return;
+                          }
+
+                          // Navigate to detailed tabs screen (Insight, Story, Scorecard, Risks)
+                          Route route = SlideRightPageRoute(
+                            builder: (context) => USMarketDetailsScreen(
+                              ticker: stockData.ticker,
+                              companyName: stockData.companyName,
+                              price: stockData.price,
+                              buyStatus: (stockData as dynamic).buyStatus ?? 'Hold',
+                              complianceStatus: (stockData as dynamic).complianceStatus ?? 'Sharia Compliant',
+                              dateTime: dateTime,
+                            ),
+                            settings: const RouteSettings(),
+                          );
+                          Navigator.of(context).push(route);
+                        },
+                        child: Container(
+                          height: 42.h,
+                          decoration: BoxDecoration(
+                            color: Constant.clrBlackOrigin,
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Key_ViewDetails'.localized,
+                              style: TextStyles.txtMedium12(context).copyWith(
+                                color: Constant.clrWhite,
+                                fontWeight: Constant.fwSemiBold,
+                                fontSize: 12.sp,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-
-          SizedBox(height: 16.h),
-
-          /// Action Button
-          GestureDetector(
-            onTap: () {
-              Route route = SlideRightPageRoute(
-                builder: (context) => USMarketDetailsScreen(
-                  ticker: stockData.ticker,
-                  companyName: stockData.companyName,
-                ),
-                settings: const RouteSettings(),
-              );
-              Navigator.of(context).push(route);
-            },
-            child: Container(
-              height: 40.h,
-              decoration: BoxDecoration(
-                color: Constant.clrPrimary,
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              child: Center(
-                child: Text(
-                  'Key_ViewDetails'.localized,
-                  style: TextStyles.txtMedG12(context).copyWith(
-                    color: Colors.white,
+          // Status Tags positioned at card edge (outside padding)
+          Positioned(
+            top: 40.h,
+            right: getAppLanguage() == 'ar' ? null : 0,
+            left: getAppLanguage() == 'ar' ? 0 : null,
+            child: Column(
+              crossAxisAlignment: getAppLanguage() == 'ar'
+                  ? CrossAxisAlignment.start
+                  : CrossAxisAlignment.end,
+              children: [
+                // Buy Status Tag
+                Container(
+                  width: 97.w,
+                  height: 23.h,
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: _getBuyStatusColor((stockData as dynamic).buyStatus ?? 'Hold'),
+                    borderRadius: getAppLanguage() == 'ar'
+                        ? BorderRadius.only(
+                      topRight: Radius.circular(12.r),
+                      bottomRight: Radius.circular(12.r),
+                    )
+                        : BorderRadius.only(
+                      topLeft: Radius.circular(12.r),
+                      bottomLeft: Radius.circular(12.r),
+                    ),
+                  ),
+                  child: Text(
+                    _getBuyStatusText((stockData as dynamic).buyStatus ?? 'Hold'),
+                    style: TextStyles.txtSemiBoldG10(context).copyWith(
+                      fontWeight: Constant.fwRegular,
+                      color: Constant.clrWhite,
+                      fontSize: 10.sp,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-              ),
+                SizedBox(height: 6.h),
+                // Sharia Compliance Tag
+                Container(
+                  width: 97.w,
+                  height: 23.h,
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: _getComplianceColor((stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
+                    borderRadius: getAppLanguage() == 'ar'
+                        ? BorderRadius.only(
+                      topRight: Radius.circular(12.r),
+                      bottomRight: Radius.circular(12.r),
+                    )
+                        : BorderRadius.only(
+                      topLeft: Radius.circular(12.r),
+                      bottomLeft: Radius.circular(12.r),
+                    ),
+                  ),
+                  child: Text(
+                    _getComplianceText((stockData as dynamic).complianceStatus ?? 'Sharia Compliant'),
+                    style: TextStyles.txtSemiBoldG10(context).copyWith(
+                      fontWeight: Constant.fwRegular,
+                      color: Constant.clrWhite,
+                      fontSize: 9.sp,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
 
-    /// Apply blur if stock is marked as blurred
-    final isBlurred = (stockData as dynamic).isBlurred ?? false;
-    return isBlurred
+    /// Apply blur based on user status and subscription (similar to recommender_details_screen)
+    final shouldBlur = _shouldBlurCard();
+    return shouldBlur
         ? Blur(
-      borderRadius: BorderRadius.circular(16.13.r),
+      borderRadius: BorderRadius.circular(16.r),
       blurColor: Constant.clrDarkByScaffoldTheme(context).withOpacity(0.2),
       child: cardContent,
     )
         : cardContent;
+  }
+
+  /// Determine if card should be blurred based on user status
+  /// Similar logic to recommender_details_screen.dart
+  bool _shouldBlurCard() {
+    final isGuest = getUserStatus() == guest;
+
+    // For US Market stocks:
+    // - Blur if user is guest (they need to sign up)
+    // - In future: also check subscription to US Market service
+    if (isGuest) {
+      return true;
+    }
+
+    // TODO: Add subscription check when US Market subscription is implemented
+    // For now, logged-in users (trader/recommender) can view all stocks
+    return false;
+  }
+
+  /// Helper: Get Buy Status Text (with translation)
+  String _getBuyStatusText(String status) {
+    showLog("===== BUY STATUS TRANSLATION =====");
+    showLog("Input status: '$status'");
+    showLog("Lowercase status: '${status.toLowerCase()}'");
+
+    String result;
+    switch (status.toLowerCase()) {
+      case 'strong buy':
+        result = 'Key_StrongBuy'.localized;
+        showLog("Matched 'strong buy', returning: $result");
+        break;
+      case 'buy':
+        result = 'Key_Buy'.localized;
+        showLog("Matched 'buy', returning: $result");
+        break;
+      case 'hold':
+        result = 'Key_Hold'.localized;
+        showLog("Matched 'hold', returning: $result");
+        break;
+      case 'sell':
+        result = 'Key_Sell'.localized;
+        showLog("Matched 'sell', returning: $result");
+        break;
+      default:
+        result = status;
+        showLog("No match, returning original: $result");
+        break;
+    }
+
+    return result;
+  }
+
+  /// Helper: Get Compliance Text (with Arabic translation)
+  String _getComplianceText(String status) {
+    if (status.toLowerCase().contains('sharia compliant')) {
+      return 'Key_ShariaCompliant'.localized;
+    } else {
+      return 'Key_NonSharia'.localized;
+    }
   }
 
   /// Horizontal Ad Banner
@@ -678,8 +1237,8 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                         children: [
                           Text(
                             index % 2 == 0
-                                ? 'Stock Market\nPromotional\nOffers'
-                                : 'Investment\nBanners\n& Video Ads',
+                                ? 'Key_StockMarketPromotionalOffers'.localized
+                                : 'Key_InvestmentBannersVideoAds'.localized,
                             style: TextStyles.txtBold22(context).copyWith(
                               color: Constant.clrWhite,
                               height: 1.2,
@@ -709,7 +1268,7 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
                             ),
                             SizedBox(width: 4.w),
                             Text(
-                              'Learn More',
+                              'Key_LearnMore'.localized,
                               style: TextStyles.txtMedium12(context).copyWith(
                                 color: const Color(0xFF5E3FBE),
                               ),
@@ -733,9 +1292,9 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
     switch (status.toLowerCase()) {
       case 'strong buy':
       case 'buy':
-        return const Color(0xFF10B981); // Green
+        return const Color(0xFF32C671); // Green (Success)
       case 'sell':
-        return const Color(0xFFEF4444); // Red
+        return const Color(0xFFE74C3C); // Red (Danger)
       case 'hold':
         return const Color(0xFFF59E0B); // Orange
       default:
@@ -746,9 +1305,142 @@ class _UsMarketDetailScreenState extends ConsumerState<UsMarketDetailScreen>
   /// Helper: Get Compliance Color
   Color _getComplianceColor(String status) {
     if (status.toLowerCase().contains('sharia compliant')) {
-      return const Color(0xFF8B5CF6); // Purple
+      return const Color(0xFF7B61FF); // Purple (Secondary)
     } else {
       return const Color(0xFFF97316); // Orange
     }
   }
+
+  /// Helper: Build Stock Logo
+  Widget _buildStockLogo(String ticker) {
+    // Map ticker to logo asset
+    String logoAsset;
+    switch (ticker.toUpperCase()) {
+      case 'XPEV':
+        logoAsset = Constant.icXpengLogo;
+        break;
+      case 'AAPL':
+        logoAsset = Constant.icAppleLogo;
+        break;
+      case 'TSLA':
+        logoAsset = Constant.icTeslaLogo;
+        break;
+      case 'AMZN':
+        logoAsset = Constant.icAmazonLogo;
+        break;
+      case 'NIO':
+        logoAsset = Constant.icNIOLogo;
+        break;
+      case 'PLTR':
+        logoAsset = Constant.icPLTRLogo;
+        break;
+      case 'DIS':
+        logoAsset = Constant.icDISLogo;
+        break;
+      case 'APDD':
+        logoAsset = Constant.icAPDDLogo;
+        break;
+      default:
+        // Default placeholder - show ticker initial
+        return Container(
+          width: 40.w,
+          height: 40.h,
+          decoration: BoxDecoration(
+            color: Constant.clrPrimary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+          child: Center(
+            child: Text(
+              ticker.substring(0, 1),
+              style: TextStyles.txtBold16(context).copyWith(
+                color: Constant.clrPrimary,
+                fontSize: 18.sp,
+              ),
+            ),
+          ),
+        );
+    }
+
+    return Container(
+      width: 40.w,
+      height: 40.h,
+      decoration: BoxDecoration(
+        color: Constant.clrWhite,
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(
+          color: Constant.clrGrey.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8.r),
+        child: Image.asset(
+          logoAsset,
+          width: 40.w,
+          height: 40.h,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            // Fallback if image doesn't exist
+            return Container(
+              color: Constant.clrPrimary.withOpacity(0.1),
+              child: Center(
+                child: Text(
+                  ticker.substring(0, 1),
+                  style: TextStyles.txtBold16(context).copyWith(
+                    color: Constant.clrPrimary,
+                    fontSize: 18.sp,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+/// Custom Painter for Dotted Border
+class DottedBorderPainter extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+  final double radius;
+
+  DottedBorderPainter({
+    required this.color,
+    required this.strokeWidth,
+    required this.radius,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    const dashWidth = 5.0;
+    const dashSpace = 3.0;
+    double startX = 0;
+
+    final path = Path()
+      ..addRRect(RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        Radius.circular(radius),
+      ));
+
+    // Draw dashed path
+    for (ui.PathMetric pathMetric in path.computeMetrics()) {
+      while (startX < pathMetric.length) {
+        final nextDash = startX + dashWidth;
+        final segment = pathMetric.extractPath(startX, nextDash);
+        canvas.drawPath(segment, paint);
+        startX = nextDash + dashSpace;
+      }
+      startX = 0;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
