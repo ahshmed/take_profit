@@ -139,8 +139,8 @@ class RecommenderBottomNavBar extends ConsumerWidget {
             iconSize,
           ),
         ),
-        // Center space for floating button - wider to prevent overlap in Arabic
-        SizedBox(width: 80.w),
+        // Center space for floating button
+        SizedBox(width: 70.w),
         // Right tabs (1, 2)
         Expanded(
           child: _buildNavItem(
