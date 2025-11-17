@@ -887,11 +887,11 @@ class _FieldsScreenState extends ConsumerState<SignUpScreen> {
   Future recommenderDetailsApiCall() async {
     final homeWatch = ref.watch(homeProvider);
     final recommenderWatch = ref.watch(recommenderProvider);
-    if (isInternetConnectionOn) {
-      await recommenderWatch.recommenderDetailAPI(
-          context,
-          homeWatch.homeRecommenderDetailsResponseModel?.data?.recommenderId ??
-              '');
+    final recommenderId = homeWatch.homeRecommenderDetailsResponseModel?.data?.recommenderId;
+
+    // Only call API if we have a valid recommender ID
+    if (isInternetConnectionOn && recommenderId != null && recommenderId.trim().isNotEmpty) {
+      await recommenderWatch.recommenderDetailAPI(context, recommenderId);
     }
   }
 

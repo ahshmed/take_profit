@@ -1617,8 +1617,23 @@ class _MyRecommendationSignalScreenState
     final isRTL = Directionality.of(context) == ui.TextDirection.rtl;
     final commonWatch = ref.watch(commonProvider);
 
+    // Check if we're in US Market mode
+    final selectedMarket = getSelectedMarket();
+    final bool isUSMarket = selectedMarket == 'us_market';
+
     // For my recommendation screen, show data since user is the recommender
     final bool shouldBlur = false;
+
+    // Determine which logo, name, and symbol to show
+    final String displayLogo = isUSMarket
+        ? (signalData.stockLogo ?? signalData.currencyLogo ?? "")
+        : (signalData.currencyLogo ?? "");
+    final String displayName = isUSMarket
+        ? (signalData.stockName ?? signalData.currencyName ?? "")
+        : (signalData.currencyName ?? "");
+    final String displaySymbol = isUSMarket
+        ? (signalData.stockSymbol ?? signalData.currencySymbol ?? "")
+        : (signalData.currencySymbol ?? "");
 
     Widget cardContent = Container(
       margin: EdgeInsets.only(bottom: 16.h),
@@ -1638,19 +1653,19 @@ class _MyRecommendationSignalScreenState
         children: [
           SizedBox(height: 16.h),
 
-          /// Currency Header with badges on opposite side
+          /// Currency/Stock Header with badges on opposite side
           Directionality(
             textDirection: isRTL ? ui.TextDirection.rtl : ui.TextDirection.ltr,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// Currency Logo
+                /// Currency/Stock Logo
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25.r),
                     child: CacheImage(
-                      imageURL: signalData.currencyLogo ?? "",
+                      imageURL: displayLogo,
                       height: 50.h,
                       width: 50.h,
                       contentMode: BoxFit.cover,
@@ -1659,13 +1674,13 @@ class _MyRecommendationSignalScreenState
                 ),
                 SizedBox(width: 12.w),
 
-                /// Currency Name and Timestamp - Expanded to take available space
+                /// Currency/Stock Name and Timestamp - Expanded to take available space
                 Expanded(
                   child: Column(
                     crossAxisAlignment: isRTL ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "${signalData.currencyName ?? ""} (${signalData.currencySymbol ?? ""})",
+                        "$displayName ($displaySymbol)",
                         style: TextStyles.txtSemiBold14(context).copyWith(
                           color: Constant.clrSigDetByTheme(context),
                           fontWeight: Constant.fwMedium,

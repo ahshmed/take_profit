@@ -2,16 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../framework/data_provider/home/home_provider.dart';
+import '../home/dashboard_screen.dart';
 import '../../framework/data_provider/home/dashboard_screen_controller.dart';
 import '../../framework/data_provider/select_market/market_providers.dart';
 import '../../framework/repository/select_market/market_model.dart';
-import '../../main.dart';
 import '../../utils/const.dart';
-import '../../utils/extension/string_extension.dart';
 import '../../utils/sliderightroute.dart';
 import '../../utils/theme_const.dart';
 import '../drawer/drawer_menu.dart';
-import '../home/dashboard_screen.dart';
 
 class SelectMarketScreen extends ConsumerStatefulWidget {
   const SelectMarketScreen({super.key});
@@ -194,16 +192,16 @@ class _ChooseMarketScreenState extends ConsumerState<SelectMarketScreen> {
                           // CRITICAL FIX: Mark that user has completed market selection
                           setFirstTimeUser(false);
 
-                          // Navigate to dashboard and force tab reset to home
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(builder: (context) => const DashboardScreen()),
-                                (route) => false,
-                          );
+                          // CRITICAL FIX: Set user status to guest to avoid 401 errors and show proper greeting
+                          saveLocalData(KEY_USER_STATUS, guest);
 
-                          // Reset to home tab (index 0)
-                          Future.delayed(const Duration(milliseconds: 100), () {
-                            ref.read(dashboardProvider).updateSelectedIndex(0);
-                          });
+                          // CRITICAL FIX: Navigate to DrawerMenu instead of DashboardScreen
+                          // This ensures ZoomDrawer is properly initialized and drawer works on first launch
+                          Route route = SlideRightPageRoute(
+                            builder: (context) => const DrawerMenu(),
+                            settings: const RouteSettings(),
+                          );
+                          Navigator.of(context).pushAndRemoveUntil(route, (route) => false);
                         }
                       },
                       style: ElevatedButton.styleFrom(

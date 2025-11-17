@@ -708,139 +708,136 @@ class _CreateSignalScreenState extends ConsumerState<CreateSignalScreen>
   Widget step3Widget(CreateSignalController signalWatch) {
     final isRTL = Directionality.of(context) == TextDirection.rtl;
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Currency Header Card
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16.r),
-              color: Constant.clrHomeCardByTheme(context),
-            ),
-            child: Column(
-              children: [
-                SizedBox(height: 16.h),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CacheImage(
-                        imageURL: widget.isEdit
-                            ? widget.signalData?.currencyLogo ?? ""
-                            : signalWatch.currencyData?.logo ?? "",
-                        height: 49.31.w,
-                        width: 49.32.w,
-                        contentMode: BoxFit.cover,
-                      ),
-                      SizedBox(width: 16.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: isRTL
-                              ? CrossAxisAlignment.end
-                              : CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.isEdit
-                                  ? widget.signalData?.currencyName ?? ""
-                                  : signalWatch.currencyData?.name ?? "",
-                              style: TextStyles.txtSemiBoldG14(context).copyWith(
-                                fontWeight: Constant.fwSemiBold,
-                                color: Constant.clrSigDetByTheme(context),
-                              ),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              widget.isEdit
-                                  ? "${widget.signalData?.livePrice ?? ""} ${widget.signalData?.currencyCode ?? ""}"
-                                  : "${signalWatch.currencyData?.price ?? ""} ${signalWatch.currencyData?.currencyCode ?? ""}",
-                              style: TextStyles.txtRegG12(context).copyWith(
-                                color: Constant.clrSigDetEntByTheme(context),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        width: 97.w,
-                        height: 23.h,
-                        padding:
-                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                        decoration: BoxDecoration(
-                          color: signalWatch.selectedRisk?.sendRiskLabel == "low"
-                              ? Constant.clrDarkGreenNew
-                              : signalWatch.selectedRisk?.sendRiskLabel == "high"
-                              ? Constant.clrDarkBlue
-                              : Constant.clrDarkPurple,
-                          borderRadius: isRTL
-                              ? BorderRadius.only(
-                            topLeft: Radius.circular(0.r),
-                            topRight: Radius.circular(12.r),
-                            bottomLeft: Radius.circular(0.r),
-                            bottomRight: Radius.circular(12.r),
-                          )
-                              : BorderRadius.only(
-                            topLeft: Radius.circular(12.r),
-                            topRight: Radius.circular(0.r),
-                            bottomLeft: Radius.circular(12.r),
-                            bottomRight: Radius.circular(0.r),
-                          ),
-                        ),
-                        child: Text(
-                          signalWatch.selectedRisk?.sendRiskLabel == "low"
-                              ? "Key_LowRisk".localized
-                              : signalWatch.selectedRisk?.sendRiskLabel == "high"
-                              ? "Key_HighRisk".localized
-                              : "Key_MediumRisk".localized,
-                          style: TextStyles.txtSemiBoldG10(context).copyWith(
-                            fontWeight: Constant.fwRegular,
-                            color: Constant.clrWhite,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Divider(color: Constant.clrSigDetDividerByTheme(context)),
-                _buildDetailsSection(signalWatch),
-              ],
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Currency Header Card
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16.r),
+            color: Constant.clrHomeCardByTheme(context),
           ),
-          SizedBox(height: 24.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
             children: [
-              Text(
-                getLocalValue("Key_AddTarget"),
-                style: TextStyles.txtSemiG16(context)
-                    .copyWith(fontWeight: Constant.fwSemiBold),
-              ),
-              InkWell(
-                onTap: () {
-                  signalWatch.addTargetList("Fixed", "", "", "", '');
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(21.r),
-                    color: Constant.clrPrimary.withOpacity(0.1),
-                  ),
-                  child: Text(
-                    "+${getLocalValue("Key_AddNew")}",
-                    style: TextStyles.txtMedium12(context)
-                        .copyWith(color: Constant.clrPrimary),
-                  ),
+              SizedBox(height: 16.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CacheImage(
+                      imageURL: widget.isEdit
+                          ? widget.signalData?.currencyLogo ?? ""
+                          : signalWatch.currencyData?.logo ?? "",
+                      height: 49.31.w,
+                      width: 49.32.w,
+                      contentMode: BoxFit.cover,
+                    ),
+                    SizedBox(width: 16.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: isRTL
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.isEdit
+                                ? widget.signalData?.currencyName ?? ""
+                                : signalWatch.currencyData?.name ?? "",
+                            style: TextStyles.txtSemiBoldG14(context).copyWith(
+                              fontWeight: Constant.fwSemiBold,
+                              color: Constant.clrSigDetByTheme(context),
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            widget.isEdit
+                                ? "${widget.signalData?.livePrice ?? ""} ${widget.signalData?.currencyCode ?? ""}"
+                                : "${signalWatch.currencyData?.price ?? ""} ${signalWatch.currencyData?.currencyCode ?? ""}",
+                            style: TextStyles.txtRegG12(context).copyWith(
+                              color: Constant.clrSigDetEntByTheme(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: 97.w,
+                      height: 23.h,
+                      padding:
+                      EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                      decoration: BoxDecoration(
+                        color: signalWatch.selectedRisk?.sendRiskLabel == "low"
+                            ? Constant.clrDarkGreenNew
+                            : signalWatch.selectedRisk?.sendRiskLabel == "high"
+                            ? Constant.clrDarkBlue
+                            : Constant.clrDarkPurple,
+                        borderRadius: isRTL
+                            ? BorderRadius.only(
+                          topLeft: Radius.circular(0.r),
+                          topRight: Radius.circular(12.r),
+                          bottomLeft: Radius.circular(0.r),
+                          bottomRight: Radius.circular(12.r),
+                        )
+                            : BorderRadius.only(
+                          topLeft: Radius.circular(12.r),
+                          topRight: Radius.circular(0.r),
+                          bottomLeft: Radius.circular(12.r),
+                          bottomRight: Radius.circular(0.r),
+                        ),
+                      ),
+                      child: Text(
+                        signalWatch.selectedRisk?.sendRiskLabel == "low"
+                            ? "Key_LowRisk".localized
+                            : signalWatch.selectedRisk?.sendRiskLabel == "high"
+                            ? "Key_HighRisk".localized
+                            : "Key_MediumRisk".localized,
+                        style: TextStyles.txtSemiBoldG10(context).copyWith(
+                          fontWeight: Constant.fwRegular,
+                          color: Constant.clrWhite,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
                 ),
-              )
+              ),
+              Divider(color: Constant.clrSigDetDividerByTheme(context)),
+              _buildDetailsSection(signalWatch),
             ],
           ),
-          SizedBox(height: 16.h),
-          listWidgetAddTargetContent(signalWatch),
-          SizedBox(height: 100.h),
-        ],
-      ),
+        ),
+        SizedBox(height: 24.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              getLocalValue("Key_AddTarget"),
+              style: TextStyles.txtSemiG16(context)
+                  .copyWith(fontWeight: Constant.fwSemiBold),
+            ),
+            InkWell(
+              onTap: () {
+                signalWatch.addTargetList("Fixed", "", "", "", '');
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(21.r),
+                  color: Constant.clrPrimary.withOpacity(0.1),
+                ),
+                child: Text(
+                  "+${getLocalValue("Key_AddNew")}",
+                  style: TextStyles.txtMedium12(context)
+                      .copyWith(color: Constant.clrPrimary),
+                ),
+              ),
+            )
+          ],
+        ),
+        SizedBox(height: 16.h),
+        listWidgetAddTarget(signalWatch),
+      ],
     );
   }
 
@@ -1226,14 +1223,19 @@ class _CreateSignalScreenState extends ConsumerState<CreateSignalScreen>
     );
   }
 
-  Widget listWidgetAddTargetContent(CreateSignalController signalWatch) {
+  Widget listWidgetAddTarget(CreateSignalController signalWatch) {
     final isRTL = Directionality.of(context) == TextDirection.rtl;
 
-    return ListView.builder(
-      itemCount: signalWatch.targetList.length,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (context, index) {
+    return Expanded(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: ListView.builder(
+            itemCount: signalWatch.targetList.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
               var valueController = TextEditingController();
               var fromController = TextEditingController();
               var toController = TextEditingController();
@@ -1544,7 +1546,10 @@ class _CreateSignalScreenState extends ConsumerState<CreateSignalScreen>
                 ),
               );
             },
-          );
+          ),
+        ),
+      ),
+    );
   }
 
   Widget widgetListStep4(CreateSignalController signalWatch) {
