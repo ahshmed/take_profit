@@ -45,7 +45,29 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   void _onItemTapped(int index) {
-    ref.read(dashboardProvider).updateSelectedIndex(index);
+    final isRecommender = getUserStatus() == recommender;
+    final String? selectedMarket = getSelectedMarket();
+    final bool isUSMarket = selectedMarket == 'us_market';
+
+    // For recommender: Tab 2 (index 2) toggles market
+    if (isRecommender && index == 2) {
+      // Toggle market
+      if (isUSMarket) {
+        // Switch to Crypto
+        setSelectedMarket('crypto_signals');
+        ref.read(selectMarketProvider.notifier).selectMarketById('crypto_signals');
+      } else {
+        // Switch to US Market
+        setSelectedMarket('us_market');
+        ref.read(selectMarketProvider.notifier).selectMarketById('us_market');
+      }
+      // Stay on home tab (index 0) after market switch
+      ref.read(dashboardProvider).updateSelectedIndex(0);
+      _previousMarket = isUSMarket ? 'crypto_signals' : 'us_market';
+    } else {
+      // Normal tab selection
+      ref.read(dashboardProvider).updateSelectedIndex(index);
+    }
   }
 
   @override
