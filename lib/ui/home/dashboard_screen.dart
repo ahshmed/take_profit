@@ -134,13 +134,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     ];
 
     // Navigation items for Recommender (3 tabs + center button - dynamic based on market)
-    // Matches trader mechanism: market toggle via tabs
+    // Home tab always labeled "Home", but content changes based on market
     final List<BottomNavItem> recommenderNavItems = isUSMarket
         ? [
-      // US Market Mode: Home (US Market), Stock, Crypto
+      // US Market Mode: Home (shows US Market), Stock, Crypto
       BottomNavItem(
-        iconPath: Constant.icUsMarketN,
-        label: getLocalValue("Key_Us_Market"),
+        iconPath: Constant.icHomeN,
+        label: getLocalValue("Key_Home"),
         screen: const UsMarketDetailScreen(
           recommenderID: '',
           appbarRequired: false,  // Shows back button + "US Market" title
@@ -158,7 +158,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
     ]
         : [
-      // Crypto Mode: Home (Crypto), Currencies, US Market
+      // Crypto Mode: Home (shows Crypto), Currencies, US Market
       BottomNavItem(
         iconPath: Constant.icHomeN,
         label: getLocalValue("Key_Home"),
