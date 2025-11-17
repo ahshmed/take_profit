@@ -12,13 +12,38 @@ import '../../utils/widgets/common_button.dart';
 import '../../utils/widgets/commonappbar.dart';
 import '../../utils/widgets/custom_textfield.dart';
 
+// Content item can be either text or image
+class ContentItem {
+  final String type; // 'text' or 'image'
+  String? text;
+  File? image;
+
+  ContentItem.text(this.text) : type = 'text', image = null;
+  ContentItem.image(this.image) : type = 'image', text = null;
+}
+
 class StoryCard {
   String title;
-  String description;
-  List<File> images; // Support for multiple images
+  List<ContentItem> content; // Mixed content: text and images inline
 
-  StoryCard({this.title = '', this.description = '', List<File>? images})
-      : images = images ?? [];
+  StoryCard({this.title = '', List<ContentItem>? content})
+      : content = content ?? [ContentItem.text('')];
+
+  // Helper to get full description text (excluding images)
+  String get description {
+    return content
+        .where((item) => item.type == 'text')
+        .map((item) => item.text ?? '')
+        .join('\n');
+  }
+
+  // Helper to get all images
+  List<File> get images {
+    return content
+        .where((item) => item.type == 'image')
+        .map((item) => item.image!)
+        .toList();
+  }
 }
 
 class CreateUSMarketStoryScreen extends ConsumerStatefulWidget {
@@ -120,7 +145,44 @@ class _CreateUSMarketStoryScreenState
 
       if (pickedFile != null) {
         setState(() {
-          _storyCards[cardIndex].images.add(File(pickedFile.path));
+          // Get current cursor position
+          final controller = _descriptionControllers[cardIndex];
+          final cursorPosition = controller.selection.baseOffset;
+          final currentText = controller.text;
+
+          // Find the last text item in content
+          int textItemIndex = -1;
+          for (int i = _storyCards[cardIndex].content.length - 1; i >= 0; i--) {
+            if (_storyCards[cardIndex].content[i].type == 'text') {
+              textItemIndex = i;
+              break;
+            }
+          }
+
+          if (textItemIndex >= 0 && cursorPosition >= 0 && cursorPosition <= currentText.length) {
+            // Split text at cursor position
+            final beforeCursor = currentText.substring(0, cursorPosition);
+            final afterCursor = currentText.substring(cursorPosition);
+
+            // Update current text item with text before cursor
+            _storyCards[cardIndex].content[textItemIndex].text = beforeCursor;
+
+            // Insert image after the text
+            _storyCards[cardIndex].content.insert(
+              textItemIndex + 1,
+              ContentItem.image(File(pickedFile.path)),
+            );
+
+            // Insert new text item for text after cursor
+            _storyCards[cardIndex].content.insert(
+              textItemIndex + 2,
+              ContentItem.text(afterCursor),
+            );
+
+            // Update text controller with text before cursor
+            controller.text = beforeCursor;
+            controller.selection = TextSelection.collapsed(offset: beforeCursor.length);
+          }
         });
       }
     } catch (e) {
@@ -133,9 +195,27 @@ class _CreateUSMarketStoryScreenState
     }
   }
 
-  void _removeImage(int cardIndex, int imageIndex) {
+  void _removeContentItem(int cardIndex, int contentIndex) {
     setState(() {
-      _storyCards[cardIndex].images.removeAt(imageIndex);
+      if (_storyCards[cardIndex].content[contentIndex].type == 'image') {
+        // Remove image and merge surrounding text items if needed
+        _storyCards[cardIndex].content.removeAt(contentIndex);
+
+        // Merge adjacent text items
+        if (contentIndex > 0 &&
+            contentIndex < _storyCards[cardIndex].content.length &&
+            _storyCards[cardIndex].content[contentIndex - 1].type == 'text' &&
+            _storyCards[cardIndex].content[contentIndex].type == 'text') {
+          final mergedText = (_storyCards[cardIndex].content[contentIndex - 1].text ?? '') +
+              (_storyCards[cardIndex].content[contentIndex].text ?? '');
+          _storyCards[cardIndex].content[contentIndex - 1].text = mergedText;
+          _storyCards[cardIndex].content.removeAt(contentIndex);
+
+          // Update controller
+          final controller = _descriptionControllers[cardIndex];
+          controller.text = mergedText;
+        }
+      }
     });
   }
 
@@ -513,95 +593,66 @@ class _CreateUSMarketStoryScreenState
                         ),
                       ),
 
-                      // Text Editor Area with integrated images
+                      // Text Editor Area with inline images (MS Word style)
                       Padding(
                         padding: EdgeInsets.all(16.w),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Multi-line text field for ~500 words
-                            Container(
-                              constraints: BoxConstraints(
-                                minHeight: 250.h,
-                                maxHeight: 400.h,
-                              ),
-                              child: TextFormField(
-                                controller: _descriptionControllers[index],
-                                focusNode: _descriptionFocusNodes[index],
-                                keyboardType: TextInputType.multiline,
-                                textInputAction: TextInputAction.newline,
-                                minLines: 12,
-                                maxLines: null,
-                                maxLength: 3000, // ~500 words
-                                style: TextStyles.txtRegular14(context).copyWith(
-                                  color: Constant.clrTitlePageByTheme(context),
-                                  height: 1.6,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: getLocalValue('Key_EnterDescription'),
-                                  hintStyle: TextStyles.txtRegular14(context).copyWith(
-                                    color: Constant.clrTextGreyByTheme(context).withValues(alpha: 0.5),
-                                  ),
-                                  border: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  contentPadding: EdgeInsets.zero,
-                                  counterStyle: TextStyles.txtRegular12(context).copyWith(
-                                    color: Constant.clrTextGreyByTheme(context),
-                                  ),
-                                ),
-                                onChanged: (value) {
-                                  _storyCards[index].description = value;
-                                },
-                              ),
-                            ),
+                        child: Container(
+                          constraints: BoxConstraints(
+                            minHeight: 250.h,
+                            maxHeight: 450.h,
+                          ),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Render content items (text and images) inline
+                                ...List.generate(
+                                  _storyCards[index].content.length,
+                                  (contentIndex) {
+                                    final item = _storyCards[index].content[contentIndex];
 
-                            // Images Preview - Inside the description box like MS Word
-                            if (_storyCards[index].images.isNotEmpty) ...[
-                              SizedBox(height: 16.h),
-                              Container(
-                                padding: EdgeInsets.all(12.w),
-                                decoration: BoxDecoration(
-                                  color: Constant.clrPrimary.withValues(alpha: 0.05),
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  border: Border.all(
-                                    color: Constant.clrPrimary.withValues(alpha: 0.1),
-                                  ),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.photo_library_outlined,
-                                          color: Constant.clrPrimary,
-                                          size: 16.h,
+                                    if (item.type == 'text') {
+                                      // Text segment
+                                      return TextFormField(
+                                        controller: _descriptionControllers[index],
+                                        focusNode: _descriptionFocusNodes[index],
+                                        keyboardType: TextInputType.multiline,
+                                        textInputAction: TextInputAction.newline,
+                                        minLines: 8,
+                                        maxLines: null,
+                                        maxLength: 3000,
+                                        style: TextStyles.txtRegular14(context).copyWith(
+                                          color: Constant.clrTitlePageByTheme(context),
+                                          height: 1.6,
                                         ),
-                                        SizedBox(width: 6.w),
-                                        Text(
-                                          '${_storyCards[index].images.length} ${getLocalValue('Key_AttachedImages')}',
-                                          style: TextStyles.txtSemiBold12(context).copyWith(
-                                            color: Constant.clrPrimary,
+                                        decoration: InputDecoration(
+                                          hintText: getLocalValue('Key_EnterDescription'),
+                                          hintStyle: TextStyles.txtRegular14(context).copyWith(
+                                            color: Constant.clrTextGreyByTheme(context).withValues(alpha: 0.5),
+                                          ),
+                                          border: InputBorder.none,
+                                          enabledBorder: InputBorder.none,
+                                          focusedBorder: InputBorder.none,
+                                          contentPadding: EdgeInsets.zero,
+                                          counterStyle: TextStyles.txtRegular12(context).copyWith(
+                                            color: Constant.clrTextGreyByTheme(context),
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 12.h),
-                                    Wrap(
-                                      spacing: 12.w,
-                                      runSpacing: 12.h,
-                                      children: List.generate(
-                                        _storyCards[index].images.length,
-                                        (imageIndex) => Container(
-                                          width: 100.w,
-                                          height: 100.w,
+                                        onChanged: (value) {
+                                          item.text = value;
+                                        },
+                                      );
+                                    } else {
+                                      // Image inline - MS Word style
+                                      return Padding(
+                                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                                        child: Container(
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10.r),
+                                            borderRadius: BorderRadius.circular(12.r),
                                             boxShadow: [
                                               BoxShadow(
                                                 color: Colors.black.withValues(alpha: 0.1),
-                                                blurRadius: 6,
+                                                blurRadius: 8,
                                                 offset: const Offset(0, 2),
                                               ),
                                             ],
@@ -609,35 +660,34 @@ class _CreateUSMarketStoryScreenState
                                           child: Stack(
                                             children: [
                                               ClipRRect(
-                                                borderRadius: BorderRadius.circular(10.r),
+                                                borderRadius: BorderRadius.circular(12.r),
                                                 child: Image.file(
-                                                  _storyCards[index].images[imageIndex],
-                                                  width: 100.w,
-                                                  height: 100.w,
+                                                  item.image!,
+                                                  width: double.infinity,
                                                   fit: BoxFit.cover,
                                                 ),
                                               ),
                                               Positioned(
-                                                top: 4,
-                                                right: 4,
+                                                top: 8,
+                                                right: 8,
                                                 child: InkWell(
-                                                  onTap: () => _removeImage(index, imageIndex),
+                                                  onTap: () => _removeContentItem(index, contentIndex),
                                                   child: Container(
-                                                    padding: EdgeInsets.all(4.w),
+                                                    padding: EdgeInsets.all(6.w),
                                                     decoration: BoxDecoration(
                                                       color: Colors.red,
                                                       shape: BoxShape.circle,
                                                       boxShadow: [
                                                         BoxShadow(
-                                                          color: Colors.black.withValues(alpha: 0.3),
-                                                          blurRadius: 4,
+                                                          color: Colors.black.withValues(alpha: 0.4),
+                                                          blurRadius: 6,
                                                         ),
                                                       ],
                                                     ),
                                                     child: Icon(
                                                       Icons.close,
                                                       color: Constant.clrWhite,
-                                                      size: 14.h,
+                                                      size: 18.h,
                                                     ),
                                                   ),
                                                 ),
@@ -645,13 +695,13 @@ class _CreateUSMarketStoryScreenState
                                             ],
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                  ],
+                                      );
+                                    }
+                                  },
                                 ),
-                              ),
-                            ],
-                          ],
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ],
