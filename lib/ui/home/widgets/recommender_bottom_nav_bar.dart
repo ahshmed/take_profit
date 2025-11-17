@@ -82,21 +82,22 @@ class RecommenderBottomNavBar extends ConsumerWidget {
             ),
           ),
 
-          // Purple circle indicator - positioned in the cutout
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 340),
-            curve: Curves.easeInOut,
-            bottom: barHeight - (circleSize / 2) + bottomPadding,
-            left: itemWidth * visualIndex + (itemWidth / 2) - (circleSize / 2),
-            child: Container(
-              width: circleSize,
-              height: circleSize,
-              decoration: BoxDecoration(
-                color: Constant.clrPrimary,
-                shape: BoxShape.circle,
+          // Purple circle indicator - only show for 4-tab layout
+          if (items.length == 4)
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 340),
+              curve: Curves.easeInOut,
+              bottom: barHeight - (circleSize / 2) + bottomPadding,
+              left: itemWidth * visualIndex + (itemWidth / 2) - (circleSize / 2),
+              child: Container(
+                width: circleSize,
+                height: circleSize,
+                decoration: BoxDecoration(
+                  color: Constant.clrPrimary,
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
-          ),
 
           // Navigation items (4 tabs in 2+2 layout with center space)
           Positioned(
@@ -140,7 +141,7 @@ class RecommenderBottomNavBar extends ConsumerWidget {
           ),
         ),
         // Center space for floating button
-        SizedBox(width: 70.w),
+        SizedBox(width: 64.w),
         // Right tabs (1, 2)
         Expanded(
           child: _buildNavItem(
