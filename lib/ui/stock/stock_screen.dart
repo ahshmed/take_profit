@@ -5,6 +5,8 @@ import 'package:badges/badges.dart' as badge;
 import '../../framework/data_provider/stock/stock_provider.dart';
 import '../../framework/data_provider/notification/notification_provider.dart';
 import '../../framework/data_provider/profile/profile_provider.dart';
+import '../../framework/repository/stock/model/stock_model.dart';
+import '../../main.dart';
 import '../../utils/const.dart';
 import '../../utils/extension/string_extension.dart';
 import '../../utils/sliderightroute.dart';
