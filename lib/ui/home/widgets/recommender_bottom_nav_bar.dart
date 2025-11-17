@@ -119,12 +119,51 @@ class RecommenderBottomNavBar extends ConsumerWidget {
     );
   }
 
-  /// Build tab items with 2+2 layout and center space
+  /// Build tab items with flexible layout and center space
+  /// Supports 3 tabs (1+1 layout) or 4 tabs (2+2 layout)
   List<Widget> _buildTabItems(
       BuildContext context,
       int selectedIndex,
       double iconSize,
       ) {
+    // For 3 tabs: 1 left + center button + 2 right
+    if (items.length == 3) {
+      return [
+        // Left tab (0)
+        Expanded(
+          child: _buildNavItem(
+            context,
+            items[0],
+            selectedIndex == 0,
+                () => onTabSelected(0),
+            iconSize,
+          ),
+        ),
+        // Center space for floating button
+        SizedBox(width: 64.w),
+        // Right tabs (1, 2)
+        Expanded(
+          child: _buildNavItem(
+            context,
+            items[1],
+            selectedIndex == 1,
+                () => onTabSelected(1),
+            iconSize,
+          ),
+        ),
+        Expanded(
+          child: _buildNavItem(
+            context,
+            items[2],
+            selectedIndex == 2,
+                () => onTabSelected(2),
+            iconSize,
+          ),
+        ),
+      ];
+    }
+
+    // For 4 tabs: 2 left + center button + 2 right (original layout)
     return [
       // Left tabs (0, 1)
       Expanded(
