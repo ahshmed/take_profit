@@ -169,12 +169,21 @@ class _CreateUSMarketStoryScreenState
 
             // Story cards list
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
-                itemCount: _storyCards.length,
-                itemBuilder: (context, index) {
-                  return _buildModernStoryCardForm(index);
-                },
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    ListView.builder(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                      itemCount: _storyCards.length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        return _buildModernStoryCardForm(index);
+                      },
+                    ),
+                    SizedBox(height: 100.h), // Bottom padding for action bar
+                  ],
+                ),
               ),
             ),
 
@@ -423,6 +432,15 @@ class _CreateUSMarketStoryScreenState
                   myFocus: _titleFocusNodes[index],
                   hintText: getLocalValue('Key_EnterTitle'),
                   textInputType: TextInputType.text,
+                  bgColor: Constant.clrHomeCardByTheme(context),
+                  borderColor: Constant.clrPrimary.withValues(alpha: 0.3),
+                  borderRadius: 16.r,
+                  height: 56.h,
+                  marginNeed: false,
+                  paddingNeed: true,
+                  textStyle: TextStyles.txtMedium16(context).copyWith(
+                    color: Constant.clrTitlePageByTheme(context),
+                  ),
                   onChanged: (value) {
                     _storyCards[index].title = value;
                   },
@@ -497,7 +515,17 @@ class _CreateUSMarketStoryScreenState
                         myFocus: _descriptionFocusNodes[index],
                         hintText: getLocalValue('Key_EnterDescription'),
                         textInputType: TextInputType.multiline,
-                        maxLine: 8,
+                        maxLine: 15,
+                        height: 280.h,
+                        bgColor: Constant.clrHomeCardByTheme(context),
+                        borderColor: Colors.transparent,
+                        borderRadius: 0,
+                        marginNeed: false,
+                        paddingNeed: true,
+                        textStyle: TextStyles.txtRegular14(context).copyWith(
+                          color: Constant.clrTitlePageByTheme(context),
+                          height: 1.5,
+                        ),
                         onChanged: (value) {
                           _storyCards[index].description = value;
                         },
@@ -527,15 +555,15 @@ class _CreateUSMarketStoryScreenState
                   ),
                   SizedBox(height: 12.h),
                   SizedBox(
-                    height: 100.h,
+                    height: 140.h,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: _storyCards[index].images.length,
                       itemBuilder: (context, imageIndex) {
                         return Container(
                           margin: EdgeInsets.only(right: 12.w),
-                          width: 100.h,
-                          height: 100.h,
+                          width: 140.h,
+                          height: 140.h,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12.r),
                             boxShadow: [
@@ -552,8 +580,8 @@ class _CreateUSMarketStoryScreenState
                                 borderRadius: BorderRadius.circular(12.r),
                                 child: Image.file(
                                   _storyCards[index].images[imageIndex],
-                                  width: 100.h,
-                                  height: 100.h,
+                                  width: 140.h,
+                                  height: 140.h,
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -613,7 +641,7 @@ class _CreateUSMarketStoryScreenState
 
   Widget _buildModernActionBar() {
     return Container(
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       decoration: BoxDecoration(
         color: Constant.clrHomeCardByTheme(context),
         borderRadius: BorderRadius.only(
@@ -635,7 +663,10 @@ class _CreateUSMarketStoryScreenState
             // Add Card Button
             Expanded(
               child: Container(
-                height: 52.h,
+                constraints: BoxConstraints(
+                  minHeight: 48.h,
+                  maxHeight: 52.h,
+                ),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -654,34 +685,46 @@ class _CreateUSMarketStoryScreenState
                   child: InkWell(
                     onTap: _addNewCard,
                     borderRadius: BorderRadius.circular(16.r),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add_circle_outline_rounded,
-                          color: Constant.clrPrimary,
-                          size: 24.h,
-                        ),
-                        SizedBox(width: 8.w),
-                        Text(
-                          getLocalValue('Key_AddCard'),
-                          style: TextStyles.txtSemiBold16(context).copyWith(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.add_circle_outline_rounded,
                             color: Constant.clrPrimary,
+                            size: 22.h,
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 6.w),
+                          Flexible(
+                            child: Text(
+                              getLocalValue('Key_AddCard'),
+                              style: TextStyles.txtSemiBold14(context).copyWith(
+                                color: Constant.clrPrimary,
+                                fontSize: 14.sp,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-            SizedBox(width: 16.w),
+            SizedBox(width: 12.w),
 
             // Publish Button
             Expanded(
               flex: 2,
               child: Container(
-                height: 52.h,
+                constraints: BoxConstraints(
+                  minHeight: 48.h,
+                  maxHeight: 52.h,
+                ),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -703,22 +746,31 @@ class _CreateUSMarketStoryScreenState
                   child: InkWell(
                     onTap: _submitStory,
                     borderRadius: BorderRadius.circular(16.r),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.publish_rounded,
-                          color: Constant.clrWhite,
-                          size: 24.h,
-                        ),
-                        SizedBox(width: 8.w),
-                        Text(
-                          getLocalValue('Key_Publish'),
-                          style: TextStyles.txtBold18(context).copyWith(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.publish_rounded,
                             color: Constant.clrWhite,
+                            size: 22.h,
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 8.w),
+                          Flexible(
+                            child: Text(
+                              getLocalValue('Key_Publish'),
+                              style: TextStyles.txtBold16(context).copyWith(
+                                color: Constant.clrWhite,
+                                fontSize: 16.sp,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
