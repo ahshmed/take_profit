@@ -45,7 +45,29 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   void _onItemTapped(int index) {
-    ref.read(dashboardProvider).updateSelectedIndex(index);
+    final isRecommender = getUserStatus() == recommender;
+    final String? selectedMarket = getSelectedMarket();
+    final bool isUSMarket = selectedMarket == 'us_market';
+
+    // For recommender: Tab 3 (index 3) toggles market
+    if (isRecommender && index == 3) {
+      // Toggle market
+      if (isUSMarket) {
+        // Switch to Crypto
+        setSelectedMarket('crypto_signals');
+        ref.read(selectMarketProvider.notifier).selectMarketById('crypto_signals');
+      } else {
+        // Switch to US Market
+        setSelectedMarket('us_market');
+        ref.read(selectMarketProvider.notifier).selectMarketById('us_market');
+      }
+      // Stay on home tab (index 0) after market switch
+      ref.read(dashboardProvider).updateSelectedIndex(0);
+      _previousMarket = isUSMarket ? 'crypto_signals' : 'us_market';
+    } else {
+      // Normal tab selection
+      ref.read(dashboardProvider).updateSelectedIndex(index);
+    }
   }
 
   @override
@@ -134,12 +156,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     ];
 
     // Navigation items for Recommender (4 tabs + center button - dynamic based on market)
+    // Home tab always labeled "Home", but content changes based on market
+    // Last tab toggles between markets
     final List<BottomNavItem> recommenderNavItems = isUSMarket
         ? [
-      // US Market Mode: Home (US Market), Stock, Crypto, Profile
+      // US Market Mode: Home (shows US Market), Stock, Recommendations, Crypto (toggles to Crypto)
       BottomNavItem(
-        iconPath: Constant.icUsMarketN,
-        label: getLocalValue("Key_Us_Market"),
+        iconPath: Constant.icHomeN,
+        label: getLocalValue("Key_Home"),
         screen: const UsMarketDetailScreen(
           recommenderID: '',
           appbarRequired: false,  // Shows back button + "US Market" title
@@ -151,18 +175,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         screen: const StockScreen(),
       ),
       BottomNavItem(
-        iconPath: Constant.icCryptoN,
-        label: getLocalValue("Key_Crypto"),
-        screen: const HomeScreen(), // Crypto home
+        iconPath: Constant.icRecommendations,
+        label: getLocalValue("Key_Recommendations"),
+        screen: const MyRecommendationSignalScreen(),
       ),
       BottomNavItem(
-        iconPath: Constant.icProfile,
-        label: getLocalValue("Key_Profile"),
-        screen: const ProfileScreen(),
+        iconPath: Constant.icCryptoN,
+        label: getLocalValue("Key_Crypto"),
+        screen: const HomeScreen(), // Toggles to Crypto mode
       ),
     ]
         : [
-      // Crypto Mode: Home (Crypto), Currencies, Recommendations, Profile
+      // Crypto Mode: Home (shows Crypto), Currencies, Recommendations, US Market (toggles to US Market)
       BottomNavItem(
         iconPath: Constant.icHomeN,
         label: getLocalValue("Key_Home"),
@@ -179,9 +203,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         screen: const MyRecommendationSignalScreen(),
       ),
       BottomNavItem(
-        iconPath: Constant.icProfile,
-        label: getLocalValue("Key_Profile"),
-        screen: const ProfileScreen(),
+        iconPath: Constant.icUsMarketN,
+        label: getLocalValue("Key_Us_Market"),
+        screen: const UsMarketDetailScreen(
+          recommenderID: '',
+          appbarRequired: true,  // Shows full header with profile/search/notifications
+        ),
       ),
     ];
 
@@ -198,18 +225,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       backgroundColor: Constant.clrTransparent,
       // This is IMPORTANT - allows body to extend behind navigation bar
       extendBody: true,
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: SizedBox(
-        width: 50.w,
-        height: 50.w,
-        child: FittedBox(
-          child: FloatingActionButton(
-            onPressed: _openWhatsapp,
-            backgroundColor: Constant.clrWhatsapp,
-            child: Image.asset(Constant.icWhatsappFab),
-          ),
-        ),
-      ),
+      // WhatsApp FAB hidden per user request
+      // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      // floatingActionButton: SizedBox(
+      //   width: 50.w,
+      //   height: 50.w,
+      //   child: FittedBox(
+      //     child: FloatingActionButton(
+      //       onPressed: _openWhatsapp,
+      //       backgroundColor: Constant.clrWhatsapp,
+      //       child: Image.asset(Constant.icWhatsappFab),
+      //     ),
+      //   ),
+      // ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         transitionBuilder: (Widget child, Animation<double> animation) {

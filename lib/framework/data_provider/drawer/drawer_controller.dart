@@ -127,7 +127,7 @@ class CustomDrawerController extends ChangeNotifier  {
   setMenuItemsForRecommender() {
     menuOptions = [
       {"icon": Constant.icHomeDN, "title": "Key_Home"},
-      {"icon": Constant.icRevenue, "title": "Key_MyRevenue"},
+      // {"icon": Constant.icRevenue, "title": "Key_MyRevenue"}, // Hidden for recommender users
       {"icon": Constant.icConsDN, "title": "Key_RequestAnalysis"},
       // {"icon": icFavourite, "title": "Key_MyFavorite"},
       // {"icon": icMenuNotification, "title": "Key_Notification"},

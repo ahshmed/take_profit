@@ -105,7 +105,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
             // Title
             Text(
               'Key_EmptyPortfolio'.localized,
-              style: TextStyles.txtBold18(context).copyWith(
+              style: TextStyles.txtSemiG18(context).copyWith(
                 color: Constant.clrTitlePageByTheme(context),
               ),
               textAlign: TextAlign.center,
@@ -189,7 +189,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
               SizedBox(height: 8.h),
               Text(
                 '\$${totalValue.toStringAsFixed(2)}',
-                style: TextStyles.txtBold32(context).copyWith(
+                style: TextStyles.txtSemiBold28(context).copyWith(
                   color: Constant.clrWhite,
                 ),
               ),
@@ -280,7 +280,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
           SizedBox(height: 8.h),
           Text(
             value,
-            style: TextStyles.txtBold20(context).copyWith(
+            style: TextStyles.txtSemiBoldG20(context).copyWith(
               color: Constant.clrTitlePageByTheme(context),
             ),
           ),
@@ -512,7 +512,7 @@ class _PortfolioScreenState extends ConsumerState<PortfolioScreen> {
           ),
           title: Text(
             'Key_RemoveFromPortfolio'.localized,
-            style: TextStyles.txtBold18(context).copyWith(
+            style: TextStyles.txtSemiG18(context).copyWith(
               color: Constant.clrTitlePageByTheme(context),
             ),
           ),

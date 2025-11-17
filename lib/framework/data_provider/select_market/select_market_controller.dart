@@ -69,6 +69,15 @@ class ChooseMarketController extends StateNotifier<SelectMarketState> {
     );
   }
 
+  void selectMarketById(String marketId) {
+    try {
+      final market = state.markets.firstWhere((m) => m.id == marketId);
+      selectMarket(market);
+    } catch (e) {
+      showLog('Market with id $marketId not found');
+    }
+  }
+
   // Load saved market selection
   Market? loadSavedMarket() {
     final savedMarketId = getSelectedMarket();
