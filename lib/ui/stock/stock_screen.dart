@@ -32,7 +32,14 @@ class _StockScreenState extends ConsumerState<StockScreen> {
     // Initialize stock data when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final stockWatch = ref.read(stockProvider);
+      final notificationWatch = ref.read(notificationProvider);
+
       stockWatch.initializeStockData();
+
+      // Load notification count for logged-in users only (not guest)
+      if (getUserStatus() != guest) {
+        notificationWatch.notificationCountAPI(context);
+      }
     });
   }
 
