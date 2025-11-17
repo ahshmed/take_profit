@@ -225,18 +225,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       backgroundColor: Constant.clrTransparent,
       // This is IMPORTANT - allows body to extend behind navigation bar
       extendBody: true,
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: SizedBox(
-        width: 50.w,
-        height: 50.w,
-        child: FittedBox(
-          child: FloatingActionButton(
-            onPressed: _openWhatsapp,
-            backgroundColor: Constant.clrWhatsapp,
-            child: Image.asset(Constant.icWhatsappFab),
-          ),
-        ),
-      ),
+      // WhatsApp FAB hidden per user request
+      // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      // floatingActionButton: SizedBox(
+      //   width: 50.w,
+      //   height: 50.w,
+      //   child: FittedBox(
+      //     child: FloatingActionButton(
+      //       onPressed: _openWhatsapp,
+      //       backgroundColor: Constant.clrWhatsapp,
+      //       child: Image.asset(Constant.icWhatsappFab),
+      //     ),
+      //   ),
+      // ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         transitionBuilder: (Widget child, Animation<double> animation) {
