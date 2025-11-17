@@ -469,6 +469,10 @@ class _CreateUSMarketStoryScreenState
                 // Rich Text Editor Container
                 // TODO: Replace with flutter_quill or html_editor_enhanced
                 Container(
+                  constraints: BoxConstraints(
+                    maxHeight: 320.h,
+                    minHeight: 200.h,
+                  ),
                   decoration: BoxDecoration(
                     color: Constant.clrScaffoldBGByTheme(context),
                     borderRadius: BorderRadius.circular(16.r),
@@ -477,6 +481,7 @@ class _CreateUSMarketStoryScreenState
                     ),
                   ),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       // Toolbar for rich text formatting
                       Container(
@@ -498,10 +503,13 @@ class _CreateUSMarketStoryScreenState
                             _buildToolbarButton(
                                 Icons.image_outlined, () => _pickImage(index)),
                             const Spacer(),
-                            Text(
-                              'Rich Text Editor',
-                              style: TextStyles.txtMedium12(context).copyWith(
-                                color: Constant.clrPrimary.withValues(alpha: 0.7),
+                            Flexible(
+                              child: Text(
+                                'Rich Text Editor',
+                                style: TextStyles.txtMedium12(context).copyWith(
+                                  color: Constant.clrPrimary.withValues(alpha: 0.7),
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
@@ -509,26 +517,27 @@ class _CreateUSMarketStoryScreenState
                       ),
 
                       // Text Editor Area
-                      CustomTextField(
-                        context: context,
-                        myController: _descriptionControllers[index],
-                        myFocus: _descriptionFocusNodes[index],
-                        hintText: getLocalValue('Key_EnterDescription'),
-                        textInputType: TextInputType.multiline,
-                        maxLine: 15,
-                        height: 280.h,
-                        bgColor: Constant.clrHomeCardByTheme(context),
-                        borderColor: Colors.transparent,
-                        borderRadius: 0,
-                        marginNeed: false,
-                        paddingNeed: true,
-                        textStyle: TextStyles.txtRegular14(context).copyWith(
-                          color: Constant.clrTitlePageByTheme(context),
-                          height: 1.5,
+                      Flexible(
+                        child: CustomTextField(
+                          context: context,
+                          myController: _descriptionControllers[index],
+                          myFocus: _descriptionFocusNodes[index],
+                          hintText: getLocalValue('Key_EnterDescription'),
+                          textInputType: TextInputType.multiline,
+                          maxLine: null,
+                          bgColor: Constant.clrHomeCardByTheme(context),
+                          borderColor: Colors.transparent,
+                          borderRadius: 0,
+                          marginNeed: false,
+                          paddingNeed: true,
+                          textStyle: TextStyles.txtRegular14(context).copyWith(
+                            color: Constant.clrTitlePageByTheme(context),
+                            height: 1.5,
+                          ),
+                          onChanged: (value) {
+                            _storyCards[index].description = value;
+                          },
                         ),
-                        onChanged: (value) {
-                          _storyCards[index].description = value;
-                        },
                       ),
                     ],
                   ),
@@ -641,7 +650,7 @@ class _CreateUSMarketStoryScreenState
 
   Widget _buildModernActionBar() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
         color: Constant.clrHomeCardByTheme(context),
         borderRadius: BorderRadius.only(
@@ -662,11 +671,9 @@ class _CreateUSMarketStoryScreenState
           children: [
             // Add Card Button
             Expanded(
+              flex: 3,
               child: Container(
-                constraints: BoxConstraints(
-                  minHeight: 48.h,
-                  maxHeight: 52.h,
-                ),
+                height: 50.h,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -674,7 +681,7 @@ class _CreateUSMarketStoryScreenState
                       Constant.clrPrimary.withValues(alpha: 0.05),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(16.r),
+                  borderRadius: BorderRadius.circular(14.r),
                   border: Border.all(
                     color: Constant.clrPrimary.withValues(alpha: 0.3),
                     width: 1.5,
@@ -684,47 +691,44 @@ class _CreateUSMarketStoryScreenState
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: _addNewCard,
-                    borderRadius: BorderRadius.circular(16.r),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.add_circle_outline_rounded,
-                            color: Constant.clrPrimary,
-                            size: 22.h,
-                          ),
-                          SizedBox(width: 6.w),
-                          Flexible(
-                            child: Text(
-                              getLocalValue('Key_AddCard'),
-                              style: TextStyles.txtSemiBold14(context).copyWith(
+                    borderRadius: BorderRadius.circular(14.r),
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12.w),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.add_circle_outline_rounded,
                                 color: Constant.clrPrimary,
-                                fontSize: 14.sp,
+                                size: 20.h,
                               ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
+                              SizedBox(width: 6.w),
+                              Text(
+                                getLocalValue('Key_AddCard'),
+                                style: TextStyles.txtSemiBold14(context).copyWith(
+                                  color: Constant.clrPrimary,
+                                  fontSize: 13.sp,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
             ),
-            SizedBox(width: 12.w),
+            SizedBox(width: 10.w),
 
             // Publish Button
             Expanded(
-              flex: 2,
+              flex: 4,
               child: Container(
-                constraints: BoxConstraints(
-                  minHeight: 48.h,
-                  maxHeight: 52.h,
-                ),
+                height: 50.h,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -732,7 +736,7 @@ class _CreateUSMarketStoryScreenState
                       Constant.clrPrimary.withValues(alpha: 0.8),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(16.r),
+                  borderRadius: BorderRadius.circular(14.r),
                   boxShadow: [
                     BoxShadow(
                       color: Constant.clrPrimary.withValues(alpha: 0.4),
@@ -745,31 +749,31 @@ class _CreateUSMarketStoryScreenState
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: _submitStory,
-                    borderRadius: BorderRadius.circular(16.r),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.publish_rounded,
-                            color: Constant.clrWhite,
-                            size: 22.h,
-                          ),
-                          SizedBox(width: 8.w),
-                          Flexible(
-                            child: Text(
-                              getLocalValue('Key_Publish'),
-                              style: TextStyles.txtBold16(context).copyWith(
+                    borderRadius: BorderRadius.circular(14.r),
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12.w),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.publish_rounded,
                                 color: Constant.clrWhite,
-                                fontSize: 16.sp,
+                                size: 20.h,
                               ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
+                              SizedBox(width: 8.w),
+                              Text(
+                                getLocalValue('Key_Publish'),
+                                style: TextStyles.txtBold16(context).copyWith(
+                                  color: Constant.clrWhite,
+                                  fontSize: 15.sp,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
