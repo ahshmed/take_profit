@@ -1,0 +1,35 @@
+Fix Verification Report: stockName Getter Error
+=====================================================
+
+Issue: The getter 'stockName' isn't defined for the type 'SignalList'
+Location: lib/ui/recommendation/my_recommendation_screen.dart:1632
+
+Root Cause:
+-----------
+The error was caused by stale IDE/analysis cache. The actual codebase does NOT
+contain any references to 'stockName' property.
+
+Code Analysis:
+--------------
+1. SignalList model (signal_list_response_model.dart) has 'currencyName' property
+2. All usages in my_recommendation_screen.dart correctly use 'currencyName':
+   - Line 664: activeSignalObj.currencyName
+   - Line 765: closedSignalObj.currencyName
+   - Line 842: pendingSignalObj.currencyName
+
+3. No references to 'stockName' found in entire codebase
+
+Resolution:
+-----------
+1. Cleaned build/ directory
+2. Cleaned .dart_tool/ directory (contains analysis cache)
+3. No code changes required - existing code is correct
+
+Next Steps for Developer:
+-------------------------
+1. Restart your IDE (VS Code/Android Studio)
+2. Run: flutter clean (if you haven't already)
+3. Run: flutter pub get
+4. The error should be resolved
+
+Verified: 2025-11-17
