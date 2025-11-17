@@ -45,30 +45,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   void _onItemTapped(int index) {
-    final isRecommender = getUserStatus() == recommender;
-    final String? selectedMarket = getSelectedMarket();
-    final bool isUSMarket = selectedMarket == 'us_market';
-
-    // Check if user tapped on market-switching tab
-    // Index 3 for recommender (4th tab), Index 4 for guest/trader (5th tab)
-    if ((isRecommender && index == 3) || (!isRecommender && index == 4)) {
-      // User tapped on the tab which switches between markets
-      if (isUSMarket) {
-        // Currently in US Market mode, switch to Crypto
-        setSelectedMarket('crypto_signals');
-        ref.read(selectMarketProvider.notifier).selectMarketById('crypto_signals');
-      } else {
-        // Currently in Crypto mode, switch to US Market
-        setSelectedMarket('us_market');
-        ref.read(selectMarketProvider.notifier).selectMarketById('us_market');
-      }
-      // Reset to home tab (index 0) after market switch
-      ref.read(dashboardProvider).updateSelectedIndex(0);
-      _previousMarket = isUSMarket ? 'crypto_signals' : 'us_market';
-    } else {
-      // Normal tab selection
-      ref.read(dashboardProvider).updateSelectedIndex(index);
-    }
+    ref.read(dashboardProvider).updateSelectedIndex(index);
   }
 
   @override
@@ -94,12 +71,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final List<BottomNavItem> guestTraderNavItems = isUSMarket
         ? [
       // US Market Mode: Home (US Market), Stock, AI Assistant, Courses, Crypto
+      // CRITICAL FIX: US Market screen with appbarRequired=false for proper simple app bar
       BottomNavItem(
-        iconPath: Constant.icHomeN,
-        label: getLocalValue("Key_Home"),
+        iconPath: Constant.icUsMarketN,
+        label: getLocalValue("Key_Us_Market"),
         screen: const UsMarketDetailScreen(
           recommenderID: '',
-          appbarRequired: false,
+          appbarRequired: false,  // Shows back button + "US Market" title
         ),
       ),
       BottomNavItem(
@@ -155,9 +133,32 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
     ];
 
-    // Navigation items for Recommender (4 tabs + center button with new styled design)
-    // Tab 4 toggles between US Market and Crypto
-    final List<BottomNavItem> recommenderNavItems = [
+    // Navigation items for Recommender (3 tabs + center button - dynamic based on market)
+    // Matches trader mechanism: market toggle via tabs
+    final List<BottomNavItem> recommenderNavItems = isUSMarket
+        ? [
+      // US Market Mode: Home (US Market), Stock, Crypto
+      BottomNavItem(
+        iconPath: Constant.icUsMarketN,
+        label: getLocalValue("Key_Us_Market"),
+        screen: const UsMarketDetailScreen(
+          recommenderID: '',
+          appbarRequired: false,  // Shows back button + "US Market" title
+        ),
+      ),
+      BottomNavItem(
+        iconPath: Constant.icCurrenciesN,
+        label: getLocalValue("Key_Stock"),
+        screen: const StockScreen(),
+      ),
+      BottomNavItem(
+        iconPath: Constant.icCryptoN,
+        label: getLocalValue("Key_Crypto"),
+        screen: const HomeScreen(), // Crypto home
+      ),
+    ]
+        : [
+      // Crypto Mode: Home (Crypto), Currencies, US Market
       BottomNavItem(
         iconPath: Constant.icHomeN,
         label: getLocalValue("Key_Home"),
@@ -165,22 +166,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
       BottomNavItem(
         iconPath: Constant.icCurrenciesN,
-        label: isUSMarket
-            ? getLocalValue("Key_Stock")
-            : getLocalValue("Key_Currencies"),
-        screen: isUSMarket
-            ? const StockScreen()
-            : const CurrenciesScreen(isDrawer: true),
+        label: getLocalValue("Key_Currencies"),
+        screen: const CurrenciesScreen(isDrawer: true),
       ),
       BottomNavItem(
-        iconPath: Constant.icRecommendations,
-        label: getLocalValue("Key_Recommendations"),
-        screen: const MyRecommendationSignalScreen(),
-      ),
-      BottomNavItem(
-        iconPath: isUSMarket ? Constant.icCryptoN : Constant.icUsMarketN,
-        label: isUSMarket ? getLocalValue("Key_Crypto") : getLocalValue("Key_Us_Market"),
-        screen: const HomeScreen(), // Will toggle market when clicked
+        iconPath: Constant.icUsMarketN,
+        label: getLocalValue("Key_Us_Market"),
+        screen: const UsMarketDetailScreen(
+          recommenderID: '',
+          appbarRequired: true,  // Shows full header with profile/search/notifications
+        ),
       ),
     ];
 
@@ -197,19 +192,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       backgroundColor: Constant.clrTransparent,
       // This is IMPORTANT - allows body to extend behind navigation bar
       extendBody: true,
-      // WhatsApp floating button - COMMENTED OUT
-      // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      // floatingActionButton: SizedBox(
-      //   width: 50.w,
-      //   height: 50.w,
-      //   child: FittedBox(
-      //     child: FloatingActionButton(
-      //       onPressed: _openWhatsapp,
-      //       backgroundColor: Constant.clrWhatsapp,
-      //       child: Image.asset(Constant.icWhatsappFab),
-      //     ),
-      //   ),
-      // ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: SizedBox(
+        width: 50.w,
+        height: 50.w,
+        child: FittedBox(
+          child: FloatingActionButton(
+            onPressed: _openWhatsapp,
+            backgroundColor: Constant.clrWhatsapp,
+            child: Image.asset(Constant.icWhatsappFab),
+          ),
+        ),
+      ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         transitionBuilder: (Widget child, Animation<double> animation) {
@@ -236,26 +230,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  // WhatsApp functionality - COMMENTED OUT
-  // Future<void> _openWhatsapp() async {
-  //   const contact = '+1234567890'; // TODO: Move to config
-  //   final url = Platform.isIOS
-  //       ? "https://wa.me/$contact"
-  //       : "whatsapp://send?phone=$contact";
-  //
-  //   try {
-  //     final uri = Uri.parse(url);
-  //     if (await canLaunchUrl(uri)) {
-  //       await launchUrl(uri);
-  //     } else {
-  //       if (kDebugMode) {
-  //         debugPrint('Could not launch WhatsApp');
-  //       }
-  //     }
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       debugPrint('Error opening WhatsApp: $e');
-  //     }
-  //   }
-  // }
+  Future<void> _openWhatsapp() async {
+    const contact = '+1234567890'; // TODO: Move to config
+    final url = Platform.isIOS
+        ? "https://wa.me/$contact"
+        : "whatsapp://send?phone=$contact";
+
+    try {
+      final uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      } else {
+        if (kDebugMode) {
+          debugPrint('Could not launch WhatsApp');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Error opening WhatsApp: $e');
+      }
+    }
+  }
 }
