@@ -469,10 +469,6 @@ class _CreateUSMarketStoryScreenState
                 // Rich Text Editor Container
                 // TODO: Replace with flutter_quill or html_editor_enhanced
                 Container(
-                  constraints: BoxConstraints(
-                    maxHeight: 320.h,
-                    minHeight: 200.h,
-                  ),
                   decoration: BoxDecoration(
                     color: Constant.clrScaffoldBGByTheme(context),
                     borderRadius: BorderRadius.circular(16.r),
@@ -482,6 +478,7 @@ class _CreateUSMarketStoryScreenState
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Toolbar for rich text formatting
                       Container(
@@ -516,110 +513,150 @@ class _CreateUSMarketStoryScreenState
                         ),
                       ),
 
-                      // Text Editor Area
-                      Flexible(
-                        child: CustomTextField(
-                          context: context,
-                          myController: _descriptionControllers[index],
-                          myFocus: _descriptionFocusNodes[index],
-                          hintText: getLocalValue('Key_EnterDescription'),
-                          textInputType: TextInputType.multiline,
-                          maxLine: null,
-                          bgColor: Constant.clrHomeCardByTheme(context),
-                          borderColor: Colors.transparent,
-                          borderRadius: 0,
-                          marginNeed: false,
-                          paddingNeed: true,
-                          textStyle: TextStyles.txtRegular14(context).copyWith(
-                            color: Constant.clrTitlePageByTheme(context),
-                            height: 1.5,
-                          ),
-                          onChanged: (value) {
-                            _storyCards[index].description = value;
-                          },
+                      // Text Editor Area with integrated images
+                      Padding(
+                        padding: EdgeInsets.all(16.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Multi-line text field for ~500 words
+                            Container(
+                              constraints: BoxConstraints(
+                                minHeight: 250.h,
+                                maxHeight: 400.h,
+                              ),
+                              child: TextFormField(
+                                controller: _descriptionControllers[index],
+                                focusNode: _descriptionFocusNodes[index],
+                                keyboardType: TextInputType.multiline,
+                                textInputAction: TextInputAction.newline,
+                                minLines: 12,
+                                maxLines: null,
+                                maxLength: 3000, // ~500 words
+                                style: TextStyles.txtRegular14(context).copyWith(
+                                  color: Constant.clrTitlePageByTheme(context),
+                                  height: 1.6,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: getLocalValue('Key_EnterDescription'),
+                                  hintStyle: TextStyles.txtRegular14(context).copyWith(
+                                    color: Constant.clrTextGreyByTheme(context).withValues(alpha: 0.5),
+                                  ),
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  contentPadding: EdgeInsets.zero,
+                                  counterStyle: TextStyles.txtRegular12(context).copyWith(
+                                    color: Constant.clrTextGreyByTheme(context),
+                                  ),
+                                ),
+                                onChanged: (value) {
+                                  _storyCards[index].description = value;
+                                },
+                              ),
+                            ),
+
+                            // Images Preview - Inside the description box like MS Word
+                            if (_storyCards[index].images.isNotEmpty) ...[
+                              SizedBox(height: 16.h),
+                              Container(
+                                padding: EdgeInsets.all(12.w),
+                                decoration: BoxDecoration(
+                                  color: Constant.clrPrimary.withValues(alpha: 0.05),
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  border: Border.all(
+                                    color: Constant.clrPrimary.withValues(alpha: 0.1),
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.photo_library_outlined,
+                                          color: Constant.clrPrimary,
+                                          size: 16.h,
+                                        ),
+                                        SizedBox(width: 6.w),
+                                        Text(
+                                          '${_storyCards[index].images.length} ${getLocalValue('Key_AttachedImages')}',
+                                          style: TextStyles.txtSemiBold12(context).copyWith(
+                                            color: Constant.clrPrimary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 12.h),
+                                    Wrap(
+                                      spacing: 12.w,
+                                      runSpacing: 12.h,
+                                      children: List.generate(
+                                        _storyCards[index].images.length,
+                                        (imageIndex) => Container(
+                                          width: 100.w,
+                                          height: 100.w,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(10.r),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withValues(alpha: 0.1),
+                                                blurRadius: 6,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Stack(
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius: BorderRadius.circular(10.r),
+                                                child: Image.file(
+                                                  _storyCards[index].images[imageIndex],
+                                                  width: 100.w,
+                                                  height: 100.w,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 4,
+                                                right: 4,
+                                                child: InkWell(
+                                                  onTap: () => _removeImage(index, imageIndex),
+                                                  child: Container(
+                                                    padding: EdgeInsets.all(4.w),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.red,
+                                                      shape: BoxShape.circle,
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black.withValues(alpha: 0.3),
+                                                          blurRadius: 4,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.close,
+                                                      color: Constant.clrWhite,
+                                                      size: 14.h,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-
-                // Images Preview
-                if (_storyCards[index].images.isNotEmpty) ...[
-                  SizedBox(height: 20.h),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.photo_library_outlined,
-                        color: Constant.clrPrimary,
-                        size: 20.h,
-                      ),
-                      SizedBox(width: 8.w),
-                      Text(
-                        getLocalValue('Key_AttachedImages'),
-                        style: TextStyles.txtSemiBold16(context).copyWith(
-                          color: Constant.clrTitlePageByTheme(context),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12.h),
-                  SizedBox(
-                    height: 140.h,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _storyCards[index].images.length,
-                      itemBuilder: (context, imageIndex) {
-                        return Container(
-                          margin: EdgeInsets.only(right: 12.w),
-                          width: 140.h,
-                          height: 140.h,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12.r),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Stack(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12.r),
-                                child: Image.file(
-                                  _storyCards[index].images[imageIndex],
-                                  width: 140.h,
-                                  height: 140.h,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              Positioned(
-                                top: 4,
-                                right: 4,
-                                child: InkWell(
-                                  onTap: () => _removeImage(index, imageIndex),
-                                  child: Container(
-                                    padding: EdgeInsets.all(4.w),
-                                    decoration: BoxDecoration(
-                                      color: Colors.red,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.close,
-                                      color: Constant.clrWhite,
-                                      size: 16.h,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
               ],
             ),
           ),
