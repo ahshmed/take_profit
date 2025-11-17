@@ -708,9 +708,10 @@ class _CreateSignalScreenState extends ConsumerState<CreateSignalScreen>
   Widget step3Widget(CreateSignalController signalWatch) {
     final isRTL = Directionality.of(context) == TextDirection.rtl;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
         // Currency Header Card
         Container(
           decoration: BoxDecoration(
@@ -837,7 +838,9 @@ class _CreateSignalScreenState extends ConsumerState<CreateSignalScreen>
         ),
         SizedBox(height: 16.h),
         listWidgetAddTarget(signalWatch),
+        SizedBox(height: 100.h), // Bottom padding to prevent content hiding behind navigation
       ],
+      ),
     );
   }
 
@@ -1226,16 +1229,11 @@ class _CreateSignalScreenState extends ConsumerState<CreateSignalScreen>
   Widget listWidgetAddTarget(CreateSignalController signalWatch) {
     final isRTL = Directionality.of(context) == TextDirection.rtl;
 
-    return Expanded(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: ListView.builder(
-            itemCount: signalWatch.targetList.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
+    return ListView.builder(
+      itemCount: signalWatch.targetList.length,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemBuilder: (context, index) {
               var valueController = TextEditingController();
               var fromController = TextEditingController();
               var toController = TextEditingController();
@@ -1546,9 +1544,6 @@ class _CreateSignalScreenState extends ConsumerState<CreateSignalScreen>
                 ),
               );
             },
-          ),
-        ),
-      ),
     );
   }
 
