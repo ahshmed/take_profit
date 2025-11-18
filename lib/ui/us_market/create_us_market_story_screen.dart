@@ -12,38 +12,20 @@ import '../../utils/widgets/common_button.dart';
 import '../../utils/widgets/commonappbar.dart';
 import '../../utils/widgets/custom_textfield.dart';
 
-// Content item can be either text or image
-class ContentItem {
-  final String type; // 'text' or 'image'
-  String? text;
-  File? image;
-
-  ContentItem.text(this.text) : type = 'text', image = null;
-  ContentItem.image(this.image) : type = 'image', text = null;
-}
-
+// Simple story card model for MS Word-style editing
 class StoryCard {
   String title;
-  List<ContentItem> content; // Mixed content: text and images inline
+  String description;
+  List<File> images;
+  List<int> imagePositions; // Character positions where images should appear
 
-  StoryCard({this.title = '', List<ContentItem>? content})
-      : content = content ?? [ContentItem.text('')];
-
-  // Helper to get full description text (excluding images)
-  String get description {
-    return content
-        .where((item) => item.type == 'text')
-        .map((item) => item.text ?? '')
-        .join('\n');
-  }
-
-  // Helper to get all images
-  List<File> get images {
-    return content
-        .where((item) => item.type == 'image')
-        .map((item) => item.image!)
-        .toList();
-  }
+  StoryCard({
+    this.title = '',
+    this.description = '',
+    List<File>? images,
+    List<int>? imagePositions,
+  }) : images = images ?? [],
+       imagePositions = imagePositions ?? [];
 }
 
 class CreateUSMarketStoryScreen extends ConsumerStatefulWidget {
@@ -147,42 +129,29 @@ class _CreateUSMarketStoryScreenState
         setState(() {
           // Get current cursor position
           final controller = _descriptionControllers[cardIndex];
-          final cursorPosition = controller.selection.baseOffset;
+          final cursorPosition = controller.selection.baseOffset >= 0
+              ? controller.selection.baseOffset
+              : controller.text.length;
+
+          // Add image to list
+          final imageIndex = _storyCards[cardIndex].images.length + 1;
+          _storyCards[cardIndex].images.add(File(pickedFile.path));
+          _storyCards[cardIndex].imagePositions.add(cursorPosition);
+
+          // Insert placeholder text at cursor position
+          final placeholder = '\n📷 [Image $imageIndex]\n';
           final currentText = controller.text;
+          final beforeCursor = currentText.substring(0, cursorPosition);
+          final afterCursor = currentText.substring(cursorPosition);
 
-          // Find the last text item in content
-          int textItemIndex = -1;
-          for (int i = _storyCards[cardIndex].content.length - 1; i >= 0; i--) {
-            if (_storyCards[cardIndex].content[i].type == 'text') {
-              textItemIndex = i;
-              break;
-            }
-          }
+          final newText = beforeCursor + placeholder + afterCursor;
+          controller.text = newText;
+          _storyCards[cardIndex].description = newText;
 
-          if (textItemIndex >= 0 && cursorPosition >= 0 && cursorPosition <= currentText.length) {
-            // Split text at cursor position
-            final beforeCursor = currentText.substring(0, cursorPosition);
-            final afterCursor = currentText.substring(cursorPosition);
-
-            // Update current text item with text before cursor
-            _storyCards[cardIndex].content[textItemIndex].text = beforeCursor;
-
-            // Insert image after the text
-            _storyCards[cardIndex].content.insert(
-              textItemIndex + 1,
-              ContentItem.image(File(pickedFile.path)),
-            );
-
-            // Insert new text item for text after cursor
-            _storyCards[cardIndex].content.insert(
-              textItemIndex + 2,
-              ContentItem.text(afterCursor),
-            );
-
-            // Update text controller with text before cursor
-            controller.text = beforeCursor;
-            controller.selection = TextSelection.collapsed(offset: beforeCursor.length);
-          }
+          // Move cursor after placeholder
+          controller.selection = TextSelection.collapsed(
+            offset: cursorPosition + placeholder.length,
+          );
         });
       }
     } catch (e) {
@@ -195,27 +164,20 @@ class _CreateUSMarketStoryScreenState
     }
   }
 
-  void _removeContentItem(int cardIndex, int contentIndex) {
+  void _removeImage(int cardIndex, int imageIndex) {
     setState(() {
-      if (_storyCards[cardIndex].content[contentIndex].type == 'image') {
-        // Remove image and merge surrounding text items if needed
-        _storyCards[cardIndex].content.removeAt(contentIndex);
+      // Remove the image placeholder from text
+      final controller = _descriptionControllers[cardIndex];
+      final placeholderToRemove = '📷 [Image ${imageIndex + 1}]';
+      final currentText = controller.text;
+      final newText = currentText.replaceAll(placeholderToRemove, '').replaceAll('\n\n\n', '\n\n');
 
-        // Merge adjacent text items
-        if (contentIndex > 0 &&
-            contentIndex < _storyCards[cardIndex].content.length &&
-            _storyCards[cardIndex].content[contentIndex - 1].type == 'text' &&
-            _storyCards[cardIndex].content[contentIndex].type == 'text') {
-          final mergedText = (_storyCards[cardIndex].content[contentIndex - 1].text ?? '') +
-              (_storyCards[cardIndex].content[contentIndex].text ?? '');
-          _storyCards[cardIndex].content[contentIndex - 1].text = mergedText;
-          _storyCards[cardIndex].content.removeAt(contentIndex);
+      controller.text = newText;
+      _storyCards[cardIndex].description = newText;
 
-          // Update controller
-          final controller = _descriptionControllers[cardIndex];
-          controller.text = mergedText;
-        }
-      }
+      // Remove image from lists
+      _storyCards[cardIndex].images.removeAt(imageIndex);
+      _storyCards[cardIndex].imagePositions.removeAt(imageIndex);
     });
   }
 
@@ -593,7 +555,7 @@ class _CreateUSMarketStoryScreenState
                         ),
                       ),
 
-                      // Text Editor Area with inline images (MS Word style)
+                      // Text Editor Area with inline image placeholders (MS Word style)
                       Padding(
                         padding: EdgeInsets.all(16.w),
                         child: Container(
@@ -605,100 +567,140 @@ class _CreateUSMarketStoryScreenState
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Render content items (text and images) inline
-                                ...List.generate(
-                                  _storyCards[index].content.length,
-                                  (contentIndex) {
-                                    final item = _storyCards[index].content[contentIndex];
-
-                                    if (item.type == 'text') {
-                                      // Text segment
-                                      return TextFormField(
-                                        controller: _descriptionControllers[index],
-                                        focusNode: _descriptionFocusNodes[index],
-                                        keyboardType: TextInputType.multiline,
-                                        textInputAction: TextInputAction.newline,
-                                        minLines: 8,
-                                        maxLines: null,
-                                        maxLength: 3000,
-                                        style: TextStyles.txtRegular14(context).copyWith(
-                                          color: Constant.clrTitlePageByTheme(context),
-                                          height: 1.6,
-                                        ),
-                                        decoration: InputDecoration(
-                                          hintText: getLocalValue('Key_EnterDescription'),
-                                          hintStyle: TextStyles.txtRegular14(context).copyWith(
-                                            color: Constant.clrTextGreyByTheme(context).withValues(alpha: 0.5),
-                                          ),
-                                          border: InputBorder.none,
-                                          enabledBorder: InputBorder.none,
-                                          focusedBorder: InputBorder.none,
-                                          contentPadding: EdgeInsets.zero,
-                                          counterStyle: TextStyles.txtRegular12(context).copyWith(
-                                            color: Constant.clrTextGreyByTheme(context),
-                                          ),
-                                        ),
-                                        onChanged: (value) {
-                                          item.text = value;
-                                        },
-                                      );
-                                    } else {
-                                      // Image inline - MS Word style
-                                      return Padding(
-                                        padding: EdgeInsets.symmetric(vertical: 12.h),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(12.r),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withValues(alpha: 0.1),
-                                                blurRadius: 8,
-                                                offset: const Offset(0, 2),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Stack(
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius: BorderRadius.circular(12.r),
-                                                child: Image.file(
-                                                  item.image!,
-                                                  width: double.infinity,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                              Positioned(
-                                                top: 8,
-                                                right: 8,
-                                                child: InkWell(
-                                                  onTap: () => _removeContentItem(index, contentIndex),
-                                                  child: Container(
-                                                    padding: EdgeInsets.all(6.w),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.red,
-                                                      shape: BoxShape.circle,
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Colors.black.withValues(alpha: 0.4),
-                                                          blurRadius: 6,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.close,
-                                                      color: Constant.clrWhite,
-                                                      size: 18.h,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    }
+                                // Single text field with image placeholders
+                                TextFormField(
+                                  controller: _descriptionControllers[index],
+                                  focusNode: _descriptionFocusNodes[index],
+                                  keyboardType: TextInputType.multiline,
+                                  textInputAction: TextInputAction.newline,
+                                  minLines: 12,
+                                  maxLines: null,
+                                  maxLength: 3000,
+                                  style: TextStyles.txtRegular14(context).copyWith(
+                                    color: Constant.clrTitlePageByTheme(context),
+                                    height: 1.6,
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintText: getLocalValue('Key_EnterDescription'),
+                                    hintStyle: TextStyles.txtRegular14(context).copyWith(
+                                      color: Constant.clrTextGreyByTheme(context).withValues(alpha: 0.5),
+                                    ),
+                                    border: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    contentPadding: EdgeInsets.zero,
+                                    counterStyle: TextStyles.txtRegular12(context).copyWith(
+                                      color: Constant.clrTextGreyByTheme(context),
+                                    ),
+                                  ),
+                                  onChanged: (value) {
+                                    _storyCards[index].description = value;
                                   },
                                 ),
+
+                                // Display actual images below corresponding to placeholders
+                                if (_storyCards[index].images.isNotEmpty) ...[
+                                  SizedBox(height: 20.h),
+                                  Container(
+                                    padding: EdgeInsets.all(12.w),
+                                    decoration: BoxDecoration(
+                                      color: Constant.clrPrimary.withValues(alpha: 0.05),
+                                      borderRadius: BorderRadius.circular(12.r),
+                                      border: Border.all(
+                                        color: Constant.clrPrimary.withValues(alpha: 0.15),
+                                      ),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.photo_library_outlined,
+                                              color: Constant.clrPrimary,
+                                              size: 16.h,
+                                            ),
+                                            SizedBox(width: 6.w),
+                                            Text(
+                                              '${_storyCards[index].images.length} Inline Images',
+                                              style: TextStyles.txtSemiBold12(context).copyWith(
+                                                color: Constant.clrPrimary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 12.h),
+                                        ...List.generate(
+                                          _storyCards[index].images.length,
+                                          (imageIndex) => Padding(
+                                            padding: EdgeInsets.only(bottom: 12.h),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  '📷 Image ${imageIndex + 1}',
+                                                  style: TextStyles.txtSemiBold12(context).copyWith(
+                                                    color: Constant.clrPrimary,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 6.h),
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(12.r),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black.withValues(alpha: 0.1),
+                                                        blurRadius: 6,
+                                                        offset: const Offset(0, 2),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Stack(
+                                                    children: [
+                                                      ClipRRect(
+                                                        borderRadius: BorderRadius.circular(12.r),
+                                                        child: Image.file(
+                                                          _storyCards[index].images[imageIndex],
+                                                          width: double.infinity,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ),
+                                                      Positioned(
+                                                        top: 8,
+                                                        right: 8,
+                                                        child: InkWell(
+                                                          onTap: () => _removeImage(index, imageIndex),
+                                                          child: Container(
+                                                            padding: EdgeInsets.all(6.w),
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.red,
+                                                              shape: BoxShape.circle,
+                                                              boxShadow: [
+                                                                BoxShadow(
+                                                                  color: Colors.black.withValues(alpha: 0.4),
+                                                                  blurRadius: 6,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            child: Icon(
+                                                              Icons.close,
+                                                              color: Constant.clrWhite,
+                                                              size: 16.h,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
