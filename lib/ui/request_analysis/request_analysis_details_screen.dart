@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:take_profit/utils/extension/string_extension.dart';
 
 import '../../framework/data_provider/request_analysis/request_analsis_provider.dart';
@@ -39,7 +41,10 @@ class _RequestAnalysisDetailsScreenState
     extends ConsumerState<RequestAnalysisDetailsScreen> {
   final TextEditingController _analysisCTR = TextEditingController();
   final FocusNode _analysisFocus = FocusNode();
-  static const int _maxCharacters = 1000;
+  static const int _maxCharacters = 3000; // Increased for rich content
+  final ImagePicker _imagePicker = ImagePicker();
+  final List<File> _analysisImages = [];
+  final List<int> _imagePositions = [];
 
   @override
   void initState() {
@@ -62,6 +67,73 @@ class _RequestAnalysisDetailsScreenState
     _analysisCTR.dispose();
     _analysisFocus.dispose();
     super.dispose();
+  }
+
+  /// Pick image and insert placeholder at cursor position
+  Future<void> _pickAnalysisImage() async {
+    try {
+      final XFile? pickedFile = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1920,
+        maxHeight: 1080,
+        imageQuality: 85,
+      );
+
+      if (pickedFile != null) {
+        setState(() {
+          final cursorPosition = _analysisCTR.selection.baseOffset >= 0
+              ? _analysisCTR.selection.baseOffset
+              : _analysisCTR.text.length;
+
+          final imageIndex = _analysisImages.length + 1;
+          _analysisImages.add(File(pickedFile.path));
+          _imagePositions.add(cursorPosition);
+
+          // Insert placeholder text at cursor position
+          final placeholder = '\n📷 [Image $imageIndex]\n';
+          final currentText = _analysisCTR.text;
+          final beforeCursor = currentText.substring(0, cursorPosition);
+          final afterCursor = currentText.substring(cursorPosition);
+
+          final newText = beforeCursor + placeholder + afterCursor;
+          _analysisCTR.text = newText;
+
+          // Update validation
+          final requestAnalysisWatch = ref.read(requestAnalysisProvider);
+          requestAnalysisWatch.checkAnalysisValidation(context, newText);
+
+          // Move cursor after placeholder
+          _analysisCTR.selection = TextSelection.collapsed(
+            offset: cursorPosition + placeholder.length,
+          );
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(getLocalValue('Key_ErrorPickingImage')),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  /// Remove image and its placeholder
+  void _removeAnalysisImage(int imageIndex) {
+    setState(() {
+      // Remove placeholder text from description
+      final placeholder = '📷 [Image ${imageIndex + 1}]';
+      final currentText = _analysisCTR.text;
+      final newText = currentText.replaceAll('\n$placeholder\n', '');
+
+      _analysisCTR.text = newText;
+      _analysisImages.removeAt(imageIndex);
+      _imagePositions.removeAt(imageIndex);
+
+      // Update validation
+      final requestAnalysisWatch = ref.read(requestAnalysisProvider);
+      requestAnalysisWatch.checkAnalysisValidation(context, newText);
+    });
   }
 
   @override
@@ -340,70 +412,203 @@ class _RequestAnalysisDetailsScreenState
     );
   }
 
-  /// Editable Analysis TextField
+  /// Editable Analysis TextField with Image Support
   Widget _buildAnalysisTextFieldEditable(
       RequestAnalysisController requestAnalysisWatch) {
     final currentLength = _analysisCTR.text.length;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15.r),
-        border: Border.all(
-          color: requestAnalysisWatch.strAnalysisError.isNotEmpty
-              ? Colors.red
-              : Constant.clrTextBorderGColor,
-          width: 1,
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15.r),
+            border: Border.all(
+              color: requestAnalysisWatch.strAnalysisError.isNotEmpty
+                  ? Colors.red
+                  : Constant.clrTextBorderGColor,
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              TextField(
+                controller: _analysisCTR,
+                focusNode: _analysisFocus,
+                keyboardType: TextInputType.multiline,
+                textInputAction: TextInputAction.newline,
+                minLines: 12,
+                maxLines: null,
+                maxLength: _maxCharacters,
+                style: TextStyles.txtRegG12(context).copyWith(
+                  color: Color(0xFF1A1A1A),
+                  height: 1.6,
+                ),
+                decoration: InputDecoration(
+                  hintText: "Enter your consultation analysis here...",
+                  hintStyle: TextStyles.txtRegG12(context).copyWith(
+                    color: Constant.clrHintGColor,
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 16.h,
+                  ),
+                  counterText: "",
+                ),
+                onChanged: (value) {
+                  requestAnalysisWatch.checkAnalysisValidation(context, value);
+                  setState(() {});
+                },
+              ),
+              Row(
+                children: [
+                  // Image picker button
+                  Padding(
+                    padding: EdgeInsets.only(left: 16.w, bottom: 12.h),
+                    child: InkWell(
+                      onTap: _pickAnalysisImage,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 6.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Constant.clrPrimary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.add_photo_alternate_outlined,
+                              size: 16.sp,
+                              color: Constant.clrPrimary,
+                            ),
+                            SizedBox(width: 4.w),
+                            Text(
+                              "Add Image",
+                              style: TextStyles.txtRegG12(context).copyWith(
+                                color: Constant.clrPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Spacer(),
+                  // Character counter
+                  Container(
+                    padding: EdgeInsets.only(right: 16.w, bottom: 12.h),
+                    child: Text(
+                      "$currentLength/$_maxCharacters",
+                      style: TextStyles.txtRegG12(context).copyWith(
+                        color: currentLength > _maxCharacters
+                            ? Colors.red
+                            : Constant.clrHintGColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          TextField(
-            controller: _analysisCTR,
-            focusNode: _analysisFocus,
-            maxLines: 15,
-            maxLength: _maxCharacters,
-            style: TextStyles.txtRegG12(context).copyWith(
-              color: Color(0xFF1A1A1A),
-            ),
-            decoration: InputDecoration(
-              hintText: "Enter your analysis here...",
-              hintStyle: TextStyles.txtRegG12(context).copyWith(
-                color: Constant.clrHintGColor,
-              ),
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 16.w,
-                vertical: 16.h,
-              ),
-              counterText: "",
-            ),
-            onChanged: (value) {
-              requestAnalysisWatch.checkAnalysisValidation(context, value);
-              setState(() {});
-            },
-          ),
+
+        // Display added images
+        if (_analysisImages.isNotEmpty) ...[
+          SizedBox(height: 16.h),
           Container(
-            padding: EdgeInsets.only(right: 16.w, bottom: 12.h),
-            alignment: Alignment.centerRight,
-            child: Text(
-              "$currentLength/$_maxCharacters",
-              style: TextStyles.txtRegG12(context).copyWith(
-                color: currentLength > _maxCharacters
-                    ? Colors.red
-                    : Constant.clrHintGColor,
+            width: double.infinity,
+            padding: EdgeInsets.all(16.w),
+            decoration: BoxDecoration(
+              color: Constant.clrPrimary.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(15.r),
+              border: Border.all(
+                color: Constant.clrPrimary.withValues(alpha: 0.2),
+                width: 1,
               ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.photo_library_outlined,
+                      color: Constant.clrPrimary,
+                      size: 16.h,
+                    ),
+                    SizedBox(width: 6.w),
+                    Text(
+                      '${_analysisImages.length} Attached Image${_analysisImages.length > 1 ? 's' : ''}',
+                      style: TextStyles.txtSemiBold12(context).copyWith(
+                        color: Constant.clrPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12.h),
+                ...List.generate(
+                  _analysisImages.length,
+                  (imageIndex) => Container(
+                    margin: EdgeInsets.only(bottom: 12.h),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              '📷 Image ${imageIndex + 1}',
+                              style: TextStyles.txtMedium12(context).copyWith(
+                                color: Constant.clrPrimary,
+                              ),
+                            ),
+                            Spacer(),
+                            InkWell(
+                              onTap: () => _removeAnalysisImage(imageIndex),
+                              child: Container(
+                                padding: EdgeInsets.all(4.w),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(4.r),
+                                ),
+                                child: Icon(
+                                  Icons.close,
+                                  size: 16.sp,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8.h),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12.r),
+                          child: Image.file(
+                            _analysisImages[imageIndex],
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
-      ),
+      ],
     );
   }
 
