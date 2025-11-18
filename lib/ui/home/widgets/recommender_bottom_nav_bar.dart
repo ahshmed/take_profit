@@ -6,6 +6,7 @@ import '../../../framework/data_provider/home/home_provider.dart';
 import '../../../utils/const.dart';
 import '../../../utils/sliderightroute.dart';
 import '../../recommendation/create_signal_screen.dart';
+import '../../us_market/select_stock_screen.dart';
 import 'custom_bottom_nav_bar.dart';
 
 /// Recommender Bottom Navigation Bar with center floating button
@@ -82,22 +83,7 @@ class RecommenderBottomNavBar extends ConsumerWidget {
             ),
           ),
 
-          // Purple circle indicator - only show for 4-tab layout
-          if (items.length == 4)
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: 340),
-              curve: Curves.easeInOut,
-              bottom: barHeight - (circleSize / 2) + bottomPadding,
-              left: itemWidth * visualIndex + (itemWidth / 2) - (circleSize / 2),
-              child: Container(
-                width: circleSize,
-                height: circleSize,
-                decoration: BoxDecoration(
-                  color: Constant.clrPrimary,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
+          // Purple circle indicator removed per user request
 
           // Navigation items (4 tabs in 2+2 layout with center space)
           Positioned(
@@ -280,8 +266,14 @@ class RecommenderBottomNavBar extends ConsumerWidget {
                     focusColor: Colors.transparent,
                     borderRadius: BorderRadius.circular(38.w),
                     onTap: () {
+                      // Check if in US Market mode
+                      final String? selectedMarket = getSelectedMarket();
+                      final bool isUSMarket = selectedMarket == 'us_market';
+
                       Route route = SlideRightPageRoute(
-                        builder: (context) => const CreateSignalScreen(),
+                        builder: (context) => isUSMarket
+                            ? const SelectStockScreen()  // US Market: Select stock then create story
+                            : const CreateSignalScreen(), // Crypto: Create signal directly
                         settings: const RouteSettings(),
                       );
                       Navigator.of(context).push(route);
