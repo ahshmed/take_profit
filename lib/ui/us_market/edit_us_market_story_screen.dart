@@ -79,37 +79,66 @@ class _EditUSMarketStoryScreenState
           ),
           SizedBox(height: 12.h),
 
-          // Technical Analysis Text Field
+          // Technical Analysis Text Field (Enhanced Rich Text)
           Container(
             decoration: BoxDecoration(
-              color: Constant.clrHomeCardByTheme(context),
-              borderRadius: BorderRadius.circular(12.r),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15.r),
               border: Border.all(
-                color: Constant.clrGrey.withOpacity(0.2),
+                color: Constant.clrTextBorderGColor,
+                width: 1,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-            child: TextField(
-              controller: _technicalAnalysisController,
-              maxLength: maxCharacters,
-              maxLines: null,
-              minLines: 12,
-              style: TextStyles.txtRegular14(context).copyWith(
-                color: Constant.clrTitlePageByTheme(context),
-              ),
-              decoration: InputDecoration(
-                hintText: getLocalValue("Key_EnterTechnicalAnalysis"),
-                hintStyle: TextStyles.txtRegular14(context).copyWith(
-                  color: Constant.clrGrey,
+            child: Column(
+              children: [
+                TextField(
+                  controller: _technicalAnalysisController,
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
+                  minLines: 12,
+                  maxLines: null,
+                  maxLength: maxCharacters,
+                  style: TextStyles.txtRegG12(context).copyWith(
+                    color: const Color(0xFF1A1A1A),
+                    height: 1.6,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: getLocalValue("Key_EnterTechnicalAnalysis"),
+                    hintStyle: TextStyles.txtRegG12(context).copyWith(
+                      color: Constant.clrHintGColor,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 16.h,
+                    ),
+                    counterText: "",
+                  ),
+                  onChanged: (value) {
+                    setState(() {}); // Rebuild to update character count
+                  },
                 ),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.all(16.w),
-                counterStyle: TextStyles.txtRegular12(context).copyWith(
-                  color: Constant.clrGrey,
+                // Character counter
+                Container(
+                  padding: EdgeInsets.only(right: 16.w, bottom: 12.h),
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    "${_technicalAnalysisController.text.length}/$maxCharacters",
+                    style: TextStyles.txtRegG12(context).copyWith(
+                      color: _technicalAnalysisController.text.length > maxCharacters
+                          ? Colors.red
+                          : Constant.clrHintGColor,
+                    ),
+                  ),
                 ),
-              ),
-              onChanged: (value) {
-                setState(() {}); // Rebuild to update character count
-              },
+              ],
             ),
           ),
         ],

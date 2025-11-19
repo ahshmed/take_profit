@@ -609,6 +609,8 @@ class _EditSignalScreenState extends ConsumerState<EditSignalScreen>
   ///technical analysis widget
   Widget technicalAnalysisWidget(EditSignalScreenController editSignalWatch) {
     final isRTL = Directionality.of(context) == TextDirection.rtl;
+    final currentLength = technicalAnalysisEnCTR.text.length;
+    const int maxCharacters = 3000;
 
     return Consumer(builder: (context, ref, child) {
       final drawerWatch = ref.watch(drawerProvider);
@@ -623,34 +625,68 @@ class _EditSignalScreenState extends ConsumerState<EditSignalScreen>
           SizedBox(height: 16.h),
           Container(
             decoration: BoxDecoration(
-              color: Constant.clrSearchByTheme(context),
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: CustomTextField(
-              height: 92.h,
-              context: context,
-              myController: technicalAnalysisEnCTR,
-              myFocus: technicalAnalysisEnFocus,
-              bgColor: Constant.clrSearchByTheme(context),
-              textInputType: TextInputType.multiline,
-              onChanged: (str) {
-                editSignalWatch.checkEnTechnicalAnalysisValidation(
-                    context, str);
-              },
-              inputFormatters: [
-                LengthLimitingTextInputFormatter(maxAboutUsLength),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15.r),
+              border: Border.all(
+                color: editSignalWatch.strTechnicalAnalysisErrorEn.isNotEmpty
+                    ? Colors.red
+                    : Constant.clrTextBorderGColor,
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
               ],
-              hintText: getLocalValue("Key_EnterHere"),
-              textInputAction: TextInputAction.newline,
-              errorMessage: editSignalWatch.strTechnicalAnalysisErrorEn,
-              borderRadius: 12.r,
-              marginNeed: false,
-              paddingNeed: false,
-              contentPadding: EdgeInsets.only(
-                  right: drawerWatch.isEngEnable == true ? -20.w : 10.w,
-                  left: drawerWatch.isEngEnable == true ? 10.w : -20.w,
-                  top: 20),
-              maxLine: 7,
+            ),
+            child: Column(
+              children: [
+                TextField(
+                  controller: technicalAnalysisEnCTR,
+                  focusNode: technicalAnalysisEnFocus,
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
+                  minLines: 12,
+                  maxLines: null,
+                  maxLength: maxCharacters,
+                  style: TextStyles.txtRegG12(context).copyWith(
+                    color: const Color(0xFF1A1A1A),
+                    height: 1.6,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: getLocalValue("Key_EnterHere"),
+                    hintStyle: TextStyles.txtRegG12(context).copyWith(
+                      color: Constant.clrHintGColor,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 16.h,
+                    ),
+                    counterText: "",
+                  ),
+                  onChanged: (value) {
+                    editSignalWatch.checkEnTechnicalAnalysisValidation(
+                        context, value);
+                    setState(() {});
+                  },
+                ),
+                // Character counter
+                Container(
+                  padding: EdgeInsets.only(right: 16.w, bottom: 12.h),
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    "$currentLength/$maxCharacters",
+                    style: TextStyles.txtRegG12(context).copyWith(
+                      color: currentLength > maxCharacters
+                          ? Colors.red
+                          : Constant.clrHintGColor,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
