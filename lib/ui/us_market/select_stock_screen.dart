@@ -171,7 +171,7 @@ class _SelectStockScreenState extends ConsumerState<SelectStockScreen> {
               ),
             ),
 
-            /// Price and Change
+            /// Price (percentage change hidden per user request)
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -181,15 +181,16 @@ class _SelectStockScreenState extends ConsumerState<SelectStockScreen> {
                     color: Constant.clrSigDetByTheme(context),
                   ),
                 ),
-                SizedBox(height: 4.h),
-                Text(
-                  stock.changePercent,
-                  style: TextStyles.txtRegular12(context).copyWith(
-                    color: stock.isPositiveChange
-                        ? const Color(0xFF10B981)
-                        : const Color(0xFFEF4444),
-                  ),
-                ),
+                // Percentage change hidden per user request
+                // SizedBox(height: 4.h),
+                // Text(
+                //   stock.changePercent,
+                //   style: TextStyles.txtRegular12(context).copyWith(
+                //     color: stock.isPositiveChange
+                //         ? const Color(0xFF10B981)
+                //         : const Color(0xFFEF4444),
+                //   ),
+                // ),
               ],
             ),
           ],
