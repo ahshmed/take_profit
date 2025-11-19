@@ -2051,6 +2051,15 @@ class _MyRecommendationSignalScreenState
 
   /// Build US Market Story Card - Simple design matching US Market screen
   Widget _buildUSMarketStoryCard(Map<String, dynamic> story) {
+    // Get localized status and risk labels
+    final String statusKey = story['status'] == 'Active'
+        ? 'Key_Active'
+        : story['status'] == 'Pending'
+            ? 'Key_Pending'
+            : 'Key_Closed';
+    final String statusLabel = getLocalValue(statusKey);
+    final String riskLabel = _getLocalizedRiskLabel(story['risk']);
+
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
@@ -2068,7 +2077,7 @@ class _MyRecommendationSignalScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// Header Row: Stock icon + name + risk badge
+          /// Header Row: Stock icon + name
           Row(
             children: [
               // Stock Icon
@@ -2111,20 +2120,6 @@ class _MyRecommendationSignalScreenState
                   ],
                 ),
               ),
-              // Risk Badge
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: _getRiskBadgeColor(story['risk']),
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Text(
-                  story['risk'],
-                  style: TextStyles.txtMedium12(context).copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
             ],
           ),
           SizedBox(height: 12.h),
@@ -2147,19 +2142,57 @@ class _MyRecommendationSignalScreenState
               ),
             ],
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 12.h),
 
-          /// Description
-          Text(
-            story['description'],
-            style: TextStyles.txtRegular14(context).copyWith(
-              color: Constant.clrSigDetByTheme(context),
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+          /// Status and Risk Badges Row (Like US Market screen labels)
+          Row(
+            children: [
+              // Status Badge
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                decoration: BoxDecoration(
+                  color: _getStatusBadgeColor(story['status']).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Text(
+                  statusLabel,
+                  style: TextStyles.txtMedium12(context).copyWith(
+                    color: _getStatusBadgeColor(story['status']),
+                    fontWeight: Constant.fwSemiBold,
+                  ),
+                ),
+              ),
+              SizedBox(width: 8.w),
+              // Risk Badge
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                decoration: BoxDecoration(
+                  color: _getRiskBadgeColor(story['risk']).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Text(
+                  riskLabel,
+                  style: TextStyles.txtMedium12(context).copyWith(
+                    color: _getRiskBadgeColor(story['risk']),
+                    fontWeight: Constant.fwSemiBold,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
+  }
+
+  /// Get status badge color
+  Color _getStatusBadgeColor(String status) {
+    if (status == 'Active') {
+      return Color(0xFF10B981); // Green
+    } else if (status == 'Pending') {
+      return Color(0xFFFBBF24); // Yellow/Orange
+    } else {
+      return Color(0xFF6B7280); // Gray
+    }
   }
 }
