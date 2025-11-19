@@ -2049,159 +2049,116 @@ class _MyRecommendationSignalScreenState
     ];
   }
 
-  /// Build US Market Story Card
+  /// Build US Market Story Card - Simple design matching US Market screen
   Widget _buildUSMarketStoryCard(Map<String, dynamic> story) {
-    final isRTL = Directionality.of(context) == ui.TextDirection.rtl;
-
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.r),
-        color: Constant.clrHomeCardByTheme(context),
+        color: Constant.clrCardBGByTheme(context),
+        borderRadius: BorderRadius.circular(15.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// Header: Ticker + Status Badge
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Stock Info
-                Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// Header Row: Stock icon + name + risk badge
+          Row(
+            children: [
+              // Stock Icon
+              Container(
+                width: 40.w,
+                height: 40.h,
+                decoration: BoxDecoration(
+                  color: Constant.clrPrimary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                child: Center(
+                  child: Text(
+                    story['ticker'].substring(0, 2),
+                    style: TextStyles.txtBold16(context).copyWith(
+                      color: Constant.clrPrimary,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 12.w),
+              // Stock name and ticker
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Stock Icon
-                    Container(
-                      width: 50.h,
-                      height: 50.h,
-                      decoration: BoxDecoration(
-                        color: Constant.clrPrimary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Center(
-                        child: Text(
-                          story['ticker'].substring(0, 2),
-                          style: TextStyles.txtBold18(context).copyWith(
-                            color: Constant.clrPrimary,
-                            fontSize: 18.sp,
-                          ),
-                        ),
+                    Text(
+                      story['ticker'],
+                      style: TextStyles.txtBold16(context).copyWith(
+                        color: Constant.clrTitlePageByTheme(context),
                       ),
                     ),
-                    SizedBox(width: 12.w),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${story['name']} (${story['ticker']})',
-                          style: TextStyles.txtSemiBold14(context).copyWith(
-                            color: Constant.clrSigDetByTheme(context),
-                          ),
-                        ),
-                        SizedBox(height: 4.h),
-                        Text(
-                          story['date'],
-                          style: TextStyles.txtRegular12(context).copyWith(
-                            fontSize: 11.sp,
-                            color: Constant.clrHeaderSubSignDetailsColor,
-                          ),
-                        ),
-                      ],
+                    Text(
+                      story['name'],
+                      style: TextStyles.txtRegular12(context).copyWith(
+                        color: Constant.clrSigDetByTheme(context),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
-
-                // Risk Badge
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                  decoration: BoxDecoration(
-                    color: _getRiskBadgeColor(story['risk']),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Text(
-                    story['risk'],
-                    style: TextStyles.txtMedium12(context).copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 12.h),
-
-            /// Price
-            Row(
-              children: [
-                Text(
-                  'Price: ',
-                  style: TextStyles.txtRegular14(context).copyWith(
-                    color: Constant.clrSigDetByTheme(context),
-                  ),
-                ),
-                Text(
-                  story['price'],
-                  style: TextStyles.txtBold16(context).copyWith(
-                    color: Constant.clrPrimary,
-                  ),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 8.h),
-
-            /// Description
-            Text(
-              story['description'],
-              style: TextStyles.txtRegular14(context).copyWith(
-                color: Constant.clrSigDetByTheme(context),
-                height: 1.4,
               ),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
-
-            SizedBox(height: 12.h),
-
-            /// Status indicator at bottom
-            Row(
-              children: [
-                Container(
-                  width: 8.w,
-                  height: 8.w,
-                  decoration: BoxDecoration(
-                    color: story['status'] == 'Active'
-                        ? Color(0xFF10B981)
-                        : story['status'] == 'Pending'
-                            ? Color(0xFFFBBF24)
-                            : Color(0xFF6B7280),
-                    shape: BoxShape.circle,
-                  ),
+              // Risk Badge
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: _getRiskBadgeColor(story['risk']),
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
-                SizedBox(width: 8.w),
-                Text(
-                  story['status'],
+                child: Text(
+                  story['risk'],
                   style: TextStyles.txtMedium12(context).copyWith(
-                    color: story['status'] == 'Active'
-                        ? Color(0xFF10B981)
-                        : story['status'] == 'Pending'
-                            ? Color(0xFFFBBF24)
-                            : Constant.clrSigDetByTheme(context),
+                    color: Colors.white,
                   ),
                 ),
-              ],
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+
+          /// Price and Date
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                story['price'],
+                style: TextStyles.txtBold16(context).copyWith(
+                  color: Constant.clrPrimary,
+                ),
+              ),
+              Text(
+                story['date'],
+                style: TextStyles.txtRegular12(context).copyWith(
+                  color: Constant.clrSigDetByTheme(context),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+
+          /// Description
+          Text(
+            story['description'],
+            style: TextStyles.txtRegular14(context).copyWith(
+              color: Constant.clrSigDetByTheme(context),
             ),
-          ],
-        ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }
