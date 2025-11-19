@@ -333,24 +333,7 @@ class _CreateUSMarketStoryScreenState
                 ),
               ),
               SizedBox(height: 6.h),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: widget.selectedStock.isPositiveChange
-                      ? const Color(0xFF10B981).withValues(alpha: 0.2)
-                      : const Color(0xFFEF4444).withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Text(
-                  widget.selectedStock.changePercent,
-                  style: TextStyles.txtMedium12(context).copyWith(
-                    color: widget.selectedStock.isPositiveChange
-                        ? const Color(0xFF10B981)
-                        : const Color(0xFFEF4444),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+              // Percentage change hidden per user request
             ],
           ),
         ],
