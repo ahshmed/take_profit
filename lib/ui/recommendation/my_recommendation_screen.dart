@@ -656,7 +656,39 @@ class _MyRecommendationSignalScreenState
                 ),
                 itemBuilder: (context, index) {
                   final story = stories[index];
-                  return _buildUSMarketStoryCard(story);
+                  return InkWell(
+                    onTap: () {
+                      // Show close signal confirmation dialog
+                      showConfirmationDialog(
+                          context,
+                          '',
+                          getLocalValue('Key_CloseSignal'),
+                          getLocalValue('Key_CloseSignalConfirmMsg'),
+                          (isPositive) {
+                            if (isPositive) {
+                              // TODO: Implement close individual story API when available
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    '${story['ticker']} ${getLocalValue('Key_CloseSignal')}',
+                                    style: TextStyles.txtRegular14(context).copyWith(
+                                      color: Constant.clrWhite,
+                                    ),
+                                  ),
+                                  backgroundColor: const Color(0xFF32C671),
+                                ),
+                              );
+                            }
+                          },
+                          borderRadius: 20.r,
+                          titleTextStyle: TextStyles.txtHeader25(context).copyWith(fontSize: 22.sp),
+                          buttonRadius: 30.r,
+                          yesBtnBGClr: Constant.clrTransparent,
+                          yesBtnWidth: MediaQuery.of(context).size.width * 0.35,
+                          noBtnWidth: MediaQuery.of(context).size.width * 0.35);
+                    },
+                    child: _buildUSMarketStoryCard(story),
+                  );
                 },
               ),
             ),
@@ -669,14 +701,20 @@ class _MyRecommendationSignalScreenState
                   showConfirmationDialog(
                       context,
                       '',
-                      'Close All Stories',
-                      'Are you sure you want to close all active stories?',
+                      getLocalValue('Key_ClosedAllSignals'),
+                      getLocalValue('Key_ClosedSignalsConfirmationNote'),
                       (isPositive) {
                         if (isPositive) {
                           // TODO: Implement close all stories API when available
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Close All feature coming soon for US Market'),
+                              content: Text(
+                                getLocalValue('Key_ClosedAllSignals'),
+                                style: TextStyles.txtRegular14(context).copyWith(
+                                  color: Constant.clrWhite,
+                                ),
+                              ),
+                              backgroundColor: const Color(0xFF32C671),
                             ),
                           );
                         }
@@ -890,7 +928,39 @@ class _MyRecommendationSignalScreenState
           ),
           itemBuilder: (context, index) {
             final story = _getDummyUSMarketPendingStories()[index];
-            return _buildUSMarketStoryCard(story);
+            return InkWell(
+              onTap: () {
+                // Show close signal confirmation dialog
+                showConfirmationDialog(
+                    context,
+                    '',
+                    getLocalValue('Key_CloseSignal'),
+                    getLocalValue('Key_CloseSignalConfirmMsg'),
+                    (isPositive) {
+                      if (isPositive) {
+                        // TODO: Implement close individual story API when available
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              '${story['ticker']} ${getLocalValue('Key_CloseSignal')}',
+                              style: TextStyles.txtRegular14(context).copyWith(
+                                color: Constant.clrWhite,
+                              ),
+                            ),
+                            backgroundColor: const Color(0xFF32C671),
+                          ),
+                        );
+                      }
+                    },
+                    borderRadius: 20.r,
+                    titleTextStyle: TextStyles.txtHeader25(context).copyWith(fontSize: 22.sp),
+                    buttonRadius: 30.r,
+                    yesBtnBGClr: Constant.clrTransparent,
+                    yesBtnWidth: MediaQuery.of(context).size.width * 0.35,
+                    noBtnWidth: MediaQuery.of(context).size.width * 0.35);
+              },
+              child: _buildUSMarketStoryCard(story),
+            );
           },
         ),
       );
