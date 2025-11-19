@@ -569,5 +569,9 @@
   "Key_EnterTitle": "أدخل العنوان",
   "Key_Description": "الوصف",
   "Key_EnterDescription": "أدخل الوصف",
-  "Key_FeatureComingSoon": "الميزة قريبًا! في انتظار التكامل الخلفي."
+  "Key_FeatureComingSoon": "الميزة قريبًا! في انتظار التكامل الخلفي.",
+  "Key_EditStory": "تعديل القصة",
+  "Key_TechnicalAnalysis": "التحليل الفني",
+  "Key_EnterTechnicalAnalysis": "أدخل التحليل الفني هنا...",
+  "Key_StoryDetails": "تفاصيل القصة"
 }

@@ -569,5 +569,9 @@
   "Key_EnterTitle": "Enter title",
   "Key_Description": "Description",
   "Key_EnterDescription": "Enter description",
-  "Key_FeatureComingSoon": "Feature coming soon! Backend integration pending."
+  "Key_FeatureComingSoon": "Feature coming soon! Backend integration pending.",
+  "Key_EditStory": "Edit Story",
+  "Key_TechnicalAnalysis": "Technical Analysis",
+  "Key_EnterTechnicalAnalysis": "Enter your technical analysis here...",
+  "Key_StoryDetails": "Story Details"
 }
