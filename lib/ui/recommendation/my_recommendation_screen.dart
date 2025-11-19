@@ -48,6 +48,7 @@ import '../home/helper/list_item_with_images_widget.dart';
 import '../home/signals_details_screen.dart';
 import '../notification/notification_screen.dart';
 import '../search/search_screen.dart';
+import '../us_market/us_market_story_details_screen.dart';
 import '../us_market/select_stock_screen.dart';
 import 'create_signal_screen.dart';
 import 'helper/close_all_signal_button.dart';
@@ -658,34 +659,17 @@ class _MyRecommendationSignalScreenState
                   final story = stories[index];
                   return InkWell(
                     onTap: () {
-                      // Show close signal confirmation dialog
-                      showConfirmationDialog(
-                          context,
-                          '',
-                          getLocalValue('Key_CloseSignal'),
-                          getLocalValue('Key_CloseSignalConfirmMsg'),
-                          (isPositive) {
-                            if (isPositive) {
-                              // TODO: Implement close individual story API when available
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    '${story['ticker']} ${getLocalValue('Key_CloseSignal')}',
-                                    style: TextStyles.txtRegular14(context).copyWith(
-                                      color: Constant.clrWhite,
-                                    ),
-                                  ),
-                                  backgroundColor: const Color(0xFF32C671),
-                                ),
-                              );
-                            }
+                      // Navigate to US Market Story Details Screen
+                      Route route = SlideRightPageRoute(
+                        builder: (context) => USMarketStoryDetailsScreen(
+                          story: story,
+                          onClose: () {
+                            // TODO: Implement close story API when available
                           },
-                          borderRadius: 20.r,
-                          titleTextStyle: TextStyles.txtHeader25(context).copyWith(fontSize: 22.sp),
-                          buttonRadius: 30.r,
-                          yesBtnBGClr: Constant.clrTransparent,
-                          yesBtnWidth: MediaQuery.of(context).size.width * 0.35,
-                          noBtnWidth: MediaQuery.of(context).size.width * 0.35);
+                        ),
+                        settings: const RouteSettings(),
+                      );
+                      Navigator.of(context).push(route);
                     },
                     child: _buildUSMarketStoryCard(story),
                   );
@@ -930,34 +914,17 @@ class _MyRecommendationSignalScreenState
             final story = _getDummyUSMarketPendingStories()[index];
             return InkWell(
               onTap: () {
-                // Show close signal confirmation dialog
-                showConfirmationDialog(
-                    context,
-                    '',
-                    getLocalValue('Key_CloseSignal'),
-                    getLocalValue('Key_CloseSignalConfirmMsg'),
-                    (isPositive) {
-                      if (isPositive) {
-                        // TODO: Implement close individual story API when available
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '${story['ticker']} ${getLocalValue('Key_CloseSignal')}',
-                              style: TextStyles.txtRegular14(context).copyWith(
-                                color: Constant.clrWhite,
-                              ),
-                            ),
-                            backgroundColor: const Color(0xFF32C671),
-                          ),
-                        );
-                      }
+                // Navigate to US Market Story Details Screen
+                Route route = SlideRightPageRoute(
+                  builder: (context) => USMarketStoryDetailsScreen(
+                    story: story,
+                    onClose: () {
+                      // TODO: Implement close story API when available
                     },
-                    borderRadius: 20.r,
-                    titleTextStyle: TextStyles.txtHeader25(context).copyWith(fontSize: 22.sp),
-                    buttonRadius: 30.r,
-                    yesBtnBGClr: Constant.clrTransparent,
-                    yesBtnWidth: MediaQuery.of(context).size.width * 0.35,
-                    noBtnWidth: MediaQuery.of(context).size.width * 0.35);
+                  ),
+                  settings: const RouteSettings(),
+                );
+                Navigator.of(context).push(route);
               },
               child: _buildUSMarketStoryCard(story),
             );
