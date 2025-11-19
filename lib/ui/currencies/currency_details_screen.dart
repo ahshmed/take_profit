@@ -202,24 +202,24 @@ class _CurrencyDetailScreenState extends ConsumerState<CurrencyDetailScreen>
 
             SizedBox(height: 24.h),
 
-            // Second Chart Image
-            Container(
-              width: double.infinity,
-              height: 250.h,
-              decoration: BoxDecoration(
-                color: isDarkMode ? Constant.clrBlackOrigin : Constant.clrWhite,
-                borderRadius: BorderRadius.circular(14.r),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(14.r),
-                child: Image.asset(
-                  'assets/images/image2.png',
-                  fit: BoxFit.contain,
-                  width: 345,
-                  height: 171,
-                ),
-              ),
-            ),
+            // Second Chart Image - Hidden per user request
+            // Container(
+            //   width: double.infinity,
+            //   height: 250.h,
+            //   decoration: BoxDecoration(
+            //     color: isDarkMode ? Constant.clrBlackOrigin : Constant.clrWhite,
+            //     borderRadius: BorderRadius.circular(14.r),
+            //   ),
+            //   child: ClipRRect(
+            //     borderRadius: BorderRadius.circular(14.r),
+            //     child: Image.asset(
+            //       'assets/images/image2.png',
+            //       fit: BoxFit.contain,
+            //       width: 345,
+            //       height: 171,
+            //     ),
+            //   ),
+            // ),
 
             SizedBox(height: 24.h),
           ],
