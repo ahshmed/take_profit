@@ -634,6 +634,31 @@ class _MyRecommendationSignalScreenState
   Widget myRecommendationSignalsTabActiveList(
       MyRecommendationScreenController myRecommendationWatch) {
     final signalWatch = ref.watch(createSignalProvider);
+
+    // Check if in US Market mode
+    final selectedMarket = getSelectedMarket();
+    final bool isUSMarket = selectedMarket == 'us_market';
+
+    // If US Market mode, show dummy US Market story cards
+    if (isUSMarket) {
+      return Expanded(
+        child: ListView.builder(
+          shrinkWrap: true,
+          controller: _scrollController,
+          physics: const BouncingScrollPhysics(),
+          itemCount: _getDummyUSMarketActiveStories().length,
+          padding: EdgeInsets.only(
+            bottom: (MediaQuery.of(context).padding.bottom + 60.h),
+          ),
+          itemBuilder: (context, index) {
+            final story = _getDummyUSMarketActiveStories()[index];
+            return _buildUSMarketStoryCard(story);
+          },
+        ),
+      );
+    }
+
+    // Original crypto signals logic
     return Expanded(
       child: (signalWatch.activeSignalList.isEmpty == true &&
               !signalWatch.isLoading)
@@ -732,6 +757,31 @@ class _MyRecommendationSignalScreenState
       MyRecommendationScreenController myRecommendationWatch) {
     final signalWatch = ref.watch(createSignalProvider);
     final commonWatch = ref.watch(commonProvider);
+
+    // Check if in US Market mode
+    final selectedMarket = getSelectedMarket();
+    final bool isUSMarket = selectedMarket == 'us_market';
+
+    // If US Market mode, show dummy US Market story cards
+    if (isUSMarket) {
+      return Expanded(
+        child: ListView.builder(
+          shrinkWrap: true,
+          controller: _scrollController,
+          physics: const BouncingScrollPhysics(),
+          itemCount: _getDummyUSMarketClosedStories().length,
+          padding: EdgeInsets.only(
+            bottom: (MediaQuery.of(context).padding.bottom + 60.h),
+          ),
+          itemBuilder: (context, index) {
+            final story = _getDummyUSMarketClosedStories()[index];
+            return _buildUSMarketStoryCard(story);
+          },
+        ),
+      );
+    }
+
+    // Original crypto signals logic
     return Expanded(
       child: (signalWatch.closedSignalList.isEmpty == true &&
               !signalWatch.isLoading)
@@ -786,6 +836,31 @@ class _MyRecommendationSignalScreenState
   Widget myRecommendationSignalsTabPendingList(
       MyRecommendationScreenController myRecommendationWatch) {
     final signalWatch = ref.watch(createSignalProvider);
+
+    // Check if in US Market mode
+    final selectedMarket = getSelectedMarket();
+    final bool isUSMarket = selectedMarket == 'us_market';
+
+    // If US Market mode, show dummy US Market story cards
+    if (isUSMarket) {
+      return Expanded(
+        child: ListView.builder(
+          shrinkWrap: true,
+          controller: _scrollController,
+          physics: const BouncingScrollPhysics(),
+          itemCount: _getDummyUSMarketPendingStories().length,
+          padding: EdgeInsets.only(
+            bottom: (MediaQuery.of(context).padding.bottom + 60.h),
+          ),
+          itemBuilder: (context, index) {
+            final story = _getDummyUSMarketPendingStories()[index];
+            return _buildUSMarketStoryCard(story);
+          },
+        ),
+      );
+    }
+
+    // Original crypto signals logic
     return Expanded(
       child: (signalWatch.pendingSignalList.isEmpty == true &&
           !signalWatch.isLoading)
@@ -1900,5 +1975,234 @@ class _MyRecommendationSignalScreenState
     }
 
     return getLocalValue('Key_MediumRisk'); // default
+  }
+
+  /// Dummy US Market Stories - Active
+  List<Map<String, dynamic>> _getDummyUSMarketActiveStories() {
+    return [
+      {
+        'ticker': 'AAPL',
+        'name': 'Apple Inc.',
+        'price': '\$175.50',
+        'status': 'Active',
+        'date': '19/11/2025 10:30',
+        'risk': 'Low',
+        'description': 'Strong buy signal based on technical analysis. Price showing upward momentum.',
+      },
+      {
+        'ticker': 'NVDA',
+        'name': 'NVIDIA Corporation',
+        'price': '\$495.20',
+        'status': 'Active',
+        'date': '19/11/2025 09:15',
+        'risk': 'Medium',
+        'description': 'AI sector leader with strong fundamentals. Watch for support at \$490.',
+      },
+    ];
+  }
+
+  /// Dummy US Market Stories - Pending
+  List<Map<String, dynamic>> _getDummyUSMarketPendingStories() {
+    return [
+      {
+        'ticker': 'TSLA',
+        'name': 'Tesla Inc.',
+        'price': '\$238.75',
+        'status': 'Pending',
+        'date': '19/11/2025 11:00',
+        'risk': 'High',
+        'description': 'Awaiting confirmation of breakout above resistance level.',
+      },
+      {
+        'ticker': 'MSFT',
+        'name': 'Microsoft Corporation',
+        'price': '\$378.90',
+        'status': 'Pending',
+        'date': '19/11/2025 10:45',
+        'risk': 'Low',
+        'description': 'Monitoring for entry point near support zone.',
+      },
+    ];
+  }
+
+  /// Dummy US Market Stories - Closed
+  List<Map<String, dynamic>> _getDummyUSMarketClosedStories() {
+    return [
+      {
+        'ticker': 'GOOGL',
+        'name': 'Alphabet Inc.',
+        'price': '\$142.30',
+        'status': 'Closed',
+        'date': '18/11/2025 16:00',
+        'risk': 'Low',
+        'description': 'Target reached. Position closed with +5.2% profit.',
+      },
+      {
+        'ticker': 'AMZN',
+        'name': 'Amazon.com Inc.',
+        'price': '\$155.60',
+        'status': 'Closed',
+        'date': '18/11/2025 14:30',
+        'risk': 'Medium',
+        'description': 'Stop loss triggered. Closed with minimal loss.',
+      },
+    ];
+  }
+
+  /// Build US Market Story Card
+  Widget _buildUSMarketStoryCard(Map<String, dynamic> story) {
+    final isRTL = Directionality.of(context) == ui.TextDirection.rtl;
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 16.h),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16.r),
+        color: Constant.clrHomeCardByTheme(context),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// Header: Ticker + Status Badge
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Stock Info
+                Row(
+                  children: [
+                    // Stock Icon
+                    Container(
+                      width: 50.h,
+                      height: 50.h,
+                      decoration: BoxDecoration(
+                        color: Constant.clrPrimary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Center(
+                        child: Text(
+                          story['ticker'].substring(0, 2),
+                          style: TextStyles.txtBold18(context).copyWith(
+                            color: Constant.clrPrimary,
+                            fontSize: 18.sp,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${story['name']} (${story['ticker']})',
+                          style: TextStyles.txtSemiBold14(context).copyWith(
+                            color: Constant.clrSigDetByTheme(context),
+                          ),
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          story['date'],
+                          style: TextStyles.txtRegular12(context).copyWith(
+                            fontSize: 11.sp,
+                            color: Constant.clrHeaderSubSignDetailsColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+
+                // Risk Badge
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                  decoration: BoxDecoration(
+                    color: _getRiskBadgeColor(story['risk']),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Text(
+                    story['risk'],
+                    style: TextStyles.txtMedium12(context).copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height: 12.h),
+
+            /// Price
+            Row(
+              children: [
+                Text(
+                  'Price: ',
+                  style: TextStyles.txtRegular14(context).copyWith(
+                    color: Constant.clrSigDetByTheme(context),
+                  ),
+                ),
+                Text(
+                  story['price'],
+                  style: TextStyles.txtBold16(context).copyWith(
+                    color: Constant.clrPrimary,
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height: 8.h),
+
+            /// Description
+            Text(
+              story['description'],
+              style: TextStyles.txtRegular14(context).copyWith(
+                color: Constant.clrSigDetByTheme(context),
+                height: 1.4,
+              ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+
+            SizedBox(height: 12.h),
+
+            /// Status indicator at bottom
+            Row(
+              children: [
+                Container(
+                  width: 8.w,
+                  height: 8.w,
+                  decoration: BoxDecoration(
+                    color: story['status'] == 'Active'
+                        ? Color(0xFF10B981)
+                        : story['status'] == 'Pending'
+                            ? Color(0xFFFBBF24)
+                            : Color(0xFF6B7280),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Text(
+                  story['status'],
+                  style: TextStyles.txtMedium12(context).copyWith(
+                    color: story['status'] == 'Active'
+                        ? Color(0xFF10B981)
+                        : story['status'] == 'Pending'
+                            ? Color(0xFFFBBF24)
+                            : Constant.clrSigDetByTheme(context),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
