@@ -242,11 +242,14 @@ class _USMarketStoryDetailsScreenState
 
   /// Bottom Buttons (Close and Edit)
   Widget _buildBottomButtons() {
+    // Get safe area bottom padding (handles navigation buttons on Android)
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
     return Container(
       padding: EdgeInsets.only(
         left: 20.w,
         right: 20.w,
-        bottom: getIsIOSPlatform() ? 34.h : 20.h,
+        bottom: bottomPadding > 0 ? bottomPadding : 20.h,
         top: 16.h,
       ),
       decoration: BoxDecoration(
@@ -319,11 +322,18 @@ class _USMarketStoryDetailsScreenState
           Navigator.pop(context, true);
         }
       },
+      dialogInsidePadding: EdgeInsets.all(15.h),
       borderRadius: 16.r,
       titleTextStyle: TextStyles.txtMedium24(context).copyWith(
         color: Constant.clrTextMainFontByTheme(context),
         fontSize: 22.sp,
       ),
+      titleTxtPadding: EdgeInsets.only(top: 10.h, bottom: 5.h),
+      messageTextStyle: TextStyles.txtMedium14(context).copyWith(
+        color: Constant.clrBlackNew,
+      ),
+      msgTxtPadding: EdgeInsets.only(bottom: 10.h, left: 58.w, right: 58.w),
+      warning: getLocalValue("Key_CloseSignalWarningMsg"),
       yesBtnTextClr: Constant.clrBlackNew,
       yesBtnBGClr: Constant.clrWhite,
       yesBtnBorderClr: Constant.clrGreyNew,
