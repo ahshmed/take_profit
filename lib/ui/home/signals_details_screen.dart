@@ -682,26 +682,8 @@ class _SignalDetailsScreenState extends ConsumerState<SignalDetailsScreen>
           ],
         ),
         SizedBox(height: 16.h),
-        InkWell(
-          onTap: () => _openChartFullScreen(chartImage),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(14.r),
-            child: Container(
-              height: 171.h,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                //border: Border.all(color: Color(0xFFE5E7EB), width: 1),
-                borderRadius: BorderRadius.circular(14.r),
-              ),
-              child: Image.asset(
-                "assets/images/image2.png",
-                height: 240.h,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-        ),
+        // Chart Screenshot Image - Hidden per user request
+        // InkWell with image2.png removed
       ],
     );
   }

@@ -106,31 +106,8 @@ class _StockDetailsScreenState extends ConsumerState<StockDetailsScreen> {
 
             SizedBox(height: 24.h),
 
-            // Second Chart Section
-            Container(
-              width: double.infinity,
-              height: 250.h,
-              decoration: BoxDecoration(
-                color: Constant.clrHomeCardByTheme(context),
-                borderRadius: BorderRadius.circular(14.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(14.r),
-                child: Image.asset(
-                  'assets/images/image2.png',
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-
-            SizedBox(height: 24.h),
+            // Second Chart Section - Hidden per user request
+            // Container with image2.png removed
 
             // News Section
             Text(
