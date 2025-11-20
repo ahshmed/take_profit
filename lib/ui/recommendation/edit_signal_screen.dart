@@ -699,11 +699,14 @@ class _EditSignalScreenState extends ConsumerState<EditSignalScreen>
     final signalWatch = ref.watch(createSignalProvider);
     final editSignalWatch = ref.watch(editSignalProvider);
 
+    // Get safe area bottom padding (handles navigation buttons on Android)
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
     return Container(
       padding: EdgeInsets.only(
         left: 20.w,
         right: 20.w,
-        bottom: getIsIOSPlatform() ? 34.h : 20.h,
+        bottom: bottomPadding > 0 ? bottomPadding : 20.h,
         top: 16.h,
       ),
       decoration: BoxDecoration(
